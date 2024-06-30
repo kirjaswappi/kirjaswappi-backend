@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build:
+  publish_and_release:
     runs-on: ubuntu-latest
     container: maven:3-sapmachine-17
     steps:
@@ -14,9 +14,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Run Spotless Check
-        run: mvn spotless:apply
 
       - name: Run Build Package
         run: mvn clean package -DskipTests
