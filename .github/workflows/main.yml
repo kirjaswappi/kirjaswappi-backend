@@ -1,0 +1,30 @@
+name: Main Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish_and_release:
+    runs-on: ubuntu-latest
+    container: maven:3-sapmachine-17
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Build Package
+        run: mvn clean package -DskipTests
+
+      - name: Publish to GitHub Packages Apache Maven
+        run: mvn deploy -s .github/mvn/settings.xml
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
