@@ -4,4 +4,11 @@
     <localRepository>${user.home}/.m2/repository</localRepository>
     <interactiveMode>true</interactiveMode>
     <offline>false</offline>
+    <servers>
+        <server>
+            <id>kirjaswappi</id>
+            <username>{{ secrets.USERNAME_GITHUB }}</username>
+            <password>{{ secrets.TOKEN_GITHUB }}</password>
+        </server>
+    </servers>
 </settings>
