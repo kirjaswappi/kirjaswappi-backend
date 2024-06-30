@@ -198,6 +198,37 @@
 					</excludes>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>com.diffplug.spotless</groupId>
+				<artifactId>spotless-maven-plugin</artifactId>
+				<version>2.39.0</version>
+				<configuration>
+					<trimTrailingWhitespace/>
+					<endWithNewline/>
+					<lineEndings>UNIX</lineEndings>
+					<java>
+						<importOrder>
+							<file>${basedir}/eclipse.importorder</file>
+						</importOrder>
+						<removeUnusedImports/>
+						<toggleOffOn/>
+						<eclipse>
+							<file>${basedir}/eclipse-formatter-profile.xml</file>
+						</eclipse>
+						<licenseHeader>
+							<file>${basedir}/license-header</file>
+						</licenseHeader>
+					</java>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>test</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
