@@ -23,5 +23,8 @@
 hs_err_pid*
 replay_pid*
 
-# IntelIj
+# IntelIJ
 .idea
+
+# Target Folder #
+target/
