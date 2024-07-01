@@ -32,9 +32,5 @@ jobs:
         with:
           tag_name: v1.0.0
           release_name: Release v1.0.0
-          body: |
-            Changes in this Release
-            - First Change
-            - Second Change
           draft: false
           prerelease: false
