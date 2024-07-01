@@ -1,0 +1,16 @@
+spring:
+  profiles:
+    active: local
+  application:
+    name: kirjaswappi-backend
+
+resilience4j.retry:
+  instances:
+    globalRetry:
+      maxRetryAttempts: 3
+      waitDuration: 1000
+      retryExceptions:
+        - java.net.SocketTimeoutException
+        - java.net.ConnectException
+        - org.springframework.dao.OptimisticLockingFailureException
+        - org.springframework.web.client.HttpServerErrorException
