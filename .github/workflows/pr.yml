@@ -18,5 +18,5 @@ jobs:
     - name: Run Tests
       run: mvn test -Dspring.profiles.active=cloud
       env:
-        MONGODB_URI: {{ secrets.MONGODB_URI }}
-        MONGODB_DATABASE: {{ secrets.MONGODB_DATABASE }}
+        MONGODB_URI: ${{ secrets.MONGODB_URI }}
+        MONGODB_DATABASE: ${{ secrets.MONGODB_DATABASE }}
