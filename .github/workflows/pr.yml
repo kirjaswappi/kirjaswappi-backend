@@ -16,4 +16,7 @@ jobs:
       run: mvn spotless:apply
 
     - name: Run Tests
-      run: mvn test
+      env:
+        MONGODB_URI: {{ secrets.MONGODB_URI }}
+        MONGODB_DATABASE: {{ secrets.MONGODB_DATABASE }}
+      run: mvn test -Dspring.profiles.active=cloud
