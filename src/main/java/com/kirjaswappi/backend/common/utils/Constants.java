@@ -10,4 +10,5 @@ public class Constants {
   public static final String API_VERSION = "/v1";
   public static final String API_BASE = API + API_VERSION;
   public static final String USERS = "/users";
+  public static final String AUTHENTICATE = "/authenticate";
 }
