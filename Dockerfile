@@ -10,8 +10,8 @@ COPY pom.xml .
 # Download dependencies (this step is cached if the POM hasn't changed)
 RUN mvn dependency:go-offline
 
-# Copy the source code
-COPY src/ ./src/
+# Copy the all files
+COPY . .
 
 # Build the JAR
 RUN mvn clean package -DskipTests
