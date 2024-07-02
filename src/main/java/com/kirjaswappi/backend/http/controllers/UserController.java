@@ -5,6 +5,7 @@
 package com.kirjaswappi.backend.http.controllers;
 
 import static com.kirjaswappi.backend.common.utils.Constants.API_BASE;
+import static com.kirjaswappi.backend.common.utils.Constants.ID_PATH;
 import static com.kirjaswappi.backend.common.utils.Constants.USERS;
 
 import java.util.List;
@@ -48,7 +49,7 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.OK).body(new UserUpdateResponse(updatedUser));
   }
 
-  @GetMapping("/{id}")
+  @GetMapping(ID_PATH)
   public ResponseEntity<UserResponse> getUser(@PathVariable String id) {
     User user = userService.getUser(id);
     return ResponseEntity.status(HttpStatus.OK).body(new UserResponse(user));

@@ -6,8 +6,6 @@ package com.kirjaswappi.backend.common.configs;
 
 import static com.kirjaswappi.backend.common.utils.Constants.APP_NAME;
 
-import java.util.Collections;
-
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
@@ -20,7 +18,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 @Configuration
-public class SwaggerConfig {
+@Profile("cloud")
+public class CloudSwaggerConfig {
   @Bean
   public GroupedOpenApi publicApis() {
     return GroupedOpenApi.builder()
@@ -38,8 +37,7 @@ public class SwaggerConfig {
   }
 
   @Bean
-  @Profile("local")
-  public OpenAPI cloudOpenAPI() {
+  public OpenAPI openAPI() {
     final String securitySchemeName = "bearerAuth";
     return new OpenAPI().info(new Info().title(APP_NAME)
         .description("This API documentation enables you to perform operations on KirjaSwappi platform.")
@@ -47,21 +45,12 @@ public class SwaggerConfig {
         // the following security scheme definition is needed for the API access
         // validation
         .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
-        .components(
-            new Components()
-                .addSecuritySchemes(securitySchemeName,
-                    new SecurityScheme()
-                        .bearerFormat("JWT")
-                        .description("This security scheme definition is needed for API validation.")
-                        .scheme("bearer")
-                        .type(SecurityScheme.Type.HTTP)));
-  }
-
-  @Bean
-  @Profile("cloud")
-  public OpenAPI localOpenAPI() {
-    return new OpenAPI().info(new Info().title(APP_NAME)
-        .description("This API documentation enables you to perform operations on KirjaSwappi platform.")
-        .version("v1.0.0"));
+        .components(new Components()
+            .addSecuritySchemes(securitySchemeName,
+                new SecurityScheme()
+                    .bearerFormat("JWT")
+                    .description("This security scheme definition is needed for API validation.")
+                    .scheme("bearer")
+                    .type(SecurityScheme.Type.HTTP)));
   }
 }

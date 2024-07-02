@@ -6,8 +6,13 @@ package com.kirjaswappi.backend.common.utils;
 
 public class Constants {
   public static final String APP_NAME = "KirjaSwappi";
+  public static final String HEALTH_ENDPOINT = "/actuator";
+  public static final String AUTHENTICATE = "/authenticate";
+  public static final String SWAGGER_DOC = "/v3/api-docs/**";
+  public static final String SWAGGER_UI = "/swagger-ui/**";
   public static final String API = "/api";
   public static final String API_VERSION = "/v1";
   public static final String API_BASE = API + API_VERSION;
   public static final String USERS = "/users";
+  public static final String ID_PATH = "/{id}";
 }
