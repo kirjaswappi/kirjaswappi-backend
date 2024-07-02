@@ -4,6 +4,9 @@ spring:
   application:
     name: kirjaswappi-backend
 
+server:
+  port: 8080
+
 resilience4j.retry:
   instances:
     globalRetry:
