@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.kirjaswappi.backend.common.http.dtos.AuthenticationRequest;
 import com.kirjaswappi.backend.common.http.dtos.AuthenticationResponse;
 import com.kirjaswappi.backend.common.service.AdminUserService;
+import com.kirjaswappi.backend.common.service.entities.AdminUser;
 import com.kirjaswappi.backend.common.utils.JwtUtil;
 import com.kirjaswappi.backend.service.exceptions.BadRequest;
 
@@ -31,7 +32,8 @@ public class AuthController {
   @PostMapping
   public ResponseEntity<AuthenticationResponse> createAuthToken(@RequestBody AuthenticationRequest request) {
     if (adminUserService.isValid(request.getUsername(), request.getPassword())) {
-      final String jwt = jwtTokenUtil.generateToken(adminUserService.getAdminUserInfo(request.getUsername()));
+      AdminUser adminUser = adminUserService.getAdminUserInfo(request.getUsername());
+      final String jwt = jwtTokenUtil.generateToken(adminUser);
       return ResponseEntity.ok(new AuthenticationResponse(jwt));
     }
     throw new BadRequest("invalidCredentials");

@@ -18,7 +18,7 @@ import io.jsonwebtoken.security.Keys;
 
 import org.springframework.stereotype.Component;
 
-import com.kirjaswappi.backend.common.jpa.daos.AdminUserDao;
+import com.kirjaswappi.backend.common.service.entities.AdminUser;
 
 @Component
 public class JwtUtil {
@@ -53,10 +53,10 @@ public class JwtUtil {
         .before(new Date());
   }
 
-  public String generateToken(AdminUserDao userDetails) {
+  public String generateToken(AdminUser adminUser) {
     Map<String, Object> claims = new HashMap<>();
-    claims.put("Scope", "Admin");
-    return createToken(claims, userDetails.getUsername());
+    claims.put("Scope", adminUser.getScopes());
+    return createToken(claims, adminUser.getUsername());
   }
 
   private String createToken(Map<String, Object> claims, String subject) {
@@ -69,8 +69,8 @@ public class JwtUtil {
         .compact();
   }
 
-  public boolean validateToken(String token, AdminUserDao userDetails) {
+  public boolean validateToken(String token, AdminUser adminUser) {
     final String username = extractUsername(token);
-    return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    return (username.equals(adminUser.getUsername()) && !isTokenExpired(token));
   }
 }

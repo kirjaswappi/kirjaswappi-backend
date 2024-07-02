@@ -7,16 +7,19 @@ package com.kirjaswappi.backend.common.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.kirjaswappi.backend.common.jpa.daos.AdminUserDao;
 import com.kirjaswappi.backend.common.jpa.repositories.AdminUserRepository;
+import com.kirjaswappi.backend.common.service.entities.AdminUser;
+import com.kirjaswappi.backend.common.service.mappers.AdminUserMapper;
 
 @Service
 public class AdminUserService {
   @Autowired
   private AdminUserRepository adminUserRepository;
+  @Autowired
+  private AdminUserMapper mapper;
 
-  public AdminUserDao getAdminUserInfo(String username) {
-    return adminUserRepository.findByUsername(username);
+  public AdminUser getAdminUserInfo(String username) {
+    return mapper.toEntity(adminUserRepository.findByUsername(username));
   }
 
   public boolean isValid(String username, String password) {
