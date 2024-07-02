@@ -24,13 +24,17 @@ jobs:
           USERNAME_GIT: ${{ secrets.USERNAME_GIT }}
           PASSWORD_GIT: ${{ secrets.TOKEN_GITHUB }}
 
+      - name: Set Version
+        id: set_version
+        run: echo "::set-output name=version::0.0.${{ github.run_number }}"
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
         with:
-          tag_name: v$(date +'%Y%m%d%H%M%S')  # Include the timestamp in the tag name
-          release_name: Release v1.0.0
+          tag_name: v${{ steps.set_version.outputs.version }}
+          release_name: Release v${{ steps.set_version.outputs.version }}
           draft: false
           prerelease: false
