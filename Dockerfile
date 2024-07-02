@@ -18,6 +18,10 @@ RUN mvn clean package -DskipTests
 
 # Set environment variables
 ENV SPRING_PROFILES_ACTIVE=cloud
+ENV PORT=10000
+
+# Expose port 10000
+EXPOSE 10000
 
 # Specify the command to run your application (adjust as needed)
 CMD ["java", "-jar", "target/backend-1.0.0-SNAPSHOT.jar"]
