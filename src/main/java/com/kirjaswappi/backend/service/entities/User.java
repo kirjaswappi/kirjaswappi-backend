@@ -9,7 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import org.bson.types.Binary;
+import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
@@ -27,5 +27,5 @@ public class User {
   private String city;
   private String country;
   private String phoneNumber;
-  private Binary profilePicture;
+  private MultipartFile profilePicture;
 }

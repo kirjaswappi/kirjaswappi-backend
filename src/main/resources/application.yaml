@@ -3,6 +3,9 @@ spring:
     active: local
   application:
     name: kirjaswappi-backend
+  data:
+    mongodb:
+      autoIndexCreation: true
 
 server:
   port: 8080

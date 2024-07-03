@@ -11,4 +11,7 @@ public class Constants {
   public static final String API_BASE = API + API_VERSION;
   public static final String USERS = "/users";
   public static final String AUTHENTICATE = "/authenticate";
+  public static final String SWAGGER_UI = "/swagger-ui/**";
+  public static final String API_DOCS = "/v3/api-docs/**";
+  public static final String ACTUATOR = "/actuator";
 }

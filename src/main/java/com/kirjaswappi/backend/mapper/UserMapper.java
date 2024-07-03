@@ -27,7 +27,6 @@ public class UserMapper {
     entity.setCity(dao.getCity());
     entity.setCountry(dao.getCountry());
     entity.setPhoneNumber(dao.getPhoneNumber());
-    entity.setProfilePicture(dao.getProfilePicture());
     return entity;
   }
 
@@ -44,7 +43,6 @@ public class UserMapper {
     dao.setCity(entity.getCity());
     dao.setCountry(entity.getCountry());
     dao.setPhoneNumber(entity.getPhoneNumber());
-    dao.setProfilePicture(entity.getProfilePicture());
     return dao;
   }
 
