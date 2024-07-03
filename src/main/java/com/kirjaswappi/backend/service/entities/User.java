@@ -9,8 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import org.springframework.web.multipart.MultipartFile;
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -27,5 +25,4 @@ public class User {
   private String city;
   private String country;
   private String phoneNumber;
-  private MultipartFile profilePicture;
 }
