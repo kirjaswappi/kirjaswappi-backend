@@ -7,8 +7,6 @@ package com.kirjaswappi.backend.http.dtos.requests;
 import lombok.Getter;
 import lombok.Setter;
 
-import org.bson.types.Binary;
-
 import com.kirjaswappi.backend.service.entities.User;
 
 @Getter
@@ -24,7 +22,6 @@ public class UserCreateRequest {
   private String city;
   private String country;
   private String phoneNumber;
-  private Binary profilePicture;
 
   public User toEntity() {
     var entity = new User();
@@ -38,7 +35,6 @@ public class UserCreateRequest {
     entity.setCity(this.city);
     entity.setCountry(this.country);
     entity.setPhoneNumber(this.phoneNumber);
-    entity.setProfilePicture(this.profilePicture);
     return entity;
   }
 }

@@ -7,8 +7,6 @@ package com.kirjaswappi.backend.http.dtos.responses;
 import lombok.Getter;
 import lombok.Setter;
 
-import org.bson.types.Binary;
-
 import com.kirjaswappi.backend.service.entities.User;
 
 @Getter
@@ -25,7 +23,6 @@ public class UserUpdateResponse {
   private String city;
   private String country;
   private String phoneNumber;
-  private Binary profilePicture;
 
   public UserUpdateResponse(User entity) {
     this.id = entity.getId();
@@ -39,6 +36,5 @@ public class UserUpdateResponse {
     this.city = entity.getCity();
     this.country = entity.getCountry();
     this.phoneNumber = entity.getPhoneNumber();
-    this.profilePicture = entity.getProfilePicture();
   }
 }
