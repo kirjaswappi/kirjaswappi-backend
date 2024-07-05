@@ -5,6 +5,7 @@
 package com.kirjaswappi.backend.common.components;
 
 import java.io.IOException;
+import java.util.List;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -14,6 +15,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -34,7 +37,6 @@ public class FilterApiRequest extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
-
     // 1. Extract Token
     String jwt = extractJwtToken(request);
 
@@ -49,10 +51,9 @@ public class FilterApiRequest extends OncePerRequestFilter {
     AdminUser userDetails = adminUserService.getAdminUserInfo(username);
 
     if (jwtUtil.validateToken(jwt, userDetails)) {
-
       // 4. Set Authentication (encapsulate token creation)
       SecurityContextHolder.getContext().setAuthentication(
-          createAuthenticationToken(userDetails, request));
+          createAuthenticationToken(jwt, userDetails, request));
     }
 
     filterChain.doFilter(request, response);
@@ -67,9 +68,12 @@ public class FilterApiRequest extends OncePerRequestFilter {
     return null;
   }
 
-  private UsernamePasswordAuthenticationToken createAuthenticationToken(AdminUser userDetails,
+  private UsernamePasswordAuthenticationToken createAuthenticationToken(String jwt, AdminUser userDetails,
       HttpServletRequest request) {
-    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, null);
+    String role = jwtUtil.extractRole(jwt);
+    List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
+    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+        userDetails, null, authorities);
     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
     return authToken;
   }

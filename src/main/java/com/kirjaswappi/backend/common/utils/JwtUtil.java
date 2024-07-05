@@ -4,7 +4,7 @@
  */
 package com.kirjaswappi.backend.common.utils;
 
-import static com.kirjaswappi.backend.common.utils.Constants.SCOPES;
+import static com.kirjaswappi.backend.common.utils.Constants.ROLE;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -57,7 +57,7 @@ public class JwtUtil {
 
   public String generateToken(AdminUser adminUser) {
     Map<String, Object> claims = new HashMap<>();
-    claims.put(SCOPES, adminUser.getScopes());
+    claims.put(ROLE, adminUser.getScopes());
     return createToken(claims, adminUser.getUsername());
   }
 
@@ -74,5 +74,10 @@ public class JwtUtil {
   public boolean validateToken(String token, AdminUser adminUser) {
     final String username = extractUsername(token);
     return (username.equals(adminUser.getUsername()) && !isTokenExpired(token));
+  }
+
+  public String extractRole(String token) {
+    Claims claims = extractAllClaims(token);
+    return claims.get(ROLE, String.class);
   }
 }
