@@ -34,22 +34,44 @@ public class FilterApiRequest extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
-    final String authorizationHeader = request.getHeader("Authorization");
-    String username = null;
-    String jwt = null;
-    if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-      jwt = authorizationHeader.substring(7);
-      username = jwtUtil.extractUsername(jwt);
+
+    // 1. Extract Token
+    String jwt = extractJwtToken(request);
+
+    // 2. Early Exit if No Token
+    if (jwt == null || SecurityContextHolder.getContext().getAuthentication() != null) {
+      filterChain.doFilter(request, response);
+      return;
     }
-    if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-      AdminUser userDetails = this.adminUserService.getAdminUserInfo(username);
-      if (jwtUtil.validateToken(jwt, userDetails)) {
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-            userDetails, null, null);
-        usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-      }
+
+    // 3. Validate Token and User
+    String username = jwtUtil.extractUsername(jwt);
+    AdminUser userDetails = adminUserService.getAdminUserInfo(username);
+
+    if (jwtUtil.validateToken(jwt, userDetails)) {
+
+      // 4. Set Authentication (encapsulate token creation)
+      SecurityContextHolder.getContext().setAuthentication(
+          createAuthenticationToken(userDetails, request));
     }
+
     filterChain.doFilter(request, response);
   }
+
+  // Helper Methods:
+  private String extractJwtToken(HttpServletRequest request) {
+    final String authorizationHeader = request.getHeader("Authorization");
+    if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+      return authorizationHeader.substring(7);
+    }
+    return null;
+  }
+
+  private UsernamePasswordAuthenticationToken createAuthenticationToken(AdminUser userDetails,
+      HttpServletRequest request) {
+    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, null);
+    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+    return authToken;
+  }
+
 }

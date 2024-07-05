@@ -12,9 +12,10 @@ RUN mvn package -DskipTests
 
 # Set environment variables
 ENV SPRING_PROFILES_ACTIVE=cloud
+ENV PORT=10000
 
 # Expose port
-EXPOSE 10000
+EXPOSE $PORT
 
 # Run the Jar
-CMD ["java", "-jar", "target/backend-1.0.0-SNAPSHOT.jar", "--server.port=10000"]
+CMD ["java", "-jar", "target/backend-1.0.0-SNAPSHOT.jar"]

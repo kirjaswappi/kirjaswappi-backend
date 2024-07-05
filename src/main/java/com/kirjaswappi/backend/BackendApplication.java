@@ -6,19 +6,17 @@ package com.kirjaswappi.backend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.core.env.Environment;
 
 @SpringBootApplication
 public class BackendApplication {
 
   public static void main(String[] args) {
-    SpringApplication app = new SpringApplication(BackendApplication.class);
-    Environment env = app.run(args).getEnvironment();
-
-    // Dynamically set the port
-    String port = env.getProperty("PORT");
+    String port = java.lang.System.getenv("PORT");
     if (port != null) {
+      // Dynamically set the port
+      System.out.println("Running Server on Port: " + port);
       System.setProperty("server.port", port);
     }
+    SpringApplication.run(BackendApplication.class, args);
   }
 }
