@@ -24,9 +24,10 @@ public class UserDao {
   private String lastName;
   private String email;
   private String password;
+  private String salt;
   private String streetName;
   private String houseNumber;
-  private String zipCode;
+  private int zipCode;
   private String city;
   private String country;
   private String phoneNumber;

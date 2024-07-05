@@ -9,11 +9,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import com.kirjaswappi.backend.common.utils.Util;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class AdminUser {
   String username;
+  String password;
   String scopes;
+
+  public void setPassword(String password, String salt) {
+    this.password = Util.hashPassword(password, salt);
+  }
 }

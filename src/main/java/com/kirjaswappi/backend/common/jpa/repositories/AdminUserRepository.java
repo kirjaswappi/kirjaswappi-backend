@@ -4,12 +4,14 @@
  */
 package com.kirjaswappi.backend.common.jpa.repositories;
 
+import java.util.Optional;
+
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.kirjaswappi.backend.common.jpa.daos.AdminUserDao;
 
 public interface AdminUserRepository extends MongoRepository<AdminUserDao, String> {
-  AdminUserDao findByUsername(String username);
+  Optional<AdminUserDao> findByUsername(String username);
 
-  boolean existsByUsernameAndPassword(String username, String password);
+  Optional<AdminUserDao> findByUsernameAndPassword(String username, String password);
 }

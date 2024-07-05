@@ -5,13 +5,17 @@
 package com.kirjaswappi.backend.http.controllers;
 
 import static com.kirjaswappi.backend.common.utils.Constants.API_BASE;
+import static com.kirjaswappi.backend.common.utils.Constants.LOGIN;
 import static com.kirjaswappi.backend.common.utils.Constants.USERS;
 
 import java.util.List;
 
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kirjaswappi.backend.http.dtos.requests.UserAuthenticationRequest;
 import com.kirjaswappi.backend.http.dtos.requests.UserCreateRequest;
 import com.kirjaswappi.backend.http.dtos.requests.UserUpdateRequest;
 import com.kirjaswappi.backend.http.dtos.responses.UserCreateResponse;
@@ -31,19 +36,25 @@ import com.kirjaswappi.backend.service.UserService;
 import com.kirjaswappi.backend.service.entities.User;
 
 @RestController
+@Validated
 @RequestMapping(API_BASE + USERS)
 public class UserController {
   @Autowired
   private UserService userService;
 
   @PostMapping
-  public ResponseEntity<UserCreateResponse> addUser(@RequestBody UserCreateRequest user) {
+  public ResponseEntity<UserCreateResponse> addUser(@Valid @RequestBody UserCreateRequest user) {
     User savedUser = userService.addUser(user.toEntity());
     return ResponseEntity.status(HttpStatus.CREATED).body(new UserCreateResponse(savedUser));
   }
 
-  @PutMapping
-  public ResponseEntity<UserUpdateResponse> updateUser(@RequestBody UserUpdateRequest user) {
+  @PutMapping("/{id}")
+  public ResponseEntity<UserUpdateResponse> updateUser(@PathVariable String id,
+      @Valid @RequestBody UserUpdateRequest user) {
+    // validate id
+    if (!id.equals(user.getId())) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
     User updatedUser = userService.updateUser(user.toEntity());
     return ResponseEntity.status(HttpStatus.OK).body(new UserUpdateResponse(updatedUser));
   }
@@ -66,4 +77,11 @@ public class UserController {
     userService.deleteUser(id);
     return ResponseEntity.noContent().build();
   }
+
+  @PostMapping(LOGIN)
+  public ResponseEntity<UserResponse> login(@Valid @RequestBody UserAuthenticationRequest userAuthenticationRequest) {
+    User user = userService.verifyLogin(userAuthenticationRequest.toEntity());
+    return ResponseEntity.status(HttpStatus.OK).body(new UserResponse(user));
+  }
+
 }

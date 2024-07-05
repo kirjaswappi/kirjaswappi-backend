@@ -4,10 +4,14 @@
  */
 package com.kirjaswappi.backend.jpa.repositories;
 
+import java.util.Optional;
+
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.kirjaswappi.backend.jpa.daos.UserDao;
 
 public interface UserRepository extends MongoRepository<UserDao, String> {
-  // Custom queries if needed
+  Optional<UserDao> findByEmailAndPassword(String email, String password);
+
+  Optional<UserDao> findByEmail(String email);
 }

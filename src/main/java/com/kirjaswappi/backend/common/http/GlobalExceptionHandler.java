@@ -26,13 +26,14 @@ import org.springframework.web.context.request.WebRequest;
 
 import com.kirjaswappi.backend.common.exceptions.BusinessException;
 import com.kirjaswappi.backend.common.exceptions.SystemException;
+import com.kirjaswappi.backend.common.service.exceptions.InvalidCredentials;
 import com.kirjaswappi.backend.service.exceptions.ResourceNotFound;
+import com.kirjaswappi.backend.service.exceptions.UserNotFound;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
   private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
   private static final String INTERNAL_ERROR = "internalServerError";
-
   private final MessageSource messageSource;
 
   @Autowired
@@ -40,9 +41,21 @@ public class GlobalExceptionHandler {
     this.messageSource = messageSource;
   }
 
+  @ExceptionHandler(InvalidCredentials.class)
+  @ResponseStatus(HttpStatus.UNAUTHORIZED)
+  public ErrorResponse handleInvalidCredentialsException(InvalidCredentials exception, WebRequest webRequest) {
+    return this.buildErrorResponse(exception, webRequest);
+  }
+
   @ExceptionHandler(ResourceNotFound.class)
   @ResponseStatus(HttpStatus.NOT_FOUND)
-  public ErrorResponse handleNotFoundException(ResourceNotFound exception, WebRequest webRequest) {
+  public ErrorResponse handleResourceNotFoundException(ResourceNotFound exception, WebRequest webRequest) {
+    return this.buildErrorResponse(exception, webRequest);
+  }
+
+  @ExceptionHandler(UserNotFound.class)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  public ErrorResponse handleUserNotFoundException(UserNotFound exception, WebRequest webRequest) {
     return this.buildErrorResponse(exception, webRequest);
   }
 

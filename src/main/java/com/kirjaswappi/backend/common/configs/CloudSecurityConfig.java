@@ -5,6 +5,7 @@
 package com.kirjaswappi.backend.common.configs;
 
 import static com.kirjaswappi.backend.common.utils.Constants.ACTUATOR;
+import static com.kirjaswappi.backend.common.utils.Constants.ADMIN_USERS;
 import static com.kirjaswappi.backend.common.utils.Constants.API_BASE;
 import static com.kirjaswappi.backend.common.utils.Constants.API_DOCS;
 import static com.kirjaswappi.backend.common.utils.Constants.AUTHENTICATE;
@@ -33,7 +34,8 @@ public class CloudSecurityConfig {
   public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
     http.csrf(AbstractHttpConfigurer::disable)
         .authorizeRequests()
-        .requestMatchers(ACTUATOR, API_DOCS, SWAGGER_UI, API_BASE + AUTHENTICATE)
+        .requestMatchers(ACTUATOR, API_DOCS, SWAGGER_UI, API_BASE + ADMIN_USERS,
+            API_BASE + ADMIN_USERS + AUTHENTICATE)
         .permitAll()
         .anyRequest()
         .authenticated();

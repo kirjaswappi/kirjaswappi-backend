@@ -4,16 +4,15 @@
  */
 package com.kirjaswappi.backend.common.utils;
 
+import lombok.NoArgsConstructor;
+
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 /**
  * Provides static methods about the current request
  */
+@NoArgsConstructor
 public class PathProvider {
-
-  private PathProvider() {
-  }
-
   /**
    * returns the current path of the request
    */
