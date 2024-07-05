@@ -4,6 +4,8 @@
  */
 package com.kirjaswappi.backend.service.entities;
 
+import static com.kirjaswappi.backend.common.utils.Util.hashPassword;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,8 +23,12 @@ public class User {
   private String password;
   private String streetName;
   private String houseNumber;
-  private String zipCode;
+  private int zipCode;
   private String city;
   private String country;
   private String phoneNumber;
+
+  public void setPassword(String password, String salt) {
+    this.password = hashPassword(password, salt);
+  }
 }

@@ -4,6 +4,8 @@
  */
 package com.kirjaswappi.backend.http.dtos.requests;
 
+import jakarta.validation.constraints.NotBlank;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,15 +14,20 @@ import com.kirjaswappi.backend.service.entities.User;
 @Getter
 @Setter
 public class UserUpdateRequest {
+  @NotBlank(message = "ID cannot be blank")
   private String id;
+  @NotBlank(message = "First name cannot be blank")
   private String firstName;
+  @NotBlank(message = "Last name cannot be blank")
   private String lastName;
-  private String email;
-  private String password;
+  @NotBlank(message = "Street name cannot be blank")
   private String streetName;
+  @NotBlank(message = "House no. cannot be blank")
   private String houseNumber;
-  private String zipCode;
+  private int zipCode;
+  @NotBlank(message = "City cannot be blank")
   private String city;
+  @NotBlank(message = "Country cannot be blank")
   private String country;
   private String phoneNumber;
 
@@ -29,8 +36,6 @@ public class UserUpdateRequest {
     entity.setId(this.id);
     entity.setFirstName(this.firstName);
     entity.setLastName(this.lastName);
-    entity.setEmail(this.email);
-    entity.setPassword(this.password);
     entity.setStreetName(this.streetName);
     entity.setHouseNumber(this.houseNumber);
     entity.setZipCode(this.zipCode);

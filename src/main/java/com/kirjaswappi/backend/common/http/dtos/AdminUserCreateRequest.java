@@ -14,14 +14,16 @@ import com.kirjaswappi.backend.common.service.entities.AdminUser;
 @Getter
 @Setter
 @Profile("cloud")
-public class AuthenticationRequest {
+public class AdminUserCreateRequest {
   private String username;
   private String password;
+  private String scopes;
 
   public AdminUser toEntity() {
     var entity = new AdminUser();
     entity.setUsername(this.username);
     entity.setPassword(this.password);
+    entity.setScopes(this.scopes);
     return entity;
   }
 }

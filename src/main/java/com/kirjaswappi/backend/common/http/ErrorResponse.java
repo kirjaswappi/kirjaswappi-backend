@@ -15,24 +15,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * request.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ErrorResponse {
-
-  private final Error error;
-
-  public ErrorResponse(Error error) {
-    this.error = error;
-  }
-
-  public Error getError() {
-    return this.error;
-  }
-
+public record ErrorResponse(Error error) {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class Error {
     private final String code;
-
     private final String message;
-
     private final String target;
     private List<ErrorDetail> details;
 
@@ -71,27 +58,10 @@ public class ErrorResponse {
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  private static class ErrorDetail {
-    private final String code;
-    private final String message;
-    private final String target;
-
-    public ErrorDetail(String code, String message, String target) {
-      this.code = code;
-      this.message = message;
-      this.target = target;
-    }
-
-    public String getCode() {
-      return code;
-    }
-
-    public String getMessage() {
-      return message;
-    }
-
-    public String getTarget() {
-      return target;
-    }
+  private record ErrorDetail(
+      String code,
+      String message,
+      String target
+  ) {
   }
 }

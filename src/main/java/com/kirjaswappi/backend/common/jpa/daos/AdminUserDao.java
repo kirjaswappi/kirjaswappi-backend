@@ -22,5 +22,6 @@ public class AdminUserDao {
   String id;
   String username;
   String password;
+  String salt;
   String scopes;
 }

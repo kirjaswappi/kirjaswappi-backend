@@ -4,6 +4,8 @@
  */
 package com.kirjaswappi.backend.common.utils;
 
+import static com.kirjaswappi.backend.common.utils.Constants.SCOPES;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
@@ -55,7 +57,7 @@ public class JwtUtil {
 
   public String generateToken(AdminUser adminUser) {
     Map<String, Object> claims = new HashMap<>();
-    claims.put("Scope", adminUser.getScopes());
+    claims.put(SCOPES, adminUser.getScopes());
     return createToken(claims, adminUser.getUsername());
   }
 
