@@ -17,4 +17,7 @@ public class Constants {
   public static final String API_DOCS = "/v3/api-docs/**";
   public static final String ACTUATOR = "/actuator";
   public static final String ROLE = "role";
+  public static final String RESET_PASSWORD = "/reset-password";
+  public static final String ID = "/{id}";
+  public static final String EMAIL = "/{email}";
 }
