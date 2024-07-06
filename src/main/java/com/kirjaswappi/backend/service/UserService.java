@@ -96,13 +96,20 @@ public class UserService {
     UserDao dao = userRepository.findByEmail(email)
         .orElseThrow(() -> new BadRequest("invalidEmailProvided"));
 
-    // add salt to password:
-    String newSalt = Util.generateSalt();
-    user.setPassword(user.getPassword(), newSalt);
+    // forbid newPassword to be the same as currentPassword:
+    String currentPassword = dao.getPassword();
+    String newPassword = Util.hashPassword(user.getPassword(), dao.getSalt());
+    if (currentPassword.equals(newPassword)) {
+      throw new BadRequest("newPasswordSameAsCurrentPassword");
+    }
 
-    // save user:
+    // add new salt to new password:
+    String newSalt = Util.generateSalt();
+    String newPasswordWithNewSalt = Util.hashPassword(user.getPassword(), newSalt);
+
+    // save password:
     dao.setSalt(newSalt);
-    dao.setPassword(user.getPassword());
+    dao.setPassword(newPasswordWithNewSalt);
     userRepository.save(dao);
   }
 }
