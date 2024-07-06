@@ -14,12 +14,12 @@ import com.kirjaswappi.backend.common.service.entities.AdminUser;
 @Getter
 @Setter
 @Profile("cloud")
-public class AdminUserCreateResponse {
+public class AdminUserResponse {
   private String username;
-  private String scopes;
+  private String role;
 
-  public AdminUserCreateResponse(AdminUser adminUser) {
+  public AdminUserResponse(AdminUser adminUser) {
     this.username = adminUser.getUsername();
-    this.scopes = adminUser.getScopes();
+    this.role = adminUser.getRole();
   }
 }

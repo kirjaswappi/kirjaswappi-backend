@@ -11,6 +11,8 @@ import static com.kirjaswappi.backend.common.utils.Constants.API_BASE;
 import static com.kirjaswappi.backend.common.utils.Constants.API_DOCS;
 import static com.kirjaswappi.backend.common.utils.Constants.AUTHENTICATE;
 import static com.kirjaswappi.backend.common.utils.Constants.SWAGGER_UI;
+import static org.springframework.http.HttpMethod.DELETE;
+import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,14 +37,16 @@ public class CloudSecurityConfig {
 
   @Bean
   public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-    http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+    return http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .csrf(AbstractHttpConfigurer::disable)
         .authorizeRequests(authorize -> authorize
-            .requestMatchers(ACTUATOR, API_DOCS, SWAGGER_UI, API_BASE + ADMIN_USERS + AUTHENTICATE).permitAll()
+            .requestMatchers(ACTUATOR, API_DOCS, SWAGGER_UI, API_BASE + AUTHENTICATE).permitAll()
             .requestMatchers(POST, API_BASE + ADMIN_USERS).hasAuthority(ADMIN)
-            .anyRequest().authenticated());
-    http.addFilterBefore(filterApiRequest, UsernamePasswordAuthenticationFilter.class);
-    return http.build();
+            .requestMatchers(GET, API_BASE + ADMIN_USERS).hasAuthority(ADMIN)
+            .requestMatchers(DELETE, API_BASE + ADMIN_USERS).hasAuthority(ADMIN)
+            .anyRequest().authenticated())
+        .addFilterBefore(filterApiRequest, UsernamePasswordAuthenticationFilter.class)
+        .build();
   }
 
   static class Scopes {

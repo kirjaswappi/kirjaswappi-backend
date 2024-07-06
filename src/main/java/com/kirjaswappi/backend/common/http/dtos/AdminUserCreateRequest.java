@@ -17,13 +17,13 @@ import com.kirjaswappi.backend.common.service.entities.AdminUser;
 public class AdminUserCreateRequest {
   private String username;
   private String password;
-  private String scopes;
+  private String role;
 
   public AdminUser toEntity() {
     var entity = new AdminUser();
     entity.setUsername(this.username);
     entity.setPassword(this.password);
-    entity.setScopes(this.scopes);
+    entity.setRole(this.role);
     return entity;
   }
 }

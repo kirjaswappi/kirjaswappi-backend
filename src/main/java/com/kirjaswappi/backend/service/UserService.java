@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.kirjaswappi.backend.common.service.exceptions.InvalidCredentials;
 import com.kirjaswappi.backend.common.utils.Util;
@@ -19,6 +20,7 @@ import com.kirjaswappi.backend.service.exceptions.BadRequest;
 import com.kirjaswappi.backend.service.exceptions.UserNotFound;
 
 @Service
+@Transactional
 public class UserService {
   @Autowired
   UserRepository userRepository;

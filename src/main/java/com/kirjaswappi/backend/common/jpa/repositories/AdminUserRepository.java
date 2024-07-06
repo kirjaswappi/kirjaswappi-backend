@@ -14,4 +14,6 @@ public interface AdminUserRepository extends MongoRepository<AdminUserDao, Strin
   Optional<AdminUserDao> findByUsername(String username);
 
   Optional<AdminUserDao> findByUsernameAndPassword(String username, String password);
+
+  void deleteByUsername(String username);
 }

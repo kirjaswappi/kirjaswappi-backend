@@ -14,7 +14,7 @@ public class AdminUserMapper {
   public AdminUser toEntity(AdminUserDao dao) {
     var entity = new AdminUser();
     entity.setUsername(dao.getUsername());
-    entity.setScopes(dao.getScopes());
+    entity.setRole(dao.getRole());
     return entity;
   }
 
@@ -23,7 +23,7 @@ public class AdminUserMapper {
     dao.setUsername(user.getUsername());
     dao.setPassword(user.getPassword());
     dao.setSalt(salt);
-    dao.setScopes(user.getScopes());
+    dao.setRole(user.getRole());
     return dao;
   }
 }
