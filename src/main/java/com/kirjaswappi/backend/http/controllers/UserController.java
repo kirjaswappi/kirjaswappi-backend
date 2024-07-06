@@ -5,7 +5,10 @@
 package com.kirjaswappi.backend.http.controllers;
 
 import static com.kirjaswappi.backend.common.utils.Constants.API_BASE;
+import static com.kirjaswappi.backend.common.utils.Constants.EMAIL;
+import static com.kirjaswappi.backend.common.utils.Constants.ID;
 import static com.kirjaswappi.backend.common.utils.Constants.LOGIN;
+import static com.kirjaswappi.backend.common.utils.Constants.RESET_PASSWORD;
 import static com.kirjaswappi.backend.common.utils.Constants.USERS;
 
 import java.util.List;
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kirjaswappi.backend.http.dtos.requests.ResetPasswordRequest;
 import com.kirjaswappi.backend.http.dtos.requests.UserAuthenticationRequest;
 import com.kirjaswappi.backend.http.dtos.requests.UserCreateRequest;
 import com.kirjaswappi.backend.http.dtos.requests.UserUpdateRequest;
@@ -48,7 +52,7 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.CREATED).body(new UserCreateResponse(savedUser));
   }
 
-  @PutMapping("/{id}")
+  @PutMapping(ID)
   public ResponseEntity<UserUpdateResponse> updateUser(@PathVariable String id,
       @Valid @RequestBody UserUpdateRequest user) {
     // validate id
@@ -59,7 +63,7 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.OK).body(new UserUpdateResponse(updatedUser));
   }
 
-  @GetMapping("/{id}")
+  @GetMapping(ID)
   public ResponseEntity<UserResponse> getUser(@PathVariable String id) {
     User user = userService.getUser(id);
     return ResponseEntity.status(HttpStatus.OK).body(new UserResponse(user));
@@ -72,7 +76,7 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.OK).body(userListResponses);
   }
 
-  @DeleteMapping("/{id}")
+  @DeleteMapping(ID)
   public ResponseEntity<Void> deleteUser(@PathVariable String id) {
     userService.deleteUser(id);
     return ResponseEntity.noContent().build();
@@ -82,6 +86,14 @@ public class UserController {
   public ResponseEntity<UserResponse> login(@Valid @RequestBody UserAuthenticationRequest userAuthenticationRequest) {
     User user = userService.verifyLogin(userAuthenticationRequest.toEntity());
     return ResponseEntity.status(HttpStatus.OK).body(new UserResponse(user));
+  }
+
+  @PostMapping(RESET_PASSWORD + EMAIL)
+  public ResponseEntity<Void> resetPassword(@PathVariable String email,
+      @Valid @RequestBody ResetPasswordRequest request) {
+    userService.verifyCurrentPassword(email, request.getCurrentPassword());
+    userService.resetPassword(email, request.toEntity());
+    return ResponseEntity.ok().build();
   }
 
 }

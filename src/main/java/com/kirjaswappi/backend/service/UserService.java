@@ -76,4 +76,33 @@ public class UserService {
     return mapper.toEntity(userRepository.findByEmailAndPassword(dao.getEmail(), password)
         .orElseThrow(() -> new InvalidCredentials("invalidCredentials")));
   }
+
+  public void verifyCurrentPassword(String email, String currentPassword) {
+    // get salt from email:
+    UserDao dao = userRepository.findByEmail(email)
+        .orElseThrow(() -> new BadRequest("invalidEmailProvided"));
+
+    // hash password with salt:
+    String password = Util.hashPassword(currentPassword, dao.getSalt());
+
+    // validate email and password:
+    if (userRepository.findByEmailAndPassword(dao.getEmail(), password).isEmpty()) {
+      throw new InvalidCredentials("currentPasswordMismatch");
+    }
+  }
+
+  public void resetPassword(String email, User user) {
+    // get user from email:
+    UserDao dao = userRepository.findByEmail(email)
+        .orElseThrow(() -> new BadRequest("invalidEmailProvided"));
+
+    // add salt to password:
+    String newSalt = Util.generateSalt();
+    user.setPassword(user.getPassword(), newSalt);
+
+    // save user:
+    dao.setSalt(newSalt);
+    dao.setPassword(user.getPassword());
+    userRepository.save(dao);
+  }
 }
