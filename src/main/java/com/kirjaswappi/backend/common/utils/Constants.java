@@ -21,4 +21,6 @@ public class Constants {
   public static final String ID = "/{id}";
   public static final String EMAIL = "/{email}";
   public static final String SEND_OTP = "/send-otp";
+  public static final String VERIFY_OTP = "/verify-otp";
+  public static final String NUMERIC = "0123456789";
 }
