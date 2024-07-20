@@ -5,11 +5,11 @@
 package com.kirjaswappi.backend.common.configs;
 
 import static com.kirjaswappi.backend.common.configs.CloudSecurityConfig.Scopes.ADMIN;
-import static com.kirjaswappi.backend.common.utils.Constants.ACTUATOR;
 import static com.kirjaswappi.backend.common.utils.Constants.ADMIN_USERS;
 import static com.kirjaswappi.backend.common.utils.Constants.API_BASE;
 import static com.kirjaswappi.backend.common.utils.Constants.API_DOCS;
 import static com.kirjaswappi.backend.common.utils.Constants.AUTHENTICATE;
+import static com.kirjaswappi.backend.common.utils.Constants.HEALTH;
 import static com.kirjaswappi.backend.common.utils.Constants.SWAGGER_UI;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
@@ -40,7 +40,7 @@ public class CloudSecurityConfig {
     return http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .csrf(AbstractHttpConfigurer::disable)
         .authorizeRequests(authorize -> authorize
-            .requestMatchers(ACTUATOR, API_DOCS, SWAGGER_UI, API_BASE + AUTHENTICATE).permitAll()
+            .requestMatchers(HEALTH, API_DOCS, SWAGGER_UI, API_BASE + AUTHENTICATE).permitAll()
             .requestMatchers(POST, API_BASE + ADMIN_USERS).hasAuthority(ADMIN)
             .requestMatchers(GET, API_BASE + ADMIN_USERS).hasAuthority(ADMIN)
             .requestMatchers(DELETE, API_BASE + ADMIN_USERS).hasAuthority(ADMIN)
