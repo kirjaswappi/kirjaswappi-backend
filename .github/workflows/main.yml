@@ -19,7 +19,7 @@ jobs:
         run: mvn clean package -DskipTests
 
       - name: Publish to GitHub Packages Apache Maven
-        run: mvn deploy -s .github/mvn/settings.xml
+        run: mvn deploy -s .github/mvn/settings.xml -DskipTests
         env:
           USERNAME_GIT: ${{ secrets.USERNAME_GIT }}
           PASSWORD_GIT: ${{ secrets.TOKEN_GITHUB }}
