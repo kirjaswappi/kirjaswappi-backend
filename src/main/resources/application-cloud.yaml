@@ -11,3 +11,6 @@ springdoc:
   swagger-ui:
     schemes:
       - https
+
+server:
+  forward-headers-strategy: native
