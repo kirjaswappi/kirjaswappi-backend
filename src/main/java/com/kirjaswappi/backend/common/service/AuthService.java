@@ -5,7 +5,6 @@
 package com.kirjaswappi.backend.common.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +18,6 @@ import com.kirjaswappi.backend.common.utils.Util;
 
 @Service
 @Transactional
-@Profile("cloud")
 public class AuthService {
   @Autowired
   private AdminUserRepository adminUserRepository;

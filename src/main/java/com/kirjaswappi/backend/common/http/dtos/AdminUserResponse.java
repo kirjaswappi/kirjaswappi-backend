@@ -7,13 +7,10 @@ package com.kirjaswappi.backend.common.http.dtos;
 import lombok.Getter;
 import lombok.Setter;
 
-import org.springframework.context.annotation.Profile;
-
 import com.kirjaswappi.backend.common.service.entities.AdminUser;
 
 @Getter
 @Setter
-@Profile("cloud")
 public class AdminUserResponse {
   private String username;
   private String role;
