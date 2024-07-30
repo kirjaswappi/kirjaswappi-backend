@@ -30,6 +30,7 @@ public class JwtUtil {
   private static final byte[] SECRET_KEY_BYTES = SECRET_STRING.getBytes(StandardCharsets.UTF_8);
   private static final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(SECRET_KEY_BYTES);
   private static final long TOKEN_EXPIRATION_MS = 30 * 60 * 1000;
+  private static final String TOKEN_TYPE = "jwtToken";
 
   public String extractUsername(String token) {
     return extractClaim(token, Claims::getSubject);
@@ -60,6 +61,7 @@ public class JwtUtil {
   public String generateJwtToken(AdminUser adminUser) {
     Map<String, Object> claims = new HashMap<>();
     claims.put(ROLE, adminUser.getRole());
+    claims.put(TOKEN_TYPE, true);
     return createJwtToken(claims, adminUser.getUsername());
   }
 
@@ -75,7 +77,12 @@ public class JwtUtil {
 
   public boolean validateToken(String token, AdminUser adminUser) {
     final String username = extractUsername(token);
-    return (username.equals(adminUser.getUsername()) && !isTokenExpired(token));
+    return (username.equals(adminUser.getUsername()) && !isTokenExpired(token)) && isValidTokenType(token);
+  }
+
+  private boolean isValidTokenType(String token) {
+    Claims claims = extractAllClaims(token);
+    return claims.get(TOKEN_TYPE, Boolean.class);
   }
 
   public String extractRole(String token) {
@@ -86,6 +93,7 @@ public class JwtUtil {
   public String generateRefreshToken(AdminUser adminUser) {
     Map<String, Object> claims = new HashMap<>();
     claims.put(ROLE, adminUser.getRole());
+    claims.put(TOKEN_TYPE, false);
     return createRefreshToken(claims, adminUser.getUsername());
   }
 
@@ -94,6 +102,7 @@ public class JwtUtil {
         .claims(claims)
         .subject(subject)
         .issuedAt(new Date(System.currentTimeMillis()))
+        .expiration(new Date(Long.MAX_VALUE))
         .signWith(SECRET_KEY)
         .compact();
   }

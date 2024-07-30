@@ -14,6 +14,8 @@ public class AdminUserMapper {
   public AdminUser toEntity(AdminUserDao dao) {
     var entity = new AdminUser();
     entity.setUsername(dao.getUsername());
+    entity.setPassword(dao.getPassword());
+    entity.setSalt(dao.getSalt());
     entity.setRole(dao.getRole());
     return entity;
   }
