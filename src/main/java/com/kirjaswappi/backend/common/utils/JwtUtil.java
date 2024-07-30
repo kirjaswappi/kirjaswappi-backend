@@ -14,6 +14,8 @@ import java.util.function.Function;
 
 import javax.crypto.SecretKey;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -55,13 +57,13 @@ public class JwtUtil {
         .before(new Date());
   }
 
-  public String generateToken(AdminUser adminUser) {
+  public String generateJwtToken(AdminUser adminUser) {
     Map<String, Object> claims = new HashMap<>();
     claims.put(ROLE, adminUser.getRole());
-    return createToken(claims, adminUser.getUsername());
+    return createJwtToken(claims, adminUser.getUsername());
   }
 
-  private String createToken(Map<String, Object> claims, String subject) {
+  private String createJwtToken(Map<String, Object> claims, String subject) {
     return Jwts.builder()
         .claims(claims)
         .subject(subject)
@@ -79,5 +81,28 @@ public class JwtUtil {
   public String extractRole(String token) {
     Claims claims = extractAllClaims(token);
     return claims.get(ROLE, String.class);
+  }
+
+  public String generateRefreshToken(AdminUser adminUser) {
+    Map<String, Object> claims = new HashMap<>();
+    claims.put(ROLE, adminUser.getRole());
+    return createRefreshToken(claims, adminUser.getUsername());
+  }
+
+  private String createRefreshToken(Map<String, Object> claims, String subject) {
+    return Jwts.builder()
+        .claims(claims)
+        .subject(subject)
+        .issuedAt(new Date(System.currentTimeMillis()))
+        .signWith(SECRET_KEY)
+        .compact();
+  }
+
+  public String extractJwtToken(HttpServletRequest request) {
+    final String authorizationHeader = request.getHeader("Authorization");
+    if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+      return authorizationHeader.substring(7);
+    }
+    return null;
   }
 }

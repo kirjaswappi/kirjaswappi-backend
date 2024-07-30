@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kirjaswappi.backend.common.http.dtos.AuthenticationRequest;
 import com.kirjaswappi.backend.common.http.dtos.AuthenticationResponse;
+import com.kirjaswappi.backend.common.http.dtos.RefreshAuthenticationRequest;
+import com.kirjaswappi.backend.common.http.dtos.RefreshAuthenticationResponse;
 import com.kirjaswappi.backend.common.service.AuthService;
 import com.kirjaswappi.backend.common.service.entities.AdminUser;
 
@@ -28,6 +30,15 @@ public class AuthController {
   @PostMapping
   public ResponseEntity<AuthenticationResponse> createAuthToken(@RequestBody AuthenticationRequest request) {
     AdminUser adminUser = authService.verifyLogin(request.toEntity());
-    return ResponseEntity.ok(new AuthenticationResponse(authService.generateToken(adminUser)));
+    String jwtToken = authService.generateJwtToken(adminUser);
+    String refreshToken = authService.generateRefreshToken(adminUser);
+    return ResponseEntity.ok(new AuthenticationResponse(jwtToken, refreshToken));
+  }
+
+  @PostMapping("/refresh")
+  public ResponseEntity<RefreshAuthenticationResponse> refreshAuthToken(
+      @RequestBody RefreshAuthenticationRequest request) {
+    String jwtToken = authService.verifyRefreshToken(request.getRefreshToken());
+    return ResponseEntity.ok(new RefreshAuthenticationResponse(jwtToken));
   }
 }
