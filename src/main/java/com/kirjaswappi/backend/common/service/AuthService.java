@@ -8,39 +8,38 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.kirjaswappi.backend.common.jpa.daos.AdminUserDao;
-import com.kirjaswappi.backend.common.jpa.repositories.AdminUserRepository;
 import com.kirjaswappi.backend.common.service.entities.AdminUser;
-import com.kirjaswappi.backend.common.service.exceptions.InvalidCredentials;
-import com.kirjaswappi.backend.common.service.mappers.AdminUserMapper;
 import com.kirjaswappi.backend.common.utils.JwtUtil;
-import com.kirjaswappi.backend.common.utils.Util;
+import com.kirjaswappi.backend.service.exceptions.BadRequest;
 
 @Service
 @Transactional
 public class AuthService {
   @Autowired
-  private AdminUserRepository adminUserRepository;
+  private JwtUtil jwtUtil;
   @Autowired
-  private AdminUserMapper mapper;
-  @Autowired
-  private JwtUtil jwtTokenUtil;
+  private AdminUserService adminUserService;
 
-  // validate user credentials, if exists return user info
   public AdminUser verifyLogin(AdminUser user) {
-    // get salt from username:
-    AdminUserDao dao = adminUserRepository.findByUsername(user.getUsername())
-        .orElseThrow(() -> new InvalidCredentials("invalidCredentials"));
-
-    // hash password with salt:
-    String password = Util.hashPassword(user.getPassword(), dao.getSalt());
-
-    // validate email and password and return user:
-    return mapper.toEntity(adminUserRepository.findByUsernameAndPassword(dao.getUsername(), password)
-        .orElseThrow(() -> new InvalidCredentials("invalidCredentials")));
+    // validate user credentials, if exists return user info
+    return adminUserService.verifyUser(user);
   }
 
-  public String generateToken(AdminUser adminUser) {
-    return jwtTokenUtil.generateToken(adminUser);
+  public String generateJwtToken(AdminUser adminUser) {
+    return jwtUtil.generateJwtToken(adminUser);
+  }
+
+  public String generateRefreshToken(AdminUser adminUser) {
+    return jwtUtil.generateRefreshToken(adminUser);
+  }
+
+  public String verifyRefreshToken(String refreshToken) {
+    String username = jwtUtil.extractUsername(refreshToken);
+    AdminUser userDetails = adminUserService.getAdminUserInfo(username);
+    if (jwtUtil.validateToken(refreshToken, userDetails)) {
+      return jwtUtil.generateJwtToken(userDetails);
+    } else {
+      throw new BadRequest("invalidRefreshToken");
+    }
   }
 }

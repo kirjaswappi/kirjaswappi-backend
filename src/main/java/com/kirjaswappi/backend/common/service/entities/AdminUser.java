@@ -18,6 +18,7 @@ import com.kirjaswappi.backend.common.utils.Util;
 public class AdminUser {
   String username;
   String password;
+  String salt;
   String role;
 
   public void setPassword(String password, String salt) {

@@ -38,7 +38,7 @@ public class FilterApiRequest extends OncePerRequestFilter {
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
     // 1. Extract Token
-    String jwt = extractJwtToken(request);
+    String jwt = jwtUtil.extractJwtToken(request);
 
     // 2. Early Exit if No Token
     if (jwt == null || SecurityContextHolder.getContext().getAuthentication() != null) {
@@ -57,15 +57,6 @@ public class FilterApiRequest extends OncePerRequestFilter {
     }
 
     filterChain.doFilter(request, response);
-  }
-
-  // Helper Methods:
-  private String extractJwtToken(HttpServletRequest request) {
-    final String authorizationHeader = request.getHeader("Authorization");
-    if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-      return authorizationHeader.substring(7);
-    }
-    return null;
   }
 
   private UsernamePasswordAuthenticationToken createAuthenticationToken(String jwt, AdminUser userDetails,

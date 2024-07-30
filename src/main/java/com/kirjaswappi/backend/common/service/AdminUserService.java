@@ -53,4 +53,14 @@ public class AdminUserService {
   public void deleteUser(String username) {
     adminUserRepository.deleteByUsername(username);
   }
+
+  public AdminUser verifyUser(AdminUser user) {
+    AdminUser adminUserFromDB = getAdminUserInfo(user.getUsername());
+    String password = Util.hashPassword(user.getPassword(), adminUserFromDB.getSalt());
+    if (adminUserFromDB.getPassword().equals(password)) {
+      return adminUserFromDB;
+    } else {
+      throw new BadRequest("invalidCredentials");
+    }
+  }
 }

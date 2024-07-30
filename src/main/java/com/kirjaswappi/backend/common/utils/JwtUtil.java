@@ -14,6 +14,8 @@ import java.util.function.Function;
 
 import javax.crypto.SecretKey;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -28,6 +30,7 @@ public class JwtUtil {
   private static final byte[] SECRET_KEY_BYTES = SECRET_STRING.getBytes(StandardCharsets.UTF_8);
   private static final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(SECRET_KEY_BYTES);
   private static final long TOKEN_EXPIRATION_MS = 30 * 60 * 1000;
+  private static final String TOKEN_TYPE = "jwtToken";
 
   public String extractUsername(String token) {
     return extractClaim(token, Claims::getSubject);
@@ -55,13 +58,14 @@ public class JwtUtil {
         .before(new Date());
   }
 
-  public String generateToken(AdminUser adminUser) {
+  public String generateJwtToken(AdminUser adminUser) {
     Map<String, Object> claims = new HashMap<>();
     claims.put(ROLE, adminUser.getRole());
-    return createToken(claims, adminUser.getUsername());
+    claims.put(TOKEN_TYPE, true);
+    return createJwtToken(claims, adminUser.getUsername());
   }
 
-  private String createToken(Map<String, Object> claims, String subject) {
+  private String createJwtToken(Map<String, Object> claims, String subject) {
     return Jwts.builder()
         .claims(claims)
         .subject(subject)
@@ -73,11 +77,41 @@ public class JwtUtil {
 
   public boolean validateToken(String token, AdminUser adminUser) {
     final String username = extractUsername(token);
-    return (username.equals(adminUser.getUsername()) && !isTokenExpired(token));
+    return (username.equals(adminUser.getUsername()) && !isTokenExpired(token)) && isValidTokenType(token);
+  }
+
+  private boolean isValidTokenType(String token) {
+    Claims claims = extractAllClaims(token);
+    return claims.get(TOKEN_TYPE, Boolean.class);
   }
 
   public String extractRole(String token) {
     Claims claims = extractAllClaims(token);
     return claims.get(ROLE, String.class);
+  }
+
+  public String generateRefreshToken(AdminUser adminUser) {
+    Map<String, Object> claims = new HashMap<>();
+    claims.put(ROLE, adminUser.getRole());
+    claims.put(TOKEN_TYPE, false);
+    return createRefreshToken(claims, adminUser.getUsername());
+  }
+
+  private String createRefreshToken(Map<String, Object> claims, String subject) {
+    return Jwts.builder()
+        .claims(claims)
+        .subject(subject)
+        .issuedAt(new Date(System.currentTimeMillis()))
+        .expiration(new Date(Long.MAX_VALUE))
+        .signWith(SECRET_KEY)
+        .compact();
+  }
+
+  public String extractJwtToken(HttpServletRequest request) {
+    final String authorizationHeader = request.getHeader("Authorization");
+    if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+      return authorizationHeader.substring(7);
+    }
+    return null;
   }
 }
