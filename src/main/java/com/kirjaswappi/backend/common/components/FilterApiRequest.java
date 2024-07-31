@@ -50,7 +50,7 @@ public class FilterApiRequest extends OncePerRequestFilter {
     String username = jwtUtil.extractUsername(jwt);
     AdminUser userDetails = adminUserService.getAdminUserInfo(username);
 
-    if (jwtUtil.validateToken(jwt, userDetails)) {
+    if (jwtUtil.validateJwtToken(jwt, userDetails)) {
       // 4. Set Authentication (encapsulate token creation)
       SecurityContextHolder.getContext().setAuthentication(
           createAuthenticationToken(jwt, userDetails, request));

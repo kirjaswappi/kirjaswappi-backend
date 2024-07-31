@@ -36,7 +36,7 @@ public class AuthService {
   public String verifyRefreshToken(String refreshToken) {
     String username = jwtUtil.extractUsername(refreshToken);
     AdminUser userDetails = adminUserService.getAdminUserInfo(username);
-    if (jwtUtil.validateToken(refreshToken, userDetails)) {
+    if (jwtUtil.validateRefreshToken(refreshToken, userDetails)) {
       return jwtUtil.generateJwtToken(userDetails);
     } else {
       throw new BadRequest("invalidRefreshToken");
