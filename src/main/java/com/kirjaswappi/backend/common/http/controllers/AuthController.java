@@ -6,6 +6,7 @@ package com.kirjaswappi.backend.common.http.controllers;
 
 import static com.kirjaswappi.backend.common.utils.Constants.API_BASE;
 import static com.kirjaswappi.backend.common.utils.Constants.AUTHENTICATE;
+import static com.kirjaswappi.backend.common.utils.Constants.REFRESH;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +36,7 @@ public class AuthController {
     return ResponseEntity.ok(new AuthenticationResponse(jwtToken, refreshToken));
   }
 
-  @PostMapping("/refresh")
+  @PostMapping(REFRESH)
   public ResponseEntity<RefreshAuthenticationResponse> refreshAuthToken(
       @RequestBody RefreshAuthenticationRequest request) {
     String jwtToken = authService.verifyRefreshToken(request.getRefreshToken());

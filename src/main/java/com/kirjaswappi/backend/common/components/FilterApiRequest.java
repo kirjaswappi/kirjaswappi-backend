@@ -47,16 +47,23 @@ public class FilterApiRequest extends OncePerRequestFilter {
     }
 
     // 3. Validate Token and User
+    validateTokenAndUser(request, jwt);
+
+    // 4. Continue Filter Chain
+    filterChain.doFilter(request, response);
+  }
+
+  private void validateTokenAndUser(HttpServletRequest request, String jwt) {
     String username = jwtUtil.extractUsername(jwt);
     AdminUser userDetails = adminUserService.getAdminUserInfo(username);
-
     if (jwtUtil.validateJwtToken(jwt, userDetails)) {
-      // 4. Set Authentication (encapsulate token creation)
-      SecurityContextHolder.getContext().setAuthentication(
-          createAuthenticationToken(jwt, userDetails, request));
+      setAuthentication(request, jwt, userDetails);
     }
+  }
 
-    filterChain.doFilter(request, response);
+  private void setAuthentication(HttpServletRequest request, String jwt, AdminUser userDetails) {
+    SecurityContextHolder.getContext().setAuthentication(
+        createAuthenticationToken(jwt, userDetails, request));
   }
 
   private UsernamePasswordAuthenticationToken createAuthenticationToken(String jwt, AdminUser userDetails,
