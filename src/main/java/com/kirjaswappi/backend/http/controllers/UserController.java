@@ -9,6 +9,7 @@ import static com.kirjaswappi.backend.common.utils.Constants.EMAIL;
 import static com.kirjaswappi.backend.common.utils.Constants.ID;
 import static com.kirjaswappi.backend.common.utils.Constants.LOGIN;
 import static com.kirjaswappi.backend.common.utils.Constants.RESET_PASSWORD;
+import static com.kirjaswappi.backend.common.utils.Constants.SIGNUP;
 import static com.kirjaswappi.backend.common.utils.Constants.USERS;
 
 import java.util.List;
@@ -38,6 +39,7 @@ import com.kirjaswappi.backend.http.dtos.responses.UserResponse;
 import com.kirjaswappi.backend.http.dtos.responses.UserUpdateResponse;
 import com.kirjaswappi.backend.service.UserService;
 import com.kirjaswappi.backend.service.entities.User;
+import com.kirjaswappi.backend.service.exceptions.BadRequest;
 
 @RestController
 @Validated
@@ -46,8 +48,8 @@ public class UserController {
   @Autowired
   private UserService userService;
 
-  @PostMapping
-  public ResponseEntity<UserCreateResponse> addUser(@Valid @RequestBody UserCreateRequest user) {
+  @PostMapping(SIGNUP)
+  public ResponseEntity<UserCreateResponse> createUser(@Valid @RequestBody UserCreateRequest user) {
     User savedUser = userService.addUser(user.toEntity());
     return ResponseEntity.status(HttpStatus.CREATED).body(new UserCreateResponse(savedUser));
   }
@@ -55,9 +57,9 @@ public class UserController {
   @PutMapping(ID)
   public ResponseEntity<UserUpdateResponse> updateUser(@PathVariable String id,
       @Valid @RequestBody UserUpdateRequest user) {
-    // validate id
+    // validate id:
     if (!id.equals(user.getId())) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+      throw new BadRequest("idMismatch", id, user.getId());
     }
     User updatedUser = userService.updateUser(user.toEntity());
     return ResponseEntity.status(HttpStatus.OK).body(new UserUpdateResponse(updatedUser));

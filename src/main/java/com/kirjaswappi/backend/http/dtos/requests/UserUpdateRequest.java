@@ -4,34 +4,28 @@
  */
 package com.kirjaswappi.backend.http.dtos.requests;
 
-import jakarta.validation.constraints.NotBlank;
-
 import lombok.Getter;
 import lombok.Setter;
 
+import com.kirjaswappi.backend.http.validations.UserValidation;
 import com.kirjaswappi.backend.service.entities.User;
+import com.kirjaswappi.backend.service.exceptions.BadRequest;
 
 @Getter
 @Setter
 public class UserUpdateRequest {
-  @NotBlank(message = "ID cannot be blank")
   private String id;
-  @NotBlank(message = "First name cannot be blank")
   private String firstName;
-  @NotBlank(message = "Last name cannot be blank")
   private String lastName;
-  @NotBlank(message = "Street name cannot be blank")
   private String streetName;
-  @NotBlank(message = "House no. cannot be blank")
   private String houseNumber;
   private int zipCode;
-  @NotBlank(message = "City cannot be blank")
   private String city;
-  @NotBlank(message = "Country cannot be blank")
   private String country;
   private String phoneNumber;
 
   public User toEntity() {
+    validateProperties();
     var entity = new User();
     entity.setId(this.id);
     entity.setFirstName(this.firstName);
@@ -43,5 +37,16 @@ public class UserUpdateRequest {
     entity.setCountry(this.country);
     entity.setPhoneNumber(this.phoneNumber);
     return entity;
+  }
+
+  private void validateProperties() {
+    // validate first name:
+    if (!UserValidation.validateNotBlank(this.firstName)) {
+      throw new BadRequest("firstNameCannotBeBlank", this.firstName);
+    }
+    // validate last name:
+    if (!UserValidation.validateNotBlank(this.lastName)) {
+      throw new BadRequest("lastNameCannotBeBlank", this.lastName);
+    }
   }
 }

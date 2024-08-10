@@ -4,48 +4,47 @@
  */
 package com.kirjaswappi.backend.http.dtos.requests;
 
-import jakarta.validation.constraints.NotBlank;
-
 import lombok.Getter;
 import lombok.Setter;
 
-import com.kirjaswappi.backend.http.validations.annotations.EmailValidation;
+import com.kirjaswappi.backend.http.validations.UserValidation;
 import com.kirjaswappi.backend.service.entities.User;
+import com.kirjaswappi.backend.service.exceptions.BadRequest;
 
 @Getter
 @Setter
 public class UserCreateRequest {
-  @NotBlank(message = "First name cannot be blank")
   private String firstName;
-  @NotBlank(message = "Last name cannot be blank")
   private String lastName;
-  @EmailValidation(message = "Please provide a valid email address")
   private String email;
-  @NotBlank(message = "Password cannot be blank")
   private String password;
-  @NotBlank(message = "Street name cannot be blank")
-  private String streetName;
-  @NotBlank(message = "House no. cannot be blank")
-  private String houseNumber;
-  private int zipCode;
-  @NotBlank(message = "City cannot be blank")
-  private String city;
-  @NotBlank(message = "Country cannot be blank")
-  private String country;
-  private String phoneNumber;
 
   public User toEntity() {
+    validateProperties();
     var entity = new User();
     entity.setFirstName(this.firstName);
     entity.setLastName(this.lastName);
     entity.setEmail(this.email);
     entity.setPassword(this.password);
-    entity.setStreetName(this.streetName);
-    entity.setHouseNumber(this.houseNumber);
-    entity.setZipCode(this.zipCode);
-    entity.setCity(this.city);
-    entity.setCountry(this.country);
-    entity.setPhoneNumber(this.phoneNumber);
     return entity;
+  }
+
+  private void validateProperties() {
+    // validate first name:
+    if (!UserValidation.validateNotBlank(this.firstName)) {
+      throw new BadRequest("firstNameCannotBeBlank", this.firstName);
+    }
+    // validate last name:
+    if (!UserValidation.validateNotBlank(this.lastName)) {
+      throw new BadRequest("lastNameCannotBeBlank", this.lastName);
+    }
+    // validate email:
+    if (!UserValidation.validateEmail(this.email)) {
+      throw new BadRequest("invalidEmailAddress", this.email);
+    }
+    // validate password:
+    if (!UserValidation.validateNotBlank(this.password)) {
+      throw new BadRequest("passwordCannotBeBlank", this.password);
+    }
   }
 }
