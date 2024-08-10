@@ -12,4 +12,6 @@ import com.kirjaswappi.backend.common.jpa.daos.OTPDao;
 
 public interface OTPRepository extends MongoRepository<OTPDao, String> {
   Optional<OTPDao> findByEmail(String email);
+
+  void deleteAllByEmail(String email);
 }

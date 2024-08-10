@@ -34,6 +34,8 @@ public class OTPService {
   }
 
   public OTP saveOTP(OTP otp) {
+    // Delete all the previous OTPs:
+    otpRepository.deleteAllByEmail(otp.getEmail());
     var dao = otpMapper.toDao(otp);
     return otpMapper.toEntity(otpRepository.save(dao));
   }
@@ -54,6 +56,6 @@ public class OTPService {
       throw new BadRequest("otpExpired", otp);
     }
     // Delete the OTP after verification:
-    otpRepository.delete(otpMapper.toDao(otpEntity));
+    otpRepository.deleteAllByEmail(email);
   }
 }
