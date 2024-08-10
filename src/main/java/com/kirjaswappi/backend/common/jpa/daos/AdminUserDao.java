@@ -4,6 +4,8 @@
  */
 package com.kirjaswappi.backend.common.jpa.daos;
 
+import jakarta.validation.constraints.NotNull;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,8 +22,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class AdminUserDao {
   @Id
   String id;
+  @NotNull
   String username;
+  @NotNull
   String password;
+  @NotNull
   String salt;
+  @NotNull
   String role;
 }

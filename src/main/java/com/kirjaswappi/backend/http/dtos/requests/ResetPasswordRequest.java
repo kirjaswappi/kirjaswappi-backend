@@ -7,6 +7,7 @@ package com.kirjaswappi.backend.http.dtos.requests;
 import lombok.Getter;
 import lombok.Setter;
 
+import com.kirjaswappi.backend.http.validations.UserValidation;
 import com.kirjaswappi.backend.service.entities.User;
 import com.kirjaswappi.backend.service.exceptions.BadRequest;
 
@@ -24,5 +25,20 @@ public class ResetPasswordRequest {
     var entity = new User();
     entity.setPassword(this.newPassword);
     return entity;
+  }
+
+  private void validateProperties() {
+    // validate current password:
+    if (!UserValidation.validateNotBlank(this.currentPassword)) {
+      throw new BadRequest("currentPasswordCannotBeBlank", this.currentPassword);
+    }
+    // validate new password:
+    if (!UserValidation.validateNotBlank(this.newPassword)) {
+      throw new BadRequest("newPasswordCannotBeBlank", this.newPassword);
+    }
+    // validate confirm password:
+    if (!UserValidation.validateNotBlank(this.confirmPassword)) {
+      throw new BadRequest("confirmPasswordCannotBeBlank", this.confirmPassword);
+    }
   }
 }

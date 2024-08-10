@@ -6,6 +6,8 @@ package com.kirjaswappi.backend.common.jpa.daos;
 
 import java.util.Date;
 
+import jakarta.validation.constraints.NotNull;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +21,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OTPDao {
+  @NotNull
   private String email;
+  @NotNull
   private String otp;
+  @NotNull
   private Date createdAt;
 }
