@@ -12,6 +12,7 @@ public class Constants {
   public static final String USERS = "/users";
   public static final String ADMIN_USERS = "/admin-users";
   public static final String SIGNUP = "/signup";
+  public static final String VERIFY_EMAIL = "/verify-email";
   public static final String LOGIN = "/login";
   public static final String AUTHENTICATE = "/authenticate";
   public static final String REFRESH = "/refresh";

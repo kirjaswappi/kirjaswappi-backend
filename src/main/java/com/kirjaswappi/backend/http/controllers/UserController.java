@@ -11,15 +11,14 @@ import static com.kirjaswappi.backend.common.utils.Constants.LOGIN;
 import static com.kirjaswappi.backend.common.utils.Constants.RESET_PASSWORD;
 import static com.kirjaswappi.backend.common.utils.Constants.SIGNUP;
 import static com.kirjaswappi.backend.common.utils.Constants.USERS;
+import static com.kirjaswappi.backend.common.utils.Constants.VERIFY_EMAIL;
 
+import java.io.IOException;
 import java.util.List;
-
-import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,8 +26,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kirjaswappi.backend.common.service.OTPService;
 import com.kirjaswappi.backend.http.dtos.requests.ResetPasswordRequest;
 import com.kirjaswappi.backend.http.dtos.requests.UserAuthenticationRequest;
 import com.kirjaswappi.backend.http.dtos.requests.UserCreateRequest;
@@ -42,21 +43,29 @@ import com.kirjaswappi.backend.service.entities.User;
 import com.kirjaswappi.backend.service.exceptions.BadRequest;
 
 @RestController
-@Validated
 @RequestMapping(API_BASE + USERS)
 public class UserController {
   @Autowired
   private UserService userService;
+  @Autowired
+  private OTPService otpService;
 
   @PostMapping(SIGNUP)
-  public ResponseEntity<UserCreateResponse> createUser(@Valid @RequestBody UserCreateRequest user) {
+  public ResponseEntity<UserCreateResponse> createUser(@RequestBody UserCreateRequest user) throws IOException {
     User savedUser = userService.addUser(user.toEntity());
+    otpService.saveAndSendOTP(savedUser.getEmail());
     return ResponseEntity.status(HttpStatus.CREATED).body(new UserCreateResponse(savedUser));
   }
 
+  @PostMapping(VERIFY_EMAIL)
+  public ResponseEntity<String> verifyEmail(@RequestParam String email, @RequestParam String otp) {
+    otpService.verifyOTPByEmail(email, otp);
+    userService.verifyEmail(email);
+    return ResponseEntity.ok("Email: " + email + " verified successfully.");
+  }
+
   @PutMapping(ID)
-  public ResponseEntity<UserUpdateResponse> updateUser(@PathVariable String id,
-      @Valid @RequestBody UserUpdateRequest user) {
+  public ResponseEntity<UserUpdateResponse> updateUser(@PathVariable String id, @RequestBody UserUpdateRequest user) {
     // validate id:
     if (!id.equals(user.getId())) {
       throw new BadRequest("idMismatch", id, user.getId());
@@ -85,14 +94,13 @@ public class UserController {
   }
 
   @PostMapping(LOGIN)
-  public ResponseEntity<UserResponse> login(@Valid @RequestBody UserAuthenticationRequest userAuthenticationRequest) {
+  public ResponseEntity<UserResponse> login(@RequestBody UserAuthenticationRequest userAuthenticationRequest) {
     User user = userService.verifyLogin(userAuthenticationRequest.toEntity());
     return ResponseEntity.status(HttpStatus.OK).body(new UserResponse(user));
   }
 
   @PostMapping(RESET_PASSWORD + EMAIL)
-  public ResponseEntity<Void> resetPassword(@PathVariable String email,
-      @Valid @RequestBody ResetPasswordRequest request) {
+  public ResponseEntity<Void> resetPassword(@PathVariable String email, @RequestBody ResetPasswordRequest request) {
     userService.verifyCurrentPassword(email, request.getCurrentPassword());
     userService.resetPassword(email, request.toEntity());
     return ResponseEntity.ok().build();

@@ -9,20 +9,32 @@ import java.io.Serializable;
 import lombok.Getter;
 import lombok.Setter;
 
-import com.kirjaswappi.backend.http.validations.annotations.EmailValidation;
+import com.kirjaswappi.backend.http.validations.UserValidation;
 import com.kirjaswappi.backend.service.entities.User;
+import com.kirjaswappi.backend.service.exceptions.BadRequest;
 
 @Getter
 @Setter
 public class UserAuthenticationRequest implements Serializable {
-  @EmailValidation(message = "Please provide a valid email address")
   private String email;
   private String password;
 
   public User toEntity() {
+    validateProperties();
     var entity = new User();
     entity.setEmail(this.email);
     entity.setPassword(this.password);
     return entity;
+  }
+
+  private void validateProperties() {
+    // validate email:
+    if (!UserValidation.validateEmail(this.email)) {
+      throw new BadRequest("invalidEmailAddress", this.email);
+    }
+    // validate password:
+    if (!UserValidation.validateNotBlank(this.password)) {
+      throw new BadRequest("passwordCannotBeBlank", this.password);
+    }
   }
 }

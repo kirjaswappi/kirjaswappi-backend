@@ -28,7 +28,7 @@ public class UserService {
   UserMapper mapper;
 
   public User addUser(User user) {
-    // validate email exists:
+    // validate user exists:
     if (userRepository.findByEmail(user.getEmail()).isPresent()) {
       throw new BadRequest("emailAlreadyExists", user.getEmail());
     }
@@ -39,6 +39,7 @@ public class UserService {
 
     // save user:
     UserDao dao = mapper.toDao(user, salt);
+    dao.setEmailVerified(false);
     return mapper.toEntity(userRepository.save(dao));
   }
 
@@ -57,10 +58,24 @@ public class UserService {
 
   public User updateUser(User user) {
     // validate user exists:
-    if (userRepository.findById(user.getId()).isEmpty()) {
-      throw new UserNotFound("userNotFound", user.getId());
+    var dao = userRepository.findById(user.getId())
+        .orElseThrow(() -> new UserNotFound("userNotFound", user.getId()));
+
+    // check email verification status:
+    if (!dao.isEmailVerified()) {
+      throw new BadRequest("emailNotVerified", user.getEmail());
     }
-    UserDao dao = mapper.toDao(user);
+
+    // update user details:
+    dao.setFirstName(user.getFirstName());
+    dao.setLastName(user.getLastName());
+    dao.setStreetName(user.getStreetName());
+    dao.setHouseNumber(user.getHouseNumber());
+    dao.setZipCode(user.getZipCode());
+    dao.setCity(user.getCity());
+    dao.setCountry(user.getCountry());
+    dao.setPhoneNumber(user.getPhoneNumber());
+
     return mapper.toEntity(userRepository.save(dao));
   }
 
@@ -68,6 +83,11 @@ public class UserService {
     // get salt from email:
     UserDao dao = userRepository.findByEmail(user.getEmail())
         .orElseThrow(() -> new InvalidCredentials("invalidCredentials"));
+
+    // check email verification status:
+    if (!dao.isEmailVerified()) {
+      throw new BadRequest("emailNotVerified", user.getEmail());
+    }
 
     // hash password with salt:
     String password = Util.hashPassword(user.getPassword(), dao.getSalt());
@@ -110,6 +130,16 @@ public class UserService {
     // save password:
     dao.setSalt(newSalt);
     dao.setPassword(newPasswordWithNewSalt);
+    userRepository.save(dao);
+  }
+
+  public void verifyEmail(String email) {
+    // get user from email:
+    UserDao dao = userRepository.findByEmail(email)
+        .orElseThrow(() -> new BadRequest("invalidEmailProvided"));
+
+    // update email verification status:
+    dao.setEmailVerified(true);
     userRepository.save(dao);
   }
 }
