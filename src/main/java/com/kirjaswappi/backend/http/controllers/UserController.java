@@ -5,6 +5,7 @@
 package com.kirjaswappi.backend.http.controllers;
 
 import static com.kirjaswappi.backend.common.utils.Constants.API_BASE;
+import static com.kirjaswappi.backend.common.utils.Constants.EMAIL;
 import static com.kirjaswappi.backend.common.utils.Constants.ID;
 import static com.kirjaswappi.backend.common.utils.Constants.LOGIN;
 import static com.kirjaswappi.backend.common.utils.Constants.RESET_PASSWORD;
@@ -98,7 +99,7 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.OK).body(new UserResponse(user));
   }
 
-  @PostMapping(RESET_PASSWORD)
+  @PostMapping(RESET_PASSWORD + EMAIL)
   public ResponseEntity<Void> resetPassword(@PathVariable String email, @RequestBody ResetPasswordRequest request) {
     userService.verifyCurrentPassword(email, request.getCurrentPassword());
     userService.resetPassword(email, request.toEntity());
