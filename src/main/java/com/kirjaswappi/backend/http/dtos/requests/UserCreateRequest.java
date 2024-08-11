@@ -24,7 +24,7 @@ public class UserCreateRequest {
     var entity = new User();
     entity.setFirstName(this.firstName);
     entity.setLastName(this.lastName);
-    entity.setEmail(this.email);
+    entity.setEmail(this.email.toLowerCase());
     entity.setPassword(this.password);
     return entity;
   }

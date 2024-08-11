@@ -59,9 +59,9 @@ public class UserController {
 
   @PostMapping(VERIFY_EMAIL)
   public ResponseEntity<String> verifyEmail(@RequestParam String email, @RequestParam String otp) {
-    otpService.verifyOTPByEmail(email, otp);
-    userService.verifyEmail(email);
-    return ResponseEntity.ok("Email: " + email + " verified successfully.");
+    otpService.verifyOTPByEmail(email.toLowerCase(), otp);
+    userService.verifyEmail(email.toLowerCase());
+    return ResponseEntity.ok("Email: " + email.toLowerCase() + " verified successfully.");
   }
 
   @PutMapping(ID)

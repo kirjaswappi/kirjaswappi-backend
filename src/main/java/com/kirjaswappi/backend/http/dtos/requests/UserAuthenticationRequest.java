@@ -22,7 +22,7 @@ public class UserAuthenticationRequest implements Serializable {
   public User toEntity() {
     validateProperties();
     var entity = new User();
-    entity.setEmail(this.email);
+    entity.setEmail(this.email.toLowerCase());
     entity.setPassword(this.password);
     return entity;
   }

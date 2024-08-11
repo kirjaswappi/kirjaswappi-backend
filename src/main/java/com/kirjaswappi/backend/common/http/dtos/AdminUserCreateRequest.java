@@ -18,7 +18,7 @@ public class AdminUserCreateRequest {
 
   public AdminUser toEntity() {
     var entity = new AdminUser();
-    entity.setUsername(this.username);
+    entity.setUsername(this.username.toLowerCase());
     entity.setPassword(this.password);
     entity.setRole(this.role);
     return entity;

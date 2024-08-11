@@ -24,13 +24,13 @@ public class OTPController {
 
   @GetMapping(SEND_OTP)
   public ResponseEntity<String> sendOTP(@RequestParam String email) throws IOException {
-    otpService.saveAndSendOTP(email);
-    return ResponseEntity.ok("OTP sent to " + email + " successfully.");
+    otpService.saveAndSendOTP(email.toLowerCase());
+    return ResponseEntity.ok("OTP sent to " + email.toLowerCase() + " successfully.");
   }
 
   @GetMapping(VERIFY_OTP)
   public ResponseEntity<String> verifyOTP(@RequestParam String email, @RequestParam String otp) throws IOException {
-    otpService.verifyOTPByEmail(email, otp);
-    return ResponseEntity.ok("OTP verified for " + email + " successfully.");
+    otpService.verifyOTPByEmail(email.toLowerCase(), otp);
+    return ResponseEntity.ok("OTP verified for " + email.toLowerCase() + " successfully.");
   }
 }
