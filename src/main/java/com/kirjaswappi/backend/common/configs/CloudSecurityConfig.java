@@ -39,7 +39,7 @@ public class CloudSecurityConfig {
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOrigins(List.of("*")); // Allow all origins or customize as per your need
+    configuration.setAllowedOriginPatterns(List.of("*")); // Allow all origins or customize as per your need
     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")); // Allow all
                                                                                                         // HTTP methods
                                                                                                         // or customize
