@@ -7,3 +7,6 @@ spring:
       host: localhost
       port: 27017
       database: kirjaswappi
+
+server:
+  port: 8080

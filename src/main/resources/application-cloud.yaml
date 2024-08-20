@@ -14,3 +14,4 @@ springdoc:
 
 server:
   forward-headers-strategy: native
+  port: 10000

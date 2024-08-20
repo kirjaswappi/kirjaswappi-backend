@@ -19,9 +19,6 @@ spring:
           starttls:
             enable: true
 
-server:
-  port: 8080
-
 resilience4j.retry:
   instances:
     globalRetry:
@@ -32,3 +29,20 @@ resilience4j.retry:
         - java.net.ConnectException
         - org.springframework.dao.OptimisticLockingFailureException
         - org.springframework.web.client.HttpServerErrorException
+
+logging:
+  level:
+    org:
+      springframework:
+        boot:
+          actuate: DEBUG
+        security: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+    endpoint:
+      health:
+        show-details: always
