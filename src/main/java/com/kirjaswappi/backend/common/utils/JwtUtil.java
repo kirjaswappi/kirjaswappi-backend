@@ -29,7 +29,7 @@ public class JwtUtil {
   private static final String SECRET_STRING = "admin-secretgsfgsgsergergergerwgewrgewrgwergwergwregre";
   private static final byte[] SECRET_KEY_BYTES = SECRET_STRING.getBytes(StandardCharsets.UTF_8);
   private static final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(SECRET_KEY_BYTES);
-  private static final long TOKEN_EXPIRATION_MS = 30 * 60 * 1000;
+  private static final long TOKEN_EXPIRATION_MS = 1 * 60 * 1000;
   private static final String TOKEN_TYPE = "jwtToken";
 
   public String extractUsername(String token) {
