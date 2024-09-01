@@ -57,7 +57,7 @@ public class CloudSecurityConfig {
   public SecurityFilterChain defaultSecurityFilterChain(FilterApiRequest filterApiRequest, HttpSecurity http)
       throws Exception {
     return http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .csrf(crsf -> crsf.disable())
+        .csrf(csrf -> csrf.ignoringRequestMatchers("/**")) // Allow all CSRF requests
         .authorizeHttpRequests(authorize -> authorize
             .requestMatchers(HEALTH, API_DOCS, SWAGGER_UI, API_BASE + AUTHENTICATE).permitAll()
             .requestMatchers(POST, API_BASE + ADMIN_USERS).hasAuthority(ADMIN)
