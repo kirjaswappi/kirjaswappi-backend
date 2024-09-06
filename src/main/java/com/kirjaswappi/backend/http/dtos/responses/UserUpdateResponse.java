@@ -4,6 +4,8 @@
  */
 package com.kirjaswappi.backend.http.dtos.responses;
 
+import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,6 +24,8 @@ public class UserUpdateResponse {
   private String city;
   private String country;
   private String phoneNumber;
+  private String aboutMe;
+  private List<String> favGenres;
 
   public UserUpdateResponse(User entity) {
     this.id = entity.getId();
@@ -34,5 +38,7 @@ public class UserUpdateResponse {
     this.city = entity.getCity();
     this.country = entity.getCountry();
     this.phoneNumber = entity.getPhoneNumber();
+    this.aboutMe = entity.getAboutMe();
+    this.favGenres = entity.getFavGenres();
   }
 }

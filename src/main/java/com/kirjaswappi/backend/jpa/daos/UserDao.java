@@ -4,6 +4,8 @@
  */
 package com.kirjaswappi.backend.jpa.daos;
 
+import java.util.List;
+
 import jakarta.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
@@ -39,13 +41,17 @@ public class UserDao {
   @Nullable
   private String houseNumber;
   @Nullable
-  private int zipCode;
+  private Integer zipCode;
   @Nullable
   private String city;
   @Nullable
   private String country;
   @Nullable
   private String phoneNumber;
+  @Nullable
+  private String aboutMe;
+  @Nullable
+  private List<String> favGenres;
   @NotNull
   private boolean isEmailVerified;
 }

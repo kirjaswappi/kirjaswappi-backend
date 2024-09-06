@@ -19,9 +19,7 @@ public class ResetPasswordRequest {
   private String confirmPassword;
 
   public User toEntity() {
-    if (!this.newPassword.equals(this.confirmPassword)) {
-      throw new BadRequest("passwordMismatch");
-    }
+    this.validateProperties();
     var entity = new User();
     entity.setPassword(this.newPassword);
     return entity;
@@ -39,6 +37,10 @@ public class ResetPasswordRequest {
     // validate confirm password:
     if (!UserValidation.validateNotBlank(this.confirmPassword)) {
       throw new BadRequest("confirmPasswordCannotBeBlank", this.confirmPassword);
+    }
+    // validate password and confirm password:
+    if (!this.newPassword.equals(this.confirmPassword)) {
+      throw new BadRequest("passwordsDoNotMatch", this.confirmPassword);
     }
   }
 }

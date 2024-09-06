@@ -28,9 +28,13 @@ public class UserService {
   UserMapper mapper;
 
   public User addUser(User user) {
-    // validate user exists:
-    if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-      throw new BadRequest("emailAlreadyExists", user.getEmail());
+    // validate user exists and email is not verified:
+    if (userRepository.findByEmailAndIsEmailVerified(user.getEmail(), false).isPresent()) {
+      throw new BadRequest("userExistsButNotVerified", user.getEmail());
+    }
+
+    if (userRepository.findByEmailAndIsEmailVerified(user.getEmail(), true).isPresent()) {
+      throw new BadRequest("userExistsAlready", user.getEmail());
     }
 
     // add salt to password:

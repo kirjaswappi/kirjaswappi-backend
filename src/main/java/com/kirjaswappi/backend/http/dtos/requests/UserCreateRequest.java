@@ -18,9 +18,10 @@ public class UserCreateRequest {
   private String lastName;
   private String email;
   private String password;
+  private String confirmPassword;
 
   public User toEntity() {
-    validateProperties();
+    this.validateProperties();
     var entity = new User();
     entity.setFirstName(this.firstName);
     entity.setLastName(this.lastName);
@@ -45,6 +46,14 @@ public class UserCreateRequest {
     // validate password:
     if (!UserValidation.validateNotBlank(this.password)) {
       throw new BadRequest("passwordCannotBeBlank", this.password);
+    }
+    // validate confirm password:
+    if (!UserValidation.validateNotBlank(this.confirmPassword)) {
+      throw new BadRequest("confirmPasswordCannotBeBlank", this.confirmPassword);
+    }
+    // validate password and confirm password:
+    if (!this.password.equals(this.confirmPassword)) {
+      throw new BadRequest("passwordsDoNotMatch", this.confirmPassword);
     }
   }
 }
