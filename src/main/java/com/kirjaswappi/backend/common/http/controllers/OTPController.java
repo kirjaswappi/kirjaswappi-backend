@@ -4,20 +4,21 @@
  */
 package com.kirjaswappi.backend.common.http.controllers;
 
-import static com.kirjaswappi.backend.common.utils.Constants.SEND_OTP;
-import static com.kirjaswappi.backend.common.utils.Constants.VERIFY_OTP;
+import static com.kirjaswappi.backend.common.utils.Constants.*;
 
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kirjaswappi.backend.common.service.OTPService;
 
 @RestController
+@RequestMapping(API_BASE)
 public class OTPController {
   @Autowired
   private OTPService otpService;

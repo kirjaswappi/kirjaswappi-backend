@@ -20,7 +20,7 @@ public class UserAuthenticationRequest implements Serializable {
   private String password;
 
   public User toEntity() {
-    validateProperties();
+    this.validateProperties();
     var entity = new User();
     entity.setEmail(this.email.toLowerCase());
     entity.setPassword(this.password);

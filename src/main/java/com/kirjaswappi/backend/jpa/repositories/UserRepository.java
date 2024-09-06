@@ -14,4 +14,6 @@ public interface UserRepository extends MongoRepository<UserDao, String> {
   Optional<UserDao> findByEmailAndPassword(String email, String password);
 
   Optional<UserDao> findByEmail(String email);
+
+  Optional<UserDao> findByEmailAndIsEmailVerified(String email, boolean isEmailVerified);
 }
