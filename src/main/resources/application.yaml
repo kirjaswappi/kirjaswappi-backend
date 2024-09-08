@@ -7,7 +7,7 @@ spring:
   profiles:
     active: local
   application:
-    name: kirjaswappi-backend
+    name: KirjaSwappi-Backend
   data:
     mongodb:
       autoIndexCreation: true

@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import com.kirjaswappi.backend.common.exceptions.BusinessException;
 import com.kirjaswappi.backend.common.exceptions.SystemException;
@@ -34,6 +35,7 @@ import com.kirjaswappi.backend.service.exceptions.UserNotFound;
 public class GlobalExceptionHandler {
   private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
   private static final String INTERNAL_ERROR = "internalServerError";
+  private static final String PATH_NOT_FOUND = "pathNotFound";
   private final MessageSource messageSource;
 
   @Autowired
@@ -64,6 +66,13 @@ public class GlobalExceptionHandler {
   public ErrorResponse handleGenericSystemException(SystemException exception, WebRequest webRequest) {
     return new ErrorResponse(new ErrorResponse.Error(exception.getCode(),
         this.resolveMessage(INTERNAL_ERROR, null, webRequest.getLocale())));
+  }
+
+  @ExceptionHandler(NoHandlerFoundException.class)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  public ErrorResponse handleNoHandlerFoundException(WebRequest webRequest) {
+    return new ErrorResponse(new ErrorResponse.Error(PATH_NOT_FOUND,
+        this.resolveMessage(PATH_NOT_FOUND, null, webRequest.getLocale()), getCurrentPath()));
   }
 
   @ExceptionHandler(BusinessException.class)
