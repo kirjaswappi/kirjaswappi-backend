@@ -13,26 +13,22 @@ import com.kirjaswappi.backend.service.exceptions.BadRequest;
 
 @Getter
 @Setter
-public class ResetPasswordRequest {
-  private String otp;
+public class ChangePasswordRequest {
+  private String currentPassword;
   private String newPassword;
   private String confirmPassword;
 
-  public User toEntity(String email) {
-    this.validateProperties(email);
+  public User toEntity() {
+    this.validateProperties();
     var entity = new User();
     entity.setPassword(this.newPassword);
     return entity;
   }
 
-  private void validateProperties(String email) {
-    // validate email:
-    if (!UserValidation.validateEmail(email)) {
-      throw new BadRequest("invalidEmailAddress", email);
-    }
+  private void validateProperties() {
     // validate current password:
-    if (!UserValidation.validateNotBlank(this.otp)) {
-      throw new BadRequest("otpCannotBeBlank", this.otp);
+    if (!UserValidation.validateNotBlank(this.currentPassword)) {
+      throw new BadRequest("currentPasswordCannotBeBlank", this.currentPassword);
     }
     // validate new password:
     if (!UserValidation.validateNotBlank(this.newPassword)) {

@@ -4,14 +4,7 @@
  */
 package com.kirjaswappi.backend.http.controllers;
 
-import static com.kirjaswappi.backend.common.utils.Constants.API_BASE;
-import static com.kirjaswappi.backend.common.utils.Constants.EMAIL;
-import static com.kirjaswappi.backend.common.utils.Constants.ID;
-import static com.kirjaswappi.backend.common.utils.Constants.LOGIN;
-import static com.kirjaswappi.backend.common.utils.Constants.RESET_PASSWORD;
-import static com.kirjaswappi.backend.common.utils.Constants.SIGNUP;
-import static com.kirjaswappi.backend.common.utils.Constants.USERS;
-import static com.kirjaswappi.backend.common.utils.Constants.VERIFY_EMAIL;
+import static com.kirjaswappi.backend.common.utils.Constants.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -30,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kirjaswappi.backend.common.service.OTPService;
+import com.kirjaswappi.backend.http.dtos.requests.ChangePasswordRequest;
 import com.kirjaswappi.backend.http.dtos.requests.ResetPasswordRequest;
 import com.kirjaswappi.backend.http.dtos.requests.UserAuthenticationRequest;
 import com.kirjaswappi.backend.http.dtos.requests.UserCreateRequest;
@@ -99,11 +93,19 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.OK).body(new UserResponse(user));
   }
 
-  @PostMapping(RESET_PASSWORD + EMAIL)
-  public ResponseEntity<Void> resetPassword(@PathVariable String email, @RequestBody ResetPasswordRequest request) {
+  @PostMapping(CHANGE_PASSWORD + EMAIL)
+  public ResponseEntity<String> changePassword(@PathVariable String email, @RequestBody ChangePasswordRequest request) {
     userService.verifyCurrentPassword(email, request.getCurrentPassword());
-    userService.resetPassword(email, request.toEntity());
-    return ResponseEntity.ok().build();
+    userService.changePassword(email, request.toEntity());
+    return ResponseEntity.ok("Password changed successfully for user: " + email.toLowerCase());
+  }
+
+  @PostMapping(RESET_PASSWORD + EMAIL)
+  public ResponseEntity<String> resetPassword(@PathVariable String email, @RequestBody ResetPasswordRequest request) {
+    var entity = request.toEntity(email);
+    otpService.verifyOTPByEmail(email.toLowerCase(), request.getOtp());
+    userService.changePassword(email.toLowerCase(), entity);
+    return ResponseEntity.ok("Password reset successfully for user: " + email.toLowerCase());
   }
 
 }

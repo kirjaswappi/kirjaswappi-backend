@@ -104,7 +104,7 @@ public class UserService {
   public void verifyCurrentPassword(String email, String currentPassword) {
     // get salt from email:
     UserDao dao = userRepository.findByEmail(email)
-        .orElseThrow(() -> new BadRequest("invalidEmailProvided"));
+        .orElseThrow(() -> new BadRequest("userNotFound", email));
 
     // hash password with salt:
     String password = Util.hashPassword(currentPassword, dao.getSalt());
@@ -115,16 +115,16 @@ public class UserService {
     }
   }
 
-  public void resetPassword(String email, User user) {
+  public void changePassword(String email, User user) {
     // get user from email:
     UserDao dao = userRepository.findByEmail(email)
-        .orElseThrow(() -> new BadRequest("invalidEmailProvided"));
+        .orElseThrow(() -> new BadRequest("userNotFound", email));
 
     // forbid newPassword to be the same as currentPassword:
     String currentPassword = dao.getPassword();
     String newPassword = Util.hashPassword(user.getPassword(), dao.getSalt());
     if (currentPassword.equals(newPassword)) {
-      throw new BadRequest("newPasswordSameAsCurrentPassword");
+      throw new BadRequest("newPasswordCannotBeSameAsCurrentPassword", newPassword);
     }
 
     // add new salt to new password:
