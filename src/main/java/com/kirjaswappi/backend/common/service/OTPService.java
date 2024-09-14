@@ -44,7 +44,7 @@ public class OTPService {
         .orElseThrow(() -> new ResourceNotFound("otpNotFoundForEmail", email)));
   }
 
-  public void verifyOTPByEmail(String email, String otp) {
+  public String verifyOTPByEmail(String email, String otp) {
     var otpEntity = this.getOTP(email);
 
     // check provided OTP with the stored OTP:
@@ -59,9 +59,10 @@ public class OTPService {
 
     // Delete the OTP after verification:
     otpRepository.deleteAllByEmail(email);
+    return email;
   }
 
-  public void saveAndSendOTP(String email) throws IOException {
+  public String saveAndSendOTP(String email) throws IOException {
     // Delete all the previous OTPs:
     otpRepository.deleteAllByEmail(email);
 
@@ -74,5 +75,6 @@ public class OTPService {
 
     // Send OTP via email:
     emailService.sendOTPByEmail(newOTP.getEmail(), newOTP.getOtp());
+    return newOTP.getEmail();
   }
 }
