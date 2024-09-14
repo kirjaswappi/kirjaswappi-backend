@@ -9,6 +9,7 @@ import static com.kirjaswappi.backend.common.utils.Constants.NUMERIC;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.Date;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,6 +46,10 @@ public class OTPService {
   }
 
   public String verifyOTPByEmail(String email, String otp) {
+    if (!validateEmail(email)) {
+      throw new BadRequest("invalidEmail", email);
+    }
+
     var otpEntity = this.getOTP(email);
 
     // check provided OTP with the stored OTP:
@@ -59,10 +64,14 @@ public class OTPService {
 
     // Delete the OTP after verification:
     otpRepository.deleteAllByEmail(email);
-    return email;
+    return otpEntity.getEmail();
   }
 
   public String saveAndSendOTP(String email) throws IOException {
+    if (!validateEmail(email)) {
+      throw new BadRequest("invalidEmail", email);
+    }
+
     // Delete all the previous OTPs:
     otpRepository.deleteAllByEmail(email);
 
@@ -75,6 +84,11 @@ public class OTPService {
 
     // Send OTP via email:
     emailService.sendOTPByEmail(newOTP.getEmail(), newOTP.getOtp());
-    return newOTP.getEmail();
+    return dao.getEmail();
+  }
+
+  private static boolean validateEmail(String emailAddress) {
+    String regexPattern = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+    return Pattern.compile(regexPattern).matcher(emailAddress).matches();
   }
 }
