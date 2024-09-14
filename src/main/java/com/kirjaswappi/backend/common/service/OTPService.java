@@ -8,7 +8,6 @@ import static com.kirjaswappi.backend.common.utils.Constants.NUMERIC;
 
 import java.io.IOException;
 import java.security.SecureRandom;
-import java.util.Date;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,14 +75,16 @@ public class OTPService {
     otpRepository.deleteAllByEmail(email);
 
     // Generate new OTP:
-    var newOTP = new OTP(email, this.generateOTP(), new Date());
+    var newOTP = new OTP();
+    newOTP.setEmail(email);
+    newOTP.setOtp(generateOTP());
 
     // Save the new OTP:
     var dao = otpMapper.toDao(newOTP);
     otpRepository.save(dao);
 
     // Send OTP via email:
-    emailService.sendOTPByEmail(newOTP.getEmail(), newOTP.getOtp());
+    emailService.sendOTPByEmail(dao.getEmail(), newOTP.getOtp());
     return dao.getEmail();
   }
 
