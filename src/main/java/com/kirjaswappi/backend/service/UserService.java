@@ -115,7 +115,7 @@ public class UserService {
     }
   }
 
-  public void changePassword(String email, User user) {
+  public String changePassword(String email, User user) {
     // get user from email:
     UserDao dao = userRepository.findByEmail(email)
         .orElseThrow(() -> new BadRequest("userNotFound", email));
@@ -135,9 +135,11 @@ public class UserService {
     dao.setSalt(newSalt);
     dao.setPassword(newPasswordWithNewSalt);
     userRepository.save(dao);
+
+    return dao.getEmail();
   }
 
-  public void verifyEmail(String email) {
+  public String verifyEmail(String email) {
     // get user from email:
     UserDao dao = userRepository.findByEmail(email)
         .orElseThrow(() -> new BadRequest("invalidEmailProvided"));
@@ -145,5 +147,7 @@ public class UserService {
     // update email verification status:
     dao.setEmailVerified(true);
     userRepository.save(dao);
+
+    return dao.getEmail();
   }
 }

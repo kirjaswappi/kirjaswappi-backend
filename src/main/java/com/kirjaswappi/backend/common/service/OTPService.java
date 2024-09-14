@@ -8,7 +8,7 @@ import static com.kirjaswappi.backend.common.utils.Constants.NUMERIC;
 
 import java.io.IOException;
 import java.security.SecureRandom;
-import java.util.Date;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,7 +44,11 @@ public class OTPService {
         .orElseThrow(() -> new ResourceNotFound("otpNotFoundForEmail", email)));
   }
 
-  public void verifyOTPByEmail(String email, String otp) {
+  public String verifyOTPByEmail(String email, String otp) {
+    if (!validateEmail(email)) {
+      throw new BadRequest("invalidEmail", email);
+    }
+
     var otpEntity = this.getOTP(email);
 
     // check provided OTP with the stored OTP:
@@ -59,20 +63,33 @@ public class OTPService {
 
     // Delete the OTP after verification:
     otpRepository.deleteAllByEmail(email);
+    return otpEntity.getEmail();
   }
 
-  public void saveAndSendOTP(String email) throws IOException {
+  public String saveAndSendOTP(String email) throws IOException {
+    if (!validateEmail(email)) {
+      throw new BadRequest("invalidEmail", email);
+    }
+
     // Delete all the previous OTPs:
     otpRepository.deleteAllByEmail(email);
 
     // Generate new OTP:
-    var newOTP = new OTP(email, this.generateOTP(), new Date());
+    var newOTP = new OTP();
+    newOTP.setEmail(email);
+    newOTP.setOtp(generateOTP());
 
     // Save the new OTP:
     var dao = otpMapper.toDao(newOTP);
     otpRepository.save(dao);
 
     // Send OTP via email:
-    emailService.sendOTPByEmail(newOTP.getEmail(), newOTP.getOtp());
+    emailService.sendOTPByEmail(dao.getEmail(), newOTP.getOtp());
+    return dao.getEmail();
+  }
+
+  private static boolean validateEmail(String emailAddress) {
+    String regexPattern = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+    return Pattern.compile(regexPattern).matcher(emailAddress).matches();
   }
 }

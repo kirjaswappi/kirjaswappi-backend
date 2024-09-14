@@ -54,8 +54,8 @@ public class UserController {
   @PostMapping(VERIFY_EMAIL)
   public ResponseEntity<String> verifyEmail(@RequestParam String email, @RequestParam String otp) {
     otpService.verifyOTPByEmail(email.toLowerCase(), otp);
-    userService.verifyEmail(email.toLowerCase());
-    return ResponseEntity.ok("Email: " + email.toLowerCase() + " verified successfully.");
+    String userEmail = userService.verifyEmail(email.toLowerCase());
+    return ResponseEntity.ok("Email: " + userEmail + " verified successfully.");
   }
 
   @PutMapping(ID)
@@ -96,16 +96,16 @@ public class UserController {
   @PostMapping(CHANGE_PASSWORD + EMAIL)
   public ResponseEntity<String> changePassword(@PathVariable String email, @RequestBody ChangePasswordRequest request) {
     userService.verifyCurrentPassword(email, request.getCurrentPassword());
-    userService.changePassword(email, request.toEntity());
-    return ResponseEntity.ok("Password changed successfully for user: " + email.toLowerCase());
+    String userEmail = userService.changePassword(email, request.toEntity());
+    return ResponseEntity.ok("Password changed successfully for user: " + userEmail);
   }
 
   @PostMapping(RESET_PASSWORD + EMAIL)
   public ResponseEntity<String> resetPassword(@PathVariable String email, @RequestBody ResetPasswordRequest request) {
     var entity = request.toEntity(email);
     otpService.verifyOTPByEmail(email.toLowerCase(), request.getOtp());
-    userService.changePassword(email.toLowerCase(), entity);
-    return ResponseEntity.ok("Password reset successfully for user: " + email.toLowerCase());
+    String userEmail = userService.changePassword(email.toLowerCase(), entity);
+    return ResponseEntity.ok("Password reset successfully for user: " + userEmail);
   }
 
 }
