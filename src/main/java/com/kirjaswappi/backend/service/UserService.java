@@ -28,14 +28,8 @@ public class UserService {
   UserMapper mapper;
 
   public User addUser(User user) {
-    // validate user exists and email is not verified:
-    if (userRepository.findByEmailAndIsEmailVerified(user.getEmail(), false).isPresent()) {
-      throw new BadRequest("userExistsButNotVerified", user.getEmail());
-    }
-
-    if (userRepository.findByEmailAndIsEmailVerified(user.getEmail(), true).isPresent()) {
-      throw new BadRequest("userExistsAlready", user.getEmail());
-    }
+    this.checkUserExistButNotVerified(user);
+    this.checkIfUserAlreadyExists(user);
 
     // add salt to password:
     String salt = Util.generateSalt();
@@ -45,6 +39,23 @@ public class UserService {
     UserDao dao = mapper.toDao(user, salt);
     dao.setEmailVerified(false);
     return mapper.toEntity(userRepository.save(dao));
+  }
+
+  public boolean checkIfUserExists(String email) {
+    return userRepository.findByEmail(email).isPresent();
+  }
+
+  private void checkIfUserAlreadyExists(User user) {
+    if (userRepository.findByEmailAndIsEmailVerified(user.getEmail(), true).isPresent()) {
+      throw new BadRequest("userExistsAlready", user.getEmail());
+    }
+  }
+
+  private void checkUserExistButNotVerified(User user) {
+    // validate user exists and email is not verified:
+    if (userRepository.findByEmailAndIsEmailVerified(user.getEmail(), false).isPresent()) {
+      throw new BadRequest("userExistsButNotVerified", user.getEmail());
+    }
   }
 
   public User getUser(String id) {
@@ -71,6 +82,12 @@ public class UserService {
     }
 
     // update user details:
+    this.updateUserDetails(user, dao);
+
+    return mapper.toEntity(userRepository.save(dao));
+  }
+
+  private static void updateUserDetails(User user, UserDao dao) {
     dao.setFirstName(user.getFirstName());
     dao.setLastName(user.getLastName());
     dao.setStreetName(user.getStreetName());
@@ -79,8 +96,6 @@ public class UserService {
     dao.setCity(user.getCity());
     dao.setCountry(user.getCountry());
     dao.setPhoneNumber(user.getPhoneNumber());
-
-    return mapper.toEntity(userRepository.save(dao));
   }
 
   public User verifyLogin(User user) {

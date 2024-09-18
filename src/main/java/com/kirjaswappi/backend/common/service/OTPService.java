@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.kirjaswappi.backend.common.jpa.repositories.OTPRepository;
 import com.kirjaswappi.backend.common.service.entities.OTP;
 import com.kirjaswappi.backend.common.service.mappers.OTPMapper;
+import com.kirjaswappi.backend.service.UserService;
 import com.kirjaswappi.backend.service.exceptions.BadRequest;
 import com.kirjaswappi.backend.service.exceptions.ResourceNotFound;
 
@@ -29,6 +30,8 @@ public class OTPService {
   private OTPRepository otpRepository;
   @Autowired
   private OTPMapper otpMapper;
+  @Autowired
+  private UserService userService;
 
   private String generateOTP() {
     SecureRandom secureRandom = new SecureRandom();
@@ -66,9 +69,18 @@ public class OTPService {
     return otpEntity.getEmail();
   }
 
+  private boolean checkUserExists(String email) {
+    return userService.checkIfUserExists(email);
+  }
+
   public String saveAndSendOTP(String email) throws IOException {
     if (!validateEmail(email)) {
       throw new BadRequest("invalidEmail", email);
+    }
+
+    // Check if the user exists:
+    if (!checkUserExists(email)) {
+      throw new BadRequest("userNotFound", email);
     }
 
     // Delete all the previous OTPs:

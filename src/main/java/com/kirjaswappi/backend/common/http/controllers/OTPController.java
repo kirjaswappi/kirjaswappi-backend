@@ -9,12 +9,16 @@ import static com.kirjaswappi.backend.common.utils.Constants.*;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kirjaswappi.backend.common.http.dtos.requests.VerifyOtpRequest;
+import com.kirjaswappi.backend.common.http.dtos.responses.VerifyOtpResponse;
 import com.kirjaswappi.backend.common.service.OTPService;
 
 @RestController
@@ -24,14 +28,16 @@ public class OTPController {
   private OTPService otpService;
 
   @GetMapping(SEND_OTP)
-  public ResponseEntity<String> sendOTP(@RequestParam String email) throws IOException {
+  public ResponseEntity<VerifyOtpResponse> sendOTP(@RequestParam String email) throws IOException {
     String userEmail = otpService.saveAndSendOTP(email.toLowerCase());
-    return ResponseEntity.ok("OTP sent to " + userEmail + " successfully.");
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(new VerifyOtpResponse("OTP sent to " + userEmail + " successfully."));
   }
 
   @GetMapping(VERIFY_OTP)
-  public ResponseEntity<String> verifyOTP(@RequestParam String email, @RequestParam String otp) {
-    String userEmail = otpService.verifyOTPByEmail(email.toLowerCase(), otp);
-    return ResponseEntity.ok("OTP verified for " + userEmail + " successfully.");
+  public ResponseEntity<VerifyOtpResponse> verifyOTP(@RequestBody VerifyOtpRequest request) {
+    String userEmail = otpService.verifyOTPByEmail(request.getEmail().toLowerCase(), request.getOtp());
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(new VerifyOtpResponse("OTP verified for " + userEmail + " successfully."));
   }
 }

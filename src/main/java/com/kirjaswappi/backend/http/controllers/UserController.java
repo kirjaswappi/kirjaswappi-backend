@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kirjaswappi.backend.common.service.OTPService;
@@ -28,10 +27,14 @@ import com.kirjaswappi.backend.http.dtos.requests.ResetPasswordRequest;
 import com.kirjaswappi.backend.http.dtos.requests.UserAuthenticationRequest;
 import com.kirjaswappi.backend.http.dtos.requests.UserCreateRequest;
 import com.kirjaswappi.backend.http.dtos.requests.UserUpdateRequest;
+import com.kirjaswappi.backend.http.dtos.requests.VerifyEmailRequest;
+import com.kirjaswappi.backend.http.dtos.responses.ChangePasswordResponse;
+import com.kirjaswappi.backend.http.dtos.responses.ResetPasswordResponse;
 import com.kirjaswappi.backend.http.dtos.responses.UserCreateResponse;
 import com.kirjaswappi.backend.http.dtos.responses.UserListResponse;
 import com.kirjaswappi.backend.http.dtos.responses.UserResponse;
 import com.kirjaswappi.backend.http.dtos.responses.UserUpdateResponse;
+import com.kirjaswappi.backend.http.dtos.responses.VerifyEmailResponse;
 import com.kirjaswappi.backend.service.UserService;
 import com.kirjaswappi.backend.service.entities.User;
 import com.kirjaswappi.backend.service.exceptions.BadRequest;
@@ -52,10 +55,10 @@ public class UserController {
   }
 
   @PostMapping(VERIFY_EMAIL)
-  public ResponseEntity<String> verifyEmail(@RequestParam String email, @RequestParam String otp) {
-    otpService.verifyOTPByEmail(email.toLowerCase(), otp);
-    String userEmail = userService.verifyEmail(email.toLowerCase());
-    return ResponseEntity.ok("Email: " + userEmail + " verified successfully.");
+  public ResponseEntity<VerifyEmailResponse> verifyEmail(@RequestBody VerifyEmailRequest request) {
+    otpService.verifyOTPByEmail(request.getEmail().toLowerCase(), request.getOtp());
+    String userEmail = userService.verifyEmail(request.getEmail().toLowerCase());
+    return ResponseEntity.status(HttpStatus.OK).body(new VerifyEmailResponse(userEmail + " verified successfully"));
   }
 
   @PutMapping(ID)
@@ -94,18 +97,22 @@ public class UserController {
   }
 
   @PostMapping(CHANGE_PASSWORD + EMAIL)
-  public ResponseEntity<String> changePassword(@PathVariable String email, @RequestBody ChangePasswordRequest request) {
+  public ResponseEntity<ChangePasswordResponse> changePassword(@PathVariable String email,
+      @RequestBody ChangePasswordRequest request) {
     userService.verifyCurrentPassword(email, request.getCurrentPassword());
     String userEmail = userService.changePassword(email, request.toEntity());
-    return ResponseEntity.ok("Password changed successfully for user: " + userEmail);
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(new ChangePasswordResponse("Password changed for user: " + userEmail));
   }
 
   @PostMapping(RESET_PASSWORD + EMAIL)
-  public ResponseEntity<String> resetPassword(@PathVariable String email, @RequestBody ResetPasswordRequest request) {
+  public ResponseEntity<ResetPasswordResponse> resetPassword(@PathVariable String email,
+      @RequestBody ResetPasswordRequest request) {
     var entity = request.toEntity(email);
     otpService.verifyOTPByEmail(email.toLowerCase(), request.getOtp());
     String userEmail = userService.changePassword(email.toLowerCase(), entity);
-    return ResponseEntity.ok("Password reset successfully for user: " + userEmail);
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(new ResetPasswordResponse("Password changed for user: " + userEmail));
   }
 
 }

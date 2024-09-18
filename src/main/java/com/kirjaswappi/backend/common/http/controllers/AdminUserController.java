@@ -20,8 +20,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.kirjaswappi.backend.common.http.dtos.AdminUserCreateRequest;
-import com.kirjaswappi.backend.common.http.dtos.AdminUserResponse;
+import com.kirjaswappi.backend.common.http.dtos.requests.AdminUserCreateRequest;
+import com.kirjaswappi.backend.common.http.dtos.responses.AdminUserResponse;
 import com.kirjaswappi.backend.common.service.AdminUserService;
 import com.kirjaswappi.backend.common.service.entities.AdminUser;
 
