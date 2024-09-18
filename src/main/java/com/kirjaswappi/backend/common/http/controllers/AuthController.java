@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.kirjaswappi.backend.common.http.dtos.AuthenticationRequest;
-import com.kirjaswappi.backend.common.http.dtos.AuthenticationResponse;
-import com.kirjaswappi.backend.common.http.dtos.RefreshAuthenticationRequest;
-import com.kirjaswappi.backend.common.http.dtos.RefreshAuthenticationResponse;
+import com.kirjaswappi.backend.common.http.dtos.requests.AuthenticationRequest;
+import com.kirjaswappi.backend.common.http.dtos.requests.RefreshAuthenticationRequest;
+import com.kirjaswappi.backend.common.http.dtos.responses.AuthenticationResponse;
+import com.kirjaswappi.backend.common.http.dtos.responses.RefreshAuthenticationResponse;
 import com.kirjaswappi.backend.common.service.AuthService;
 import com.kirjaswappi.backend.common.service.entities.AdminUser;
 
