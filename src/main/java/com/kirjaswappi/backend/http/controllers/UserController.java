@@ -56,9 +56,9 @@ public class UserController {
 
   @PostMapping(VERIFY_EMAIL)
   public ResponseEntity<VerifyEmailResponse> verifyEmail(@RequestBody VerifyEmailRequest request) {
-    otpService.verifyOTPByEmail(request.getEmail().toLowerCase(), request.getOtp());
-    String userEmail = userService.verifyEmail(request.getEmail().toLowerCase());
-    return ResponseEntity.status(HttpStatus.OK).body(new VerifyEmailResponse(userEmail));
+    String email = otpService.verifyOTPByEmail(request.toEntity());
+    String verifiedEmail = userService.verifyEmail(email);
+    return ResponseEntity.status(HttpStatus.OK).body(new VerifyEmailResponse(verifiedEmail));
   }
 
   @PutMapping(ID)
@@ -79,8 +79,7 @@ public class UserController {
 
   @GetMapping
   public ResponseEntity<List<UserListResponse>> getUsers() {
-    List<UserListResponse> userListResponses = userService.getUsers().stream().map(UserListResponse::new)
-        .toList();
+    var userListResponses = userService.getUsers().stream().map(UserListResponse::new).toList();
     return ResponseEntity.status(HttpStatus.OK).body(userListResponses);
   }
 
@@ -99,20 +98,17 @@ public class UserController {
   @PostMapping(CHANGE_PASSWORD + EMAIL)
   public ResponseEntity<ChangePasswordResponse> changePassword(@PathVariable String email,
       @RequestBody ChangePasswordRequest request) {
-    userService.verifyCurrentPassword(email, request.getCurrentPassword());
-    String userEmail = userService.changePassword(email, request.toEntity());
-    return ResponseEntity.status(HttpStatus.OK)
-        .body(new ChangePasswordResponse(userEmail));
+    userService.verifyCurrentPassword(request.toVerifyPasswordEntity(email));
+    String userEmail = userService.changePassword(request.toChangePasswordEntity(email));
+    return ResponseEntity.status(HttpStatus.OK).body(new ChangePasswordResponse(userEmail));
   }
 
   @PostMapping(RESET_PASSWORD + EMAIL)
   public ResponseEntity<ResetPasswordResponse> resetPassword(@PathVariable String email,
       @RequestBody ResetPasswordRequest request) {
-    var entity = request.toEntity(email);
-    otpService.verifyOTPByEmail(email.toLowerCase(), request.getOtp());
-    String userEmail = userService.changePassword(email.toLowerCase(), entity);
-    return ResponseEntity.status(HttpStatus.OK)
-        .body(new ResetPasswordResponse(userEmail));
+    otpService.verifyOTPByEmail(request.toOtpEntity(email));
+    String userEmail = userService.changePassword(request.toUserEntity(email));
+    return ResponseEntity.status(HttpStatus.OK).body(new ResetPasswordResponse(userEmail));
   }
 
 }

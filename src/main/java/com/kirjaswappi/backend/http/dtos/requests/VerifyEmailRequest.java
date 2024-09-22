@@ -4,14 +4,44 @@
  */
 package com.kirjaswappi.backend.http.dtos.requests;
 
-import lombok.AllArgsConstructor;
+import java.util.Date;
+import java.util.regex.Pattern;
+
 import lombok.Getter;
 import lombok.Setter;
 
+import com.kirjaswappi.backend.common.service.entities.OTP;
+import com.kirjaswappi.backend.service.exceptions.BadRequest;
+
 @Getter
 @Setter
-@AllArgsConstructor
 public class VerifyEmailRequest {
   private String email;
   private String otp;
+
+  public OTP toEntity() {
+    this.validateProperties(this.email, this.otp);
+    return new OTP(this.email.toLowerCase(), this.otp, new Date());
+  }
+
+  private void validateProperties(String email, String otp) {
+    if (!validateEmail(email)) {
+      throw new BadRequest("invalidEmailAddress", email);
+    }
+    if (!validateOtp(otp)) {
+      throw new BadRequest("invalidOtp", otp);
+    }
+  }
+
+  private static boolean validateOtp(String otp) {
+    return otp != null
+        && !otp.trim().isEmpty()
+        && otp.length() == 6
+        && otp.chars().allMatch(Character::isDigit);
+  }
+
+  private static boolean validateEmail(String emailAddress) {
+    String regexPattern = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+    return Pattern.compile(regexPattern).matcher(emailAddress).matches();
+  }
 }

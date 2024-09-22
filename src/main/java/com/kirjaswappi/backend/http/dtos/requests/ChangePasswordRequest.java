@@ -18,14 +18,27 @@ public class ChangePasswordRequest {
   private String newPassword;
   private String confirmPassword;
 
-  public User toEntity() {
-    this.validateProperties();
+  public User toChangePasswordEntity(String email) {
+    this.validateProperties(email);
     var entity = new User();
+    entity.setEmail(email.toLowerCase());
     entity.setPassword(this.newPassword);
     return entity;
   }
 
-  private void validateProperties() {
+  public User toVerifyPasswordEntity(String email) {
+    this.validateProperties(email);
+    var entity = new User();
+    entity.setEmail(email.toLowerCase());
+    entity.setPassword(this.currentPassword);
+    return entity;
+  }
+
+  private void validateProperties(String email) {
+    // validate email:
+    if (!UserValidation.validateEmail(email)) {
+      throw new BadRequest("invalidEmailAddress", email);
+    }
     // validate current password:
     if (!UserValidation.validateNotBlank(this.currentPassword)) {
       throw new BadRequest("currentPasswordCannotBeBlank", this.currentPassword);

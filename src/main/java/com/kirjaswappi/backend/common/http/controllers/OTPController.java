@@ -11,12 +11,12 @@ import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kirjaswappi.backend.common.http.dtos.requests.SendOtpRequest;
 import com.kirjaswappi.backend.common.http.dtos.requests.VerifyOtpRequest;
 import com.kirjaswappi.backend.common.http.dtos.responses.SendOtpResponse;
 import com.kirjaswappi.backend.common.http.dtos.responses.VerifyOtpResponse;
@@ -28,15 +28,15 @@ public class OTPController {
   @Autowired
   private OTPService otpService;
 
-  @GetMapping(SEND_OTP)
-  public ResponseEntity<SendOtpResponse> sendOTP(@RequestParam String email) throws IOException {
-    String userEmail = otpService.saveAndSendOTP(email.toLowerCase());
+  @PostMapping(SEND_OTP)
+  public ResponseEntity<SendOtpResponse> sendOTP(@RequestBody SendOtpRequest request) throws IOException {
+    String userEmail = otpService.saveAndSendOTP(request.toEntity());
     return ResponseEntity.status(HttpStatus.OK).body(new SendOtpResponse(userEmail));
   }
 
-  @GetMapping(VERIFY_OTP)
+  @PostMapping(VERIFY_OTP)
   public ResponseEntity<VerifyOtpResponse> verifyOTP(@RequestBody VerifyOtpRequest request) {
-    String email = otpService.verifyOTPByEmail(request.getEmail().toLowerCase(), request.getOtp());
+    String email = otpService.verifyOTPByEmail(request.toEntity());
     return ResponseEntity.status(HttpStatus.OK).body(new VerifyOtpResponse(email));
   }
 }
