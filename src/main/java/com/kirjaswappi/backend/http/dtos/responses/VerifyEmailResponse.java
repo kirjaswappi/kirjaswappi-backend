@@ -4,9 +4,15 @@
  */
 package com.kirjaswappi.backend.http.dtos.responses;
 
-import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-@AllArgsConstructor
+@Getter
+@Setter
 public class VerifyEmailResponse {
   private String message;
+
+  public VerifyEmailResponse(String email) {
+    this.message = email + " verified successfully.";
+  }
 }

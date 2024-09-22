@@ -4,9 +4,15 @@
  */
 package com.kirjaswappi.backend.http.dtos.responses;
 
-import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-@AllArgsConstructor
+@Getter
+@Setter
 public class ChangePasswordResponse {
   private String message;
+
+  public ChangePasswordResponse(String email) {
+    this.message = "Password changed for user: " + email;
+  }
 }

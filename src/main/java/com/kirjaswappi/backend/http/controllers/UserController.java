@@ -58,7 +58,7 @@ public class UserController {
   public ResponseEntity<VerifyEmailResponse> verifyEmail(@RequestBody VerifyEmailRequest request) {
     otpService.verifyOTPByEmail(request.getEmail().toLowerCase(), request.getOtp());
     String userEmail = userService.verifyEmail(request.getEmail().toLowerCase());
-    return ResponseEntity.status(HttpStatus.OK).body(new VerifyEmailResponse(userEmail + " verified successfully"));
+    return ResponseEntity.status(HttpStatus.OK).body(new VerifyEmailResponse(userEmail));
   }
 
   @PutMapping(ID)
@@ -102,7 +102,7 @@ public class UserController {
     userService.verifyCurrentPassword(email, request.getCurrentPassword());
     String userEmail = userService.changePassword(email, request.toEntity());
     return ResponseEntity.status(HttpStatus.OK)
-        .body(new ChangePasswordResponse("Password changed for user: " + userEmail));
+        .body(new ChangePasswordResponse(userEmail));
   }
 
   @PostMapping(RESET_PASSWORD + EMAIL)
@@ -112,7 +112,7 @@ public class UserController {
     otpService.verifyOTPByEmail(email.toLowerCase(), request.getOtp());
     String userEmail = userService.changePassword(email.toLowerCase(), entity);
     return ResponseEntity.status(HttpStatus.OK)
-        .body(new ResetPasswordResponse("Password changed for user: " + userEmail));
+        .body(new ResetPasswordResponse(userEmail));
   }
 
 }
