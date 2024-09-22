@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kirjaswappi.backend.common.http.dtos.requests.VerifyOtpRequest;
+import com.kirjaswappi.backend.common.http.dtos.responses.SendOtpResponse;
 import com.kirjaswappi.backend.common.http.dtos.responses.VerifyOtpResponse;
 import com.kirjaswappi.backend.common.service.OTPService;
 
@@ -28,16 +29,14 @@ public class OTPController {
   private OTPService otpService;
 
   @GetMapping(SEND_OTP)
-  public ResponseEntity<VerifyOtpResponse> sendOTP(@RequestParam String email) throws IOException {
+  public ResponseEntity<SendOtpResponse> sendOTP(@RequestParam String email) throws IOException {
     String userEmail = otpService.saveAndSendOTP(email.toLowerCase());
-    return ResponseEntity.status(HttpStatus.OK)
-        .body(new VerifyOtpResponse("OTP sent to " + userEmail + " successfully."));
+    return ResponseEntity.status(HttpStatus.OK).body(new SendOtpResponse(userEmail));
   }
 
   @GetMapping(VERIFY_OTP)
   public ResponseEntity<VerifyOtpResponse> verifyOTP(@RequestBody VerifyOtpRequest request) {
-    String userEmail = otpService.verifyOTPByEmail(request.getEmail().toLowerCase(), request.getOtp());
-    return ResponseEntity.status(HttpStatus.OK)
-        .body(new VerifyOtpResponse("OTP verified for " + userEmail + " successfully."));
+    String email = otpService.verifyOTPByEmail(request.getEmail().toLowerCase(), request.getOtp());
+    return ResponseEntity.status(HttpStatus.OK).body(new VerifyOtpResponse(email));
   }
 }
