@@ -4,9 +4,15 @@
  */
 package com.kirjaswappi.backend.common.http.dtos.responses;
 
-import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-@AllArgsConstructor
+@Getter
+@Setter
 public class VerifyOtpResponse {
   private String message;
+
+  public VerifyOtpResponse(String email) {
+    this.message = "OTP verified for " + email + " successfully.";
+  }
 }
