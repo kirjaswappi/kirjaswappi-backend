@@ -8,7 +8,6 @@ import static com.kirjaswappi.backend.common.utils.Constants.NUMERIC;
 
 import java.io.IOException;
 import java.security.SecureRandom;
-import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,15 +46,11 @@ public class OTPService {
         .orElseThrow(() -> new ResourceNotFound("otpNotFoundForEmail", email)));
   }
 
-  public String verifyOTPByEmail(String email, String otp) {
-    if (!validateEmail(email)) {
-      throw new BadRequest("invalidEmail", email);
-    }
-
-    var otpEntity = this.getOTP(email);
+  public String verifyOTPByEmail(OTP otp) {
+    var otpEntity = this.getOTP(otp.getEmail());
 
     // check provided OTP with the stored OTP:
-    if (!otpEntity.getOtp().equals(otp)) {
+    if (!otpEntity.getOtp().equals(otp.getOtp())) {
       throw new BadRequest("otpDoesNotMatch", otp);
     }
 
@@ -65,7 +60,7 @@ public class OTPService {
     }
 
     // Delete the OTP after verification:
-    otpRepository.deleteAllByEmail(email);
+    otpRepository.deleteAllByEmail(otp.getEmail());
     return otpEntity.getEmail();
   }
 
@@ -74,10 +69,6 @@ public class OTPService {
   }
 
   public String saveAndSendOTP(String email) throws IOException {
-    if (!validateEmail(email)) {
-      throw new BadRequest("invalidEmail", email);
-    }
-
     // Check if the user exists:
     if (!checkUserExists(email)) {
       throw new BadRequest("userNotFound", email);
@@ -98,10 +89,5 @@ public class OTPService {
     // Send OTP via email:
     emailService.sendOTPByEmail(dao.getEmail(), newOTP.getOtp());
     return dao.getEmail();
-  }
-
-  private static boolean validateEmail(String emailAddress) {
-    String regexPattern = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
-    return Pattern.compile(regexPattern).matcher(emailAddress).matches();
   }
 }
