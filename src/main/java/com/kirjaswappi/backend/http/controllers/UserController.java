@@ -106,7 +106,6 @@ public class UserController {
   @PostMapping(RESET_PASSWORD + EMAIL)
   public ResponseEntity<ResetPasswordResponse> resetPassword(@PathVariable String email,
       @RequestBody ResetPasswordRequest request) {
-    otpService.verifyOTPByEmail(request.toOtpEntity(email));
     String userEmail = userService.changePassword(request.toUserEntity(email));
     return ResponseEntity.status(HttpStatus.OK).body(new ResetPasswordResponse(userEmail));
   }
