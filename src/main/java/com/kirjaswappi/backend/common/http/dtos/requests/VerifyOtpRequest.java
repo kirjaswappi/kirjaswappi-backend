@@ -20,15 +20,15 @@ public class VerifyOtpRequest {
   private String otp;
 
   public OTP toEntity() {
-    this.validateProperties(this.email, this.otp);
+    this.validateProperties();
     return new OTP(this.email.toLowerCase(), this.otp, new Date());
   }
 
-  private void validateProperties(String email, String otp) {
-    if (!validateEmail(email)) {
+  private void validateProperties() {
+    if (!validateEmail(this.email)) {
       throw new BadRequest("invalidEmailAddress", email);
     }
-    if (!validateOtp(otp)) {
+    if (!validateOtp(this.otp)) {
       throw new BadRequest("invalidOtp", otp);
     }
   }

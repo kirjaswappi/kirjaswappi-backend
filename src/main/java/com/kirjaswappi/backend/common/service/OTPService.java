@@ -32,7 +32,7 @@ public class OTPService {
   @Autowired
   private UserService userService;
 
-  private String generateOTP() {
+  private static String generateOTP() {
     SecureRandom secureRandom = new SecureRandom();
     StringBuilder otp = new StringBuilder();
     for (int i = 0; i < 6; i++) {
