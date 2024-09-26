@@ -39,7 +39,7 @@ public class AuthService {
     if (jwtUtil.validateRefreshToken(refreshToken, userDetails)) {
       return jwtUtil.generateJwtToken(userDetails);
     } else {
-      throw new BadRequest("invalidRefreshToken");
+      throw new BadRequest("invalidRefreshToken", refreshToken);
     }
   }
 }

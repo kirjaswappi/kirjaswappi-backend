@@ -19,6 +19,7 @@ import com.kirjaswappi.backend.common.service.mappers.OTPMapper;
 import com.kirjaswappi.backend.service.UserService;
 import com.kirjaswappi.backend.service.exceptions.BadRequest;
 import com.kirjaswappi.backend.service.exceptions.ResourceNotFound;
+import com.kirjaswappi.backend.service.exceptions.UserNotFound;
 
 @Service
 @Transactional
@@ -43,7 +44,7 @@ public class OTPService {
 
   private OTP getOTP(String email) {
     return otpMapper.toEntity(otpRepository.findByEmail(email)
-        .orElseThrow(() -> new ResourceNotFound("otpNotFoundForEmail", email)));
+        .orElseThrow(() -> new ResourceNotFound("otpNotFound", email)));
   }
 
   public String verifyOTPByEmail(OTP otp) {
@@ -71,7 +72,7 @@ public class OTPService {
   public String saveAndSendOTP(String email) throws IOException {
     // Check if the user exists:
     if (!checkUserExists(email)) {
-      throw new BadRequest("userNotFound", email);
+      throw new UserNotFound(email);
     }
 
     // Delete all the previous OTPs:

@@ -13,10 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.kirjaswappi.backend.common.jpa.daos.AdminUserDao;
 import com.kirjaswappi.backend.common.jpa.repositories.AdminUserRepository;
 import com.kirjaswappi.backend.common.service.entities.AdminUser;
+import com.kirjaswappi.backend.common.service.exceptions.InvalidCredentials;
 import com.kirjaswappi.backend.common.service.mappers.AdminUserMapper;
 import com.kirjaswappi.backend.common.utils.JwtUtil;
 import com.kirjaswappi.backend.common.utils.Util;
-import com.kirjaswappi.backend.service.exceptions.BadRequest;
+import com.kirjaswappi.backend.service.exceptions.UserAlreadyExists;
 import com.kirjaswappi.backend.service.exceptions.UserNotFound;
 
 @Service
@@ -31,13 +32,13 @@ public class AdminUserService {
 
   public AdminUser getAdminUserInfo(String username) {
     return mapper.toEntity(adminUserRepository.findByUsername(username)
-        .orElseThrow(() -> new UserNotFound("userNotFound", username)));
+        .orElseThrow(() -> new UserNotFound(username)));
   }
 
   public AdminUser addUser(AdminUser adminUser) {
     // validate username exists:
     if (adminUserRepository.findByUsername(adminUser.getUsername()).isPresent()) {
-      throw new BadRequest("usernameAlreadyExists", adminUser.getUsername());
+      throw new UserAlreadyExists(adminUser.getUsername());
     }
     // add salt to password:
     String salt = Util.generateSalt();
@@ -60,7 +61,7 @@ public class AdminUserService {
     if (adminUserFromDB.getPassword().equals(password)) {
       return adminUserFromDB;
     } else {
-      throw new BadRequest("invalidCredentials");
+      throw new InvalidCredentials(user.getPassword());
     }
   }
 }

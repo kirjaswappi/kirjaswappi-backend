@@ -17,6 +17,7 @@ import com.kirjaswappi.backend.jpa.repositories.UserRepository;
 import com.kirjaswappi.backend.mapper.UserMapper;
 import com.kirjaswappi.backend.service.entities.User;
 import com.kirjaswappi.backend.service.exceptions.BadRequest;
+import com.kirjaswappi.backend.service.exceptions.UserAlreadyExists;
 import com.kirjaswappi.backend.service.exceptions.UserNotFound;
 
 @Service
@@ -47,7 +48,7 @@ public class UserService {
 
   private void checkIfUserAlreadyExists(User user) {
     if (userRepository.findByEmailAndIsEmailVerified(user.getEmail(), true).isPresent()) {
-      throw new BadRequest("userExistsAlready", user.getEmail());
+      throw new UserAlreadyExists(user.getEmail());
     }
   }
 
@@ -60,7 +61,7 @@ public class UserService {
 
   public User getUser(String id) {
     return mapper.toEntity(userRepository.findById(id)
-        .orElseThrow(() -> new UserNotFound("userNotFound", id)));
+        .orElseThrow(() -> new UserNotFound(id)));
   }
 
   public List<User> getUsers() {
@@ -74,15 +75,15 @@ public class UserService {
   public User updateUser(User user) {
     // validate user exists:
     var dao = userRepository.findById(user.getId())
-        .orElseThrow(() -> new UserNotFound("userNotFound", user.getId()));
+        .orElseThrow(() -> new UserNotFound(user.getId()));
 
     // check email verification status:
     if (!dao.isEmailVerified()) {
-      throw new BadRequest("emailNotVerified", user.getEmail());
+      throw new BadRequest("userExistsButNotVerified", user.getEmail());
     }
 
     // update user details:
-    this.updateUserDetails(user, dao);
+    updateUserDetails(user, dao);
 
     return mapper.toEntity(userRepository.save(dao));
   }
@@ -101,11 +102,11 @@ public class UserService {
   public User verifyLogin(User user) {
     // get salt from email:
     UserDao dao = userRepository.findByEmail(user.getEmail())
-        .orElseThrow(() -> new InvalidCredentials("invalidCredentials"));
+        .orElseThrow(() -> new UserNotFound(user.getEmail()));
 
     // check email verification status:
     if (!dao.isEmailVerified()) {
-      throw new BadRequest("emailNotVerified", user.getEmail());
+      throw new BadRequest("userExistsButNotVerified", user.getEmail());
     }
 
     // hash password with salt:
@@ -113,27 +114,27 @@ public class UserService {
 
     // validate email and password and return user:
     return mapper.toEntity(userRepository.findByEmailAndPassword(dao.getEmail(), password)
-        .orElseThrow(() -> new InvalidCredentials("invalidCredentials")));
+        .orElseThrow(() -> new InvalidCredentials(dao.getEmail(), password)));
   }
 
   public void verifyCurrentPassword(User user) {
     // get salt from email:
     UserDao dao = userRepository.findByEmail(user.getEmail())
-        .orElseThrow(() -> new BadRequest("userNotFound", user.getEmail()));
+        .orElseThrow(() -> new UserNotFound(user.getEmail()));
 
     // hash password with salt:
     String password = Util.hashPassword(user.getPassword(), dao.getSalt());
 
     // validate email and password:
     if (userRepository.findByEmailAndPassword(dao.getEmail(), password).isEmpty()) {
-      throw new InvalidCredentials("currentPasswordMismatch");
+      throw new BadRequest("currentPasswordMismatch", user.getPassword());
     }
   }
 
   public String changePassword(User user) {
     // get user from email:
     UserDao dao = userRepository.findByEmail(user.getEmail())
-        .orElseThrow(() -> new BadRequest("userNotFound", user.getEmail()));
+        .orElseThrow(() -> new UserNotFound(user.getEmail()));
 
     // forbid newPassword to be the same as currentPassword:
     String currentPassword = dao.getPassword();
@@ -157,7 +158,7 @@ public class UserService {
   public String verifyEmail(String email) {
     // get user from email:
     UserDao dao = userRepository.findByEmail(email)
-        .orElseThrow(() -> new BadRequest("invalidEmailProvided"));
+        .orElseThrow(() -> new UserNotFound(email));
 
     // update email verification status:
     dao.setEmailVerified(true);
