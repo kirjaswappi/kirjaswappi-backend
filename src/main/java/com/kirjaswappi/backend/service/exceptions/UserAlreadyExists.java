@@ -6,12 +6,12 @@ package com.kirjaswappi.backend.service.exceptions;
 
 import com.kirjaswappi.backend.common.exceptions.BusinessException;
 
-public class ResourceAlreadyExists extends BusinessException {
-  public ResourceAlreadyExists(String messageKey) {
+public class UserAlreadyExists extends BusinessException {
+  public UserAlreadyExists(String messageKey) {
     super(messageKey);
   }
 
-  public ResourceAlreadyExists(String messageKey, Object... params) {
-    super(messageKey, params);
+  public UserAlreadyExists(Object... params) {
+    super("userAlreadyExists", params);
   }
 }

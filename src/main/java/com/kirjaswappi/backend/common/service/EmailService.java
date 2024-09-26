@@ -5,6 +5,7 @@
 package com.kirjaswappi.backend.common.service;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -28,7 +29,7 @@ public class EmailService {
   @Autowired
   private Environment env;
 
-  private Logger logger = LoggerFactory.getLogger(EmailService.class);
+  private final Logger logger = LoggerFactory.getLogger(EmailService.class);
 
   public void sendOTPByEmail(String email, String otp) throws IOException {
     String subject = "OTP Verification";
@@ -42,7 +43,7 @@ public class EmailService {
     MimeMessage message = mailSender.createMimeMessage();
     MimeMessageHelper helper = new MimeMessageHelper(message, "utf-8");
     try {
-      helper.setFrom(env.getProperty("spring.mail.username"));
+      helper.setFrom(Objects.requireNonNull(env.getProperty("spring.mail.username")));
       helper.setTo(to);
       helper.setSubject(subject);
       helper.setText(htmlBody, true); // Set the second argument to true for HTML content

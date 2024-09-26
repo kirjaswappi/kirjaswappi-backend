@@ -7,7 +7,7 @@ package com.kirjaswappi.backend.common.service.exceptions;
 import com.kirjaswappi.backend.common.exceptions.BusinessException;
 
 public class InvalidCredentials extends BusinessException {
-  public InvalidCredentials(String messageKey, Object... params) {
-    super(messageKey, params);
+  public InvalidCredentials(Object... params) {
+    super("invalidCredentials", params);
   }
 }
