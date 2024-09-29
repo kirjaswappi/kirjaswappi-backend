@@ -7,10 +7,6 @@ package com.kirjaswappi.backend.service.exceptions;
 import com.kirjaswappi.backend.common.exceptions.BusinessException;
 
 public class UserAlreadyExists extends BusinessException {
-  public UserAlreadyExists(String messageKey) {
-    super(messageKey);
-  }
-
   public UserAlreadyExists(Object... params) {
     super("userAlreadyExists", params);
   }
