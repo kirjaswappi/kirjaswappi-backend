@@ -2,27 +2,31 @@
  * Copyright (c) 2024 KirjaSwappi or KirjaSwappi affiliate company. All rights reserved.
  * Author: Mahiuddin Al Kamal <mahiuddinalkamal>
  */
-package com.kirjaswappi.backend.common.http.dtos.requests;
+package com.kirjaswappi.backend.http.dtos.requests;
 
 import lombok.Getter;
 import lombok.Setter;
 
 import com.kirjaswappi.backend.http.validations.ValidationUtil;
+import com.kirjaswappi.backend.service.entities.Genre;
 import com.kirjaswappi.backend.service.exceptions.BadRequest;
 
 @Getter
 @Setter
-public class SendOtpRequest {
-  private String email;
+public class GenreCreateRequest {
+  private String name;
 
-  public String toEntity() {
+  public Genre toEntity() {
     this.validateProperties();
-    return this.email.toLowerCase();
+    var entity = new Genre();
+    entity.setName(this.name);
+    return entity;
   }
 
   private void validateProperties() {
-    if (!ValidationUtil.validateEmail(this.email)) {
-      throw new BadRequest("invalidEmailAddress", this.email);
+    // validate genre name:
+    if (!ValidationUtil.validateNotBlank(this.name)) {
+      throw new BadRequest("genreNameCannotBeBlank", this.name);
     }
   }
 }

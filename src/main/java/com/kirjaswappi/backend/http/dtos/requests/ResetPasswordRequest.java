@@ -7,7 +7,7 @@ package com.kirjaswappi.backend.http.dtos.requests;
 import lombok.Getter;
 import lombok.Setter;
 
-import com.kirjaswappi.backend.http.validations.UserValidation;
+import com.kirjaswappi.backend.http.validations.ValidationUtil;
 import com.kirjaswappi.backend.service.entities.User;
 import com.kirjaswappi.backend.service.exceptions.BadRequest;
 
@@ -27,15 +27,15 @@ public class ResetPasswordRequest {
 
   private void validateProperties(String email) {
     // validate email:
-    if (!UserValidation.validateEmail(email)) {
+    if (!ValidationUtil.validateEmail(email)) {
       throw new BadRequest("invalidEmailAddress", email);
     }
     // validate new password:
-    if (!UserValidation.validateNotBlank(this.newPassword)) {
+    if (!ValidationUtil.validateNotBlank(this.newPassword)) {
       throw new BadRequest("newPasswordCannotBeBlank", this.newPassword);
     }
     // validate confirm password:
-    if (!UserValidation.validateNotBlank(this.confirmPassword)) {
+    if (!ValidationUtil.validateNotBlank(this.confirmPassword)) {
       throw new BadRequest("confirmPasswordCannotBeBlank", this.confirmPassword);
     }
     // validate new password and confirm password matches:

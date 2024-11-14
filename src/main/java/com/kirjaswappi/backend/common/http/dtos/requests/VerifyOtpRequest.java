@@ -5,12 +5,12 @@
 package com.kirjaswappi.backend.common.http.dtos.requests;
 
 import java.util.Date;
-import java.util.regex.Pattern;
 
 import lombok.Getter;
 import lombok.Setter;
 
 import com.kirjaswappi.backend.common.service.entities.OTP;
+import com.kirjaswappi.backend.http.validations.ValidationUtil;
 import com.kirjaswappi.backend.service.exceptions.BadRequest;
 
 @Getter
@@ -25,23 +25,11 @@ public class VerifyOtpRequest {
   }
 
   private void validateProperties() {
-    if (!validateEmail(this.email)) {
+    if (!ValidationUtil.validateEmail(this.email)) {
       throw new BadRequest("invalidEmailAddress", email);
     }
-    if (!validateOtp(this.otp)) {
+    if (!ValidationUtil.validateOtp(this.otp)) {
       throw new BadRequest("invalidOtp", otp);
     }
-  }
-
-  private static boolean validateOtp(String otp) {
-    return otp != null
-        && !otp.trim().isEmpty()
-        && otp.length() == 6
-        && otp.chars().allMatch(Character::isDigit);
-  }
-
-  private static boolean validateEmail(String emailAddress) {
-    String regexPattern = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
-    return Pattern.compile(regexPattern).matcher(emailAddress).matches();
   }
 }

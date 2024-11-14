@@ -7,7 +7,7 @@ package com.kirjaswappi.backend.http.dtos.requests;
 import lombok.Getter;
 import lombok.Setter;
 
-import com.kirjaswappi.backend.http.validations.UserValidation;
+import com.kirjaswappi.backend.http.validations.ValidationUtil;
 import com.kirjaswappi.backend.service.entities.User;
 import com.kirjaswappi.backend.service.exceptions.BadRequest;
 
@@ -32,23 +32,23 @@ public class UserCreateRequest {
 
   private void validateProperties() {
     // validate first name:
-    if (!UserValidation.validateNotBlank(this.firstName)) {
+    if (!ValidationUtil.validateNotBlank(this.firstName)) {
       throw new BadRequest("firstNameCannotBeBlank", this.firstName);
     }
     // validate last name:
-    if (!UserValidation.validateNotBlank(this.lastName)) {
+    if (!ValidationUtil.validateNotBlank(this.lastName)) {
       throw new BadRequest("lastNameCannotBeBlank", this.lastName);
     }
     // validate email:
-    if (!UserValidation.validateEmail(this.email)) {
+    if (!ValidationUtil.validateEmail(this.email)) {
       throw new BadRequest("invalidEmailAddress", this.email);
     }
     // validate password:
-    if (!UserValidation.validateNotBlank(this.password)) {
+    if (!ValidationUtil.validateNotBlank(this.password)) {
       throw new BadRequest("passwordCannotBeBlank", this.password);
     }
     // validate confirm password:
-    if (!UserValidation.validateNotBlank(this.confirmPassword)) {
+    if (!ValidationUtil.validateNotBlank(this.confirmPassword)) {
       throw new BadRequest("confirmPasswordCannotBeBlank", this.confirmPassword);
     }
     // validate password and confirm password:

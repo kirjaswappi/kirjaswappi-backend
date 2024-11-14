@@ -9,7 +9,7 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
-import com.kirjaswappi.backend.http.validations.UserValidation;
+import com.kirjaswappi.backend.http.validations.ValidationUtil;
 import com.kirjaswappi.backend.service.entities.User;
 import com.kirjaswappi.backend.service.exceptions.BadRequest;
 
@@ -47,11 +47,11 @@ public class UserUpdateRequest {
 
   private void validateProperties() {
     // validate first name:
-    if (!UserValidation.validateNotBlank(this.firstName)) {
+    if (!ValidationUtil.validateNotBlank(this.firstName)) {
       throw new BadRequest("firstNameCannotBeBlank", this.firstName);
     }
     // validate last name:
-    if (!UserValidation.validateNotBlank(this.lastName)) {
+    if (!ValidationUtil.validateNotBlank(this.lastName)) {
       throw new BadRequest("lastNameCannotBeBlank", this.lastName);
     }
   }
