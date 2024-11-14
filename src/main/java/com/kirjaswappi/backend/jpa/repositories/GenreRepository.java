@@ -12,4 +12,6 @@ import com.kirjaswappi.backend.jpa.daos.GenreDao;
 
 public interface GenreRepository extends MongoRepository<GenreDao, String> {
   Optional<GenreDao> findByName(String name);
+
+  boolean existsByName(String name);
 }

@@ -11,11 +11,11 @@ import com.kirjaswappi.backend.service.entities.Genre;
 
 @Getter
 @Setter
-public class GenreListResponse {
+public class GenreResponse {
   private String id;
   private String name;
 
-  public GenreListResponse(Genre entity) {
+  public GenreResponse(Genre entity) {
     this.id = entity.getId();
     this.name = entity.getName();
   }
