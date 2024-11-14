@@ -10,6 +10,7 @@ public class Constants {
   public static final String API_VERSION = "/v1";
   public static final String API_BASE = API + API_VERSION;
   public static final String USERS = "/users";
+  public static final String GENRES = "/genres";
   public static final String ADMIN_USERS = "/admin-users";
   public static final String SIGNUP = "/signup";
   public static final String VERIFY_EMAIL = "/verify-email";
