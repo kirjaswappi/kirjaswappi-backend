@@ -16,7 +16,6 @@ import com.kirjaswappi.backend.common.service.entities.AdminUser;
 import com.kirjaswappi.backend.common.service.exceptions.InvalidCredentials;
 import com.kirjaswappi.backend.common.service.mappers.AdminUserMapper;
 import com.kirjaswappi.backend.common.utils.JwtUtil;
-import com.kirjaswappi.backend.common.utils.Util;
 import com.kirjaswappi.backend.service.exceptions.UserAlreadyExists;
 import com.kirjaswappi.backend.service.exceptions.UserNotFound;
 
@@ -40,10 +39,7 @@ public class AdminUserService {
     if (adminUserRepository.findByUsername(adminUser.getUsername()).isPresent()) {
       throw new UserAlreadyExists(adminUser.getUsername());
     }
-    // add salt to password:
-    String salt = Util.generateSalt();
-    adminUser.setPassword(adminUser.getPassword(), salt);
-    AdminUserDao dao = mapper.toDao(adminUser, salt);
+    AdminUserDao dao = mapper.toDao(adminUser);
     return mapper.toEntity(adminUserRepository.save(dao));
   }
 
@@ -57,8 +53,7 @@ public class AdminUserService {
 
   public AdminUser verifyUser(AdminUser user) {
     AdminUser adminUserFromDB = getAdminUserInfo(user.getUsername());
-    String password = Util.hashPassword(user.getPassword(), adminUserFromDB.getSalt());
-    if (adminUserFromDB.getPassword().equals(password)) {
+    if (adminUserFromDB.getPassword().equals(user.getPassword())) {
       return adminUserFromDB;
     } else {
       throw new InvalidCredentials(user.getPassword());
