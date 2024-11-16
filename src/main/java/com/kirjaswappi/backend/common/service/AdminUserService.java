@@ -16,7 +16,6 @@ import com.kirjaswappi.backend.common.service.entities.AdminUser;
 import com.kirjaswappi.backend.common.service.exceptions.InvalidCredentials;
 import com.kirjaswappi.backend.common.service.mappers.AdminUserMapper;
 import com.kirjaswappi.backend.common.utils.JwtUtil;
-import com.kirjaswappi.backend.common.utils.Util;
 import com.kirjaswappi.backend.service.exceptions.UserAlreadyExists;
 import com.kirjaswappi.backend.service.exceptions.UserNotFound;
 

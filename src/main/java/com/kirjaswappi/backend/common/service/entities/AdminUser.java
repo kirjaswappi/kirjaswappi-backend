@@ -9,8 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import com.kirjaswappi.backend.common.utils.Util;
-
 @Getter
 @Setter
 @NoArgsConstructor
