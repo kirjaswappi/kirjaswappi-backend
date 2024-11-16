@@ -27,7 +27,5 @@ public class AdminUserDao {
   @NotNull
   String password;
   @NotNull
-  String salt;
-  @NotNull
   String role;
 }

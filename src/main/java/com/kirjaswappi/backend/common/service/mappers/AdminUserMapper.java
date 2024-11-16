@@ -15,16 +15,14 @@ public class AdminUserMapper {
     var entity = new AdminUser();
     entity.setUsername(dao.getUsername());
     entity.setPassword(dao.getPassword());
-    entity.setSalt(dao.getSalt());
     entity.setRole(dao.getRole());
     return entity;
   }
 
-  public AdminUserDao toDao(AdminUser user, String salt) {
+  public AdminUserDao toDao(AdminUser user) {
     var dao = new AdminUserDao();
     dao.setUsername(user.getUsername());
     dao.setPassword(user.getPassword());
-    dao.setSalt(salt);
     dao.setRole(user.getRole());
     return dao;
   }
