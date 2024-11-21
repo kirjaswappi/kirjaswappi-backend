@@ -31,6 +31,8 @@ public class User {
   private String phoneNumber;
   private String aboutMe;
   private List<String> favGenres;
+  private Photo profilePhoto;
+  private Photo coverPhoto;
 
   public void setPassword(String password, String salt) {
     this.password = hashPassword(password, salt);
