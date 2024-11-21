@@ -4,8 +4,8 @@ spring:
       on-profile: local
   data:
     mongodb:
-      host: localhost
-      port: 27017
+      autoIndexCreation: true
+      uri: mongodb://localhost:27017/kirjaswappi
       database: kirjaswappi
 
 server:

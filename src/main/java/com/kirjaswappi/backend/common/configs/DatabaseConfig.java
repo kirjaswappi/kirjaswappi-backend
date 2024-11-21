@@ -5,6 +5,7 @@
 package com.kirjaswappi.backend.common.configs;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,13 +16,15 @@ import com.mongodb.client.gridfs.GridFSBuckets;
 
 @Configuration
 public class DatabaseConfig {
+  @Value("${spring.data.mongodb.uri}")
+  private String databaseUri;
 
   @Value("${spring.data.mongodb.database}")
   private String databaseName;
 
   @Bean
   public MongoClient mongoClient() {
-    return MongoClients.create();
+    return MongoClients.create(databaseUri);
   }
 
   @Bean

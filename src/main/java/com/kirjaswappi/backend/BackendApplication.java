@@ -13,12 +13,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
 public class BackendApplication {
 
   public static void main(String[] args) {
-    String port = java.lang.System.getenv("PORT");
-    if (port != null) {
-      // Dynamically set the port
-      System.out.println("Running Server on Port: " + port);
-      System.setProperty("server.port", port);
-    }
+    System.out.println("Hello, KirjaSwappi!");
+    System.out.println("Running on profile: " + System.getProperty("spring.profiles.active"));
     SpringApplication.run(BackendApplication.class, args);
   }
 }
