@@ -12,8 +12,8 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Run Spotless Check
-      run: mvn spotless:apply
+    - name: Run Build Package
+      run: mvn clean package -DskipTests
 
     - name: Run Tests
       run: mvn test -Dspring.profiles.active=cloud
