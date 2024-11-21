@@ -8,9 +8,7 @@ spring:
     active: local
   application:
     name: KirjaSwappi-Backend
-  data:
-    mongodb:
-      autoIndexCreation: true
+
   mail:
     host: smtp.gmail.com
     port: 587

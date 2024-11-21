@@ -4,6 +4,7 @@ spring:
       on-profile: cloud
   data:
     mongodb:
+      autoIndexCreation: true
       uri: ${MONGODB_URI}
       database: ${MONGODB_DATABASE}
 
