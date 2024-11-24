@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import org.bson.types.ObjectId;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,4 +18,5 @@ import lombok.Setter;
 public class Photo {
   private String id;
   private String title;
+  private ObjectId fileId;
 }

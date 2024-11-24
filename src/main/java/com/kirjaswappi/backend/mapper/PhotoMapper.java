@@ -15,10 +15,10 @@ import com.kirjaswappi.backend.service.entities.Photo;
 @NoArgsConstructor
 public class PhotoMapper {
   public Photo toEntity(PhotoDao dao) {
-    return new Photo(dao.getId(), dao.getTitle());
+    return new Photo(dao.getId(), dao.getTitle(), dao.getFileId());
   }
 
   public PhotoDao toDao(Photo entity) {
-    return new PhotoDao(entity.getId(), entity.getTitle());
+    return new PhotoDao(entity.getId(), entity.getTitle(), entity.getFileId());
   }
 }

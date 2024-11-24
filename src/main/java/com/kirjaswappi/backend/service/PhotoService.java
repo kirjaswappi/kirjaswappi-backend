@@ -21,6 +21,7 @@ import com.kirjaswappi.backend.mapper.PhotoMapper;
 import com.kirjaswappi.backend.mapper.UserMapper;
 import com.kirjaswappi.backend.service.entities.Photo;
 import com.kirjaswappi.backend.service.entities.User;
+import com.kirjaswappi.backend.service.exceptions.ResourceNotFound;
 import com.kirjaswappi.backend.service.exceptions.UserNotFound;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.model.GridFSFile;
@@ -55,10 +56,17 @@ public class PhotoService {
     User user = userMapper.toEntity(userRepository.findById(userId).orElseThrow(UserNotFound::new));
 
     var photoDao = new PhotoDao();
+    if (isProfilePhoto) {
+      photoDao.setTitle("profile-photo");
+    } else {
+      photoDao.setTitle("cover-photo");
+    }
     photoRepository.save(photoDao);
 
     GridFSUploadOptions options = new GridFSUploadOptions().metadata(new Document("type", "image"));
     ObjectId fileId = gridFSBucket.uploadFromStream(photoDao.getId(), file.getInputStream(), options);
+    photoDao.setFileId(fileId);
+    photoRepository.save(photoDao);
 
     var entity = photoMapper.toEntity(photoDao);
     if (isProfilePhoto) {
@@ -73,13 +81,19 @@ public class PhotoService {
 
   public GridFSFile getPhotoByUserEmail(String email, boolean isProfilePhoto) {
     User user = userMapper.toEntity(userRepository.findByEmail(email).orElseThrow(UserNotFound::new));
-    Photo photo = isProfilePhoto ? user.getProfilePhoto() : user.getCoverPhoto();
-    return gridFSBucket.find(eq("_id", new ObjectId(photo.getId()))).first();
+    return getGridFSFile(isProfilePhoto, user);
   }
 
   public GridFSFile getPhotoByUserId(String userId, boolean isProfilePhoto) {
     User user = userMapper.toEntity(userRepository.findById(userId).orElseThrow(UserNotFound::new));
+    return getGridFSFile(isProfilePhoto, user);
+  }
+
+  private GridFSFile getGridFSFile(boolean isProfilePhoto, User user) {
     Photo photo = isProfilePhoto ? user.getProfilePhoto() : user.getCoverPhoto();
-    return gridFSBucket.find(eq("_id", new ObjectId(photo.getId()))).first();
+    if (photo == null) {
+      throw new ResourceNotFound("photoNotFound");
+    }
+    return gridFSBucket.find(eq("_id", photo.getFileId())).first();
   }
 }
