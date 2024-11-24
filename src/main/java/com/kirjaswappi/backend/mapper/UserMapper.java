@@ -14,6 +14,9 @@ import com.kirjaswappi.backend.service.entities.User;
 @Component
 @NoArgsConstructor
 public class UserMapper {
+
+  private PhotoMapper photoMapper = new PhotoMapper();
+
   public User toEntity(UserDao dao) {
     var entity = new User();
     entity.setId(dao.getId());
@@ -27,6 +30,10 @@ public class UserMapper {
     entity.setCity(dao.getCity());
     entity.setCountry(dao.getCountry());
     entity.setPhoneNumber(dao.getPhoneNumber());
+    entity.setAboutMe(dao.getAboutMe());
+    entity.setFavGenres(dao.getFavGenres());
+    entity.setProfilePhoto(dao.getProfilePhoto() != null ? photoMapper.toEntity(dao.getProfilePhoto()) : null);
+    entity.setCoverPhoto(dao.getCoverPhoto() != null ? photoMapper.toEntity(dao.getCoverPhoto()) : null);
     return entity;
   }
 
@@ -41,6 +48,14 @@ public class UserMapper {
     dao.setCity(entity.getCity());
     dao.setCountry(entity.getCountry());
     dao.setPhoneNumber(entity.getPhoneNumber());
+    dao.setAboutMe(entity.getAboutMe());
+    dao.setFavGenres(entity.getFavGenres());
+    if (entity.getProfilePhoto() != null) {
+      dao.setProfilePhoto(photoMapper.toDao(entity.getProfilePhoto()));
+    }
+    if (entity.getCoverPhoto() != null) {
+      dao.setCoverPhoto(photoMapper.toDao(entity.getCoverPhoto()));
+    }
     return dao;
   }
 
@@ -59,6 +74,14 @@ public class UserMapper {
     dao.setCity(entity.getCity());
     dao.setCountry(entity.getCountry());
     dao.setPhoneNumber(entity.getPhoneNumber());
+    dao.setAboutMe(entity.getAboutMe());
+    dao.setFavGenres(entity.getFavGenres());
+    if (entity.getProfilePhoto() != null) {
+      dao.setProfilePhoto(photoMapper.toDao(entity.getProfilePhoto()));
+    }
+    if (entity.getCoverPhoto() != null) {
+      dao.setCoverPhoto(photoMapper.toDao(entity.getCoverPhoto()));
+    }
     return dao;
   }
 

@@ -13,6 +13,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import com.mongodb.lang.Nullable;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -31,7 +33,9 @@ public class User {
   private String phoneNumber;
   private String aboutMe;
   private List<String> favGenres;
+  @Nullable
   private Photo profilePhoto;
+  @Nullable
   private Photo coverPhoto;
 
   public void setPassword(String password, String salt) {
