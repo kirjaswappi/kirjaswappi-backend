@@ -37,28 +37,6 @@ public class UserMapper {
     return entity;
   }
 
-  public UserDao toDao(User entity) {
-    var dao = new UserDao();
-    dao.setId(entity.getId());
-    dao.setFirstName(entity.getFirstName());
-    dao.setLastName(entity.getLastName());
-    dao.setStreetName(entity.getStreetName());
-    dao.setHouseNumber(entity.getHouseNumber());
-    dao.setZipCode(entity.getZipCode());
-    dao.setCity(entity.getCity());
-    dao.setCountry(entity.getCountry());
-    dao.setPhoneNumber(entity.getPhoneNumber());
-    dao.setAboutMe(entity.getAboutMe());
-    dao.setFavGenres(entity.getFavGenres());
-    if (entity.getProfilePhoto() != null) {
-      dao.setProfilePhoto(photoMapper.toDao(entity.getProfilePhoto()));
-    }
-    if (entity.getCoverPhoto() != null) {
-      dao.setCoverPhoto(photoMapper.toDao(entity.getCoverPhoto()));
-    }
-    return dao;
-  }
-
   // This method is used to create a new user dao with salt
   public UserDao toDao(User entity, String salt) {
     var dao = new UserDao();
