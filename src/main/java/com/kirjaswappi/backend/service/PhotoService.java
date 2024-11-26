@@ -17,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.kirjaswappi.backend.jpa.daos.PhotoDao;
 import com.kirjaswappi.backend.jpa.repositories.PhotoRepository;
 import com.kirjaswappi.backend.jpa.repositories.UserRepository;
-import com.kirjaswappi.backend.mapper.PhotoMapper;
 import com.kirjaswappi.backend.mapper.UserMapper;
 import com.kirjaswappi.backend.service.entities.Photo;
 import com.kirjaswappi.backend.service.entities.User;
@@ -41,9 +40,6 @@ public class PhotoService {
   @Autowired
   private UserMapper userMapper;
 
-  @Autowired
-  private PhotoMapper photoMapper;
-
   public String addProfilePhoto(String userId, MultipartFile file) throws IOException {
     return addPhoto(userId, file, true);
   }
@@ -53,7 +49,7 @@ public class PhotoService {
   }
 
   private String addPhoto(String userId, MultipartFile file, boolean isProfilePhoto) throws IOException {
-    User user = userMapper.toEntity(userRepository.findById(userId).orElseThrow(UserNotFound::new));
+    var userDao = userRepository.findById(userId).orElseThrow(UserNotFound::new);
 
     var photoDao = new PhotoDao();
     if (isProfilePhoto) {
@@ -68,13 +64,12 @@ public class PhotoService {
     photoDao.setFileId(fileId);
     photoRepository.save(photoDao);
 
-    var entity = photoMapper.toEntity(photoDao);
     if (isProfilePhoto) {
-      user.setProfilePhoto(entity);
+      userDao.setProfilePhoto(photoDao);
     } else {
-      user.setCoverPhoto(entity);
+      userDao.setCoverPhoto(photoDao);
     }
-    userRepository.save(userMapper.toDao(user));
+    userRepository.save(userDao);
 
     return fileId.toString();
   }
