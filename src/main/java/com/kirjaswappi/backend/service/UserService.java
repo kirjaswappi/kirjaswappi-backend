@@ -97,6 +97,8 @@ public class UserService {
     dao.setCity(user.getCity());
     dao.setCountry(user.getCountry());
     dao.setPhoneNumber(user.getPhoneNumber());
+    dao.setAboutMe(user.getAboutMe());
+    dao.setFavGenres(user.getFavGenres());
   }
 
   public User verifyLogin(User user) {
