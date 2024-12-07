@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,23 +45,36 @@ public class PhotoController {
     return photoService.addCoverPhoto(userId, image);
   }
 
+  @DeleteMapping("/profile")
+  public ResponseEntity<Void> deleteProfilePhoto(@RequestParam("userId") String userId) {
+    photoService.deleteProfilePhoto(userId);
+    return ResponseEntity.noContent().build();
+  }
+
+  @DeleteMapping("/cover")
+  public ResponseEntity<Void> deleteCoverPhoto(@RequestParam("userId") String userId)
+      throws IOException {
+    photoService.deleteCoverPhoto(userId);
+    return ResponseEntity.noContent().build();
+  }
+
   @GetMapping("/profile/by-email")
-  public ResponseEntity<byte[]> getProfilePhotoByEmail(@RequestParam("email") String email) throws IOException {
+  public ResponseEntity<byte[]> getProfilePhotoByEmail(@RequestParam("email") String email) {
     return getPhotoResponse(photoService.getPhotoByUserEmail(email, true));
   }
 
   @GetMapping("/cover/by-email")
-  public ResponseEntity<byte[]> getCoverPhotoByEmail(@RequestParam("email") String email) throws IOException {
+  public ResponseEntity<byte[]> getCoverPhotoByEmail(@RequestParam("email") String email) {
     return getPhotoResponse(photoService.getPhotoByUserEmail(email, false));
   }
 
   @GetMapping("/profile/by-id")
-  public ResponseEntity<byte[]> getProfilePhotoById(@RequestParam("userId") String userId) throws IOException {
+  public ResponseEntity<byte[]> getProfilePhotoById(@RequestParam("userId") String userId) {
     return getPhotoResponse(photoService.getPhotoByUserId(userId, true));
   }
 
   @GetMapping("/cover/by-id")
-  public ResponseEntity<byte[]> getCoverPhotoById(@RequestParam("userId") String userId) throws IOException {
+  public ResponseEntity<byte[]> getCoverPhotoById(@RequestParam("userId") String userId) {
     return getPhotoResponse(photoService.getPhotoByUserId(userId, false));
   }
 
