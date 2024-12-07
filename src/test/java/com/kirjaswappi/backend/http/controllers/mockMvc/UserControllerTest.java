@@ -19,6 +19,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -51,10 +52,19 @@ public class UserControllerTest {
 
   @TestConfiguration
   static class CustomMockMvcConfiguration {
+    @Profile("local")
     @Bean
-    public MockMvc mockMvc(WebApplicationContext webApplicationContext) {
+    public MockMvc mockMvcLocal(WebApplicationContext webApplicationContext) {
       return MockMvcBuilders.webAppContextSetup(webApplicationContext)
           .defaultRequest(get("/").header("Host", "localhost:8080"))
+          .build();
+    }
+
+    @Profile("cloud")
+    @Bean
+    public MockMvc mockMvcCloud(WebApplicationContext webApplicationContext) {
+      return MockMvcBuilders.webAppContextSetup(webApplicationContext)
+          .defaultRequest(get("/").header("Host", "localhost:10000"))
           .build();
     }
   }
