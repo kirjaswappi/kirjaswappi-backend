@@ -21,6 +21,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -33,6 +34,7 @@ import com.kirjaswappi.backend.http.dtos.responses.*;
 import com.kirjaswappi.backend.service.UserService;
 import com.kirjaswappi.backend.service.entities.User;
 
+@ActiveProfiles("local")
 @WebMvcTest(UserController.class)
 public class UserControllerTest {
   @Autowired
@@ -92,7 +94,8 @@ public class UserControllerTest {
 
     mockMvc.perform(post(API_BASE + "/signup")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(userCreateRequest)))
+                    .content(objectMapper.writeValueAsString(userCreateRequest))
+                    .header("Authorization ", "Bearer a.b.c"))
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.email").value(user.getEmail()));
   }
@@ -109,7 +112,8 @@ public class UserControllerTest {
 
     mockMvc.perform(post(API_BASE + "/verify-email")
         .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsString(request)))
+        .content(objectMapper.writeValueAsString(request))
+        .header("Authorization ", "Bearer a.b.c"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.message").value("test@example.com verified successfully."));
   }
@@ -124,7 +128,8 @@ public class UserControllerTest {
 
     mockMvc.perform(put(API_BASE + "/1")
         .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsString(request)))
+        .content(objectMapper.writeValueAsString(request))
+        .header("Authorization ", "Bearer a.b.c"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.firstName").value("UpdatedFirstName"));
   }
@@ -134,7 +139,8 @@ public class UserControllerTest {
   void shouldGetUser() throws Exception {
     when(userService.getUser("1")).thenReturn(user);
 
-    mockMvc.perform(get(API_BASE + "/1"))
+    mockMvc.perform(get(API_BASE + "/1")
+                    .header("Authorization ", "Bearer a.b.c"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.email").value(user.getEmail()));
   }
@@ -144,15 +150,17 @@ public class UserControllerTest {
   void shouldGetUsers() throws Exception {
     when(userService.getUsers()).thenReturn(List.of(user));
 
-    mockMvc.perform(get(API_BASE))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$[0].email").value(user.getEmail()));
+    mockMvc.perform(get(API_BASE)
+                    .header("Authorization ", "Bearer a.b.c"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].email").value(user.getEmail()));
   }
 
   @Test
   @DisplayName("Should delete user by ID")
   void shouldDeleteUser() throws Exception {
-    mockMvc.perform(delete(API_BASE + "/1"))
+    mockMvc.perform(delete(API_BASE + "/1")
+        .header("Authorization ", "Bearer a.b.c"))
         .andExpect(status().isNoContent());
   }
 
@@ -167,7 +175,8 @@ public class UserControllerTest {
 
     mockMvc.perform(post(API_BASE + "/login")
         .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsString(request)))
+        .content(objectMapper.writeValueAsString(request))
+        .header("Authorization ", "Bearer a.b.c"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.email").value(user.getEmail()));
   }
@@ -184,7 +193,8 @@ public class UserControllerTest {
 
     mockMvc.perform(post(API_BASE + "/change-password/test@example.com")
         .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsString(request)))
+        .content(objectMapper.writeValueAsString(request))
+        .header("Authorization ", "Bearer a.b.c"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.message").value("Password changed for user: test@example.com"));
   }
@@ -200,7 +210,8 @@ public class UserControllerTest {
 
     mockMvc.perform(post(API_BASE + "/reset-password/test@example.com")
         .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsString(request)))
+        .content(objectMapper.writeValueAsString(request))
+        .header("Authorization ", "Bearer a.b.c"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.message").value("Password changed for user: test@example.com"));
   }
@@ -217,7 +228,7 @@ public class UserControllerTest {
     updatedUser.setCountry("UpdatedCountry");
     updatedUser.setPhoneNumber("UpdatedPhoneNumber");
     updatedUser.setAboutMe("UpdatedAboutMe");
-    updatedUser.setFavGenres(List.of("UpdatedGenre"));
+    updatedUser.setFavGenres(List.of("UpdatedGenre1", "UpdatedGenre2"));
     return updatedUser;
   }
 
@@ -233,7 +244,7 @@ public class UserControllerTest {
     request.setCountry("UpdatedCountry");
     request.setPhoneNumber("UpdatedPhoneNumber");
     request.setAboutMe("UpdatedAboutMe");
-    request.setFavGenres(List.of("UpdatedGenre"));
+    request.setFavGenres(List.of("UpdatedGenre1", "UpdatedGenre2"));
     return request;
   }
 }
