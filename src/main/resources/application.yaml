@@ -8,6 +8,10 @@ spring:
     active: local
   application:
     name: KirjaSwappi-Backend
+  messages:
+    basename: messages.messages
+    fallback-to-system-locale: false
+    encoding: UTF-8
 
   mail:
     host: smtp.gmail.com

@@ -38,8 +38,7 @@ public class AuthService {
     AdminUser userDetails = adminUserService.getAdminUserInfo(username);
     if (jwtUtil.validateRefreshToken(refreshToken, userDetails)) {
       return jwtUtil.generateJwtToken(userDetails);
-    } else {
-      throw new BadRequest("invalidRefreshToken", refreshToken);
     }
+    throw new BadRequest("invalidRefreshToken", refreshToken);
   }
 }

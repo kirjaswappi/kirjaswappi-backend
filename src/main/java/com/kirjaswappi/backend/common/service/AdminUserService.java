@@ -55,8 +55,7 @@ public class AdminUserService {
     AdminUser adminUserFromDB = getAdminUserInfo(user.getUsername());
     if (adminUserFromDB.getPassword().equals(user.getPassword())) {
       return adminUserFromDB;
-    } else {
-      throw new InvalidCredentials(user.getPassword());
     }
+    throw new InvalidCredentials(user.getPassword());
   }
 }

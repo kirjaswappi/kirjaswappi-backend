@@ -49,7 +49,7 @@ public class EmailService {
       helper.setText(htmlBody, true); // Set the second argument to true for HTML content
       mailSender.send(message);
     } catch (MessagingException e) {
-      logger.error("Failed to send email to " + to, e);
+      logger.error("Failed to send email to: " + to, e);
     }
   }
 }
