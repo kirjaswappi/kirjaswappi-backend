@@ -13,8 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.kirjaswappi.backend.jpa.repositories.GenreRepository;
 import com.kirjaswappi.backend.mapper.GenreMapper;
 import com.kirjaswappi.backend.service.entities.Genre;
-import com.kirjaswappi.backend.service.exceptions.GenreAlreadyExists;
-import com.kirjaswappi.backend.service.exceptions.GenreNotFound;
+import com.kirjaswappi.backend.service.exceptions.GenreAlreadyExistsException;
+import com.kirjaswappi.backend.service.exceptions.GenreNotFoundException;
 
 @Service
 @Transactional
@@ -31,7 +31,7 @@ public class GenreService {
   public Genre addGenre(Genre genre) {
     // check if genre already exists:
     if (genreRepository.existsByName(genre.getName())) {
-      throw new GenreAlreadyExists(genre.getName());
+      throw new GenreAlreadyExistsException(genre.getName());
     }
     return mapper.toEntity(genreRepository.save(mapper.toDao(genre)));
   }
@@ -39,7 +39,7 @@ public class GenreService {
   public void deleteGenre(String id) {
     // check if genre exists:
     if (!genreRepository.existsById(id)) {
-      throw new GenreNotFound(id);
+      throw new GenreNotFoundException(id);
     }
     genreRepository.deleteById(id);
   }

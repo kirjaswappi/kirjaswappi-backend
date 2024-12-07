@@ -10,13 +10,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.kirjaswappi.backend.common.service.entities.AdminUser;
 import com.kirjaswappi.backend.common.utils.JwtUtil;
-import com.kirjaswappi.backend.service.exceptions.BadRequest;
+import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 
 @Service
 @Transactional
 public class AuthService {
-  @Autowired
-  private JwtUtil jwtUtil;
   @Autowired
   private AdminUserService adminUserService;
 
@@ -26,19 +24,19 @@ public class AuthService {
   }
 
   public String generateJwtToken(AdminUser adminUser) {
-    return jwtUtil.generateJwtToken(adminUser);
+    return JwtUtil.generateJwtToken(adminUser);
   }
 
   public String generateRefreshToken(AdminUser adminUser) {
-    return jwtUtil.generateRefreshToken(adminUser);
+    return JwtUtil.generateRefreshToken(adminUser);
   }
 
   public String verifyRefreshToken(String refreshToken) {
-    String username = jwtUtil.extractUsername(refreshToken);
+    String username = JwtUtil.extractUsername(refreshToken);
     AdminUser userDetails = adminUserService.getAdminUserInfo(username);
-    if (jwtUtil.validateRefreshToken(refreshToken, userDetails)) {
-      return jwtUtil.generateJwtToken(userDetails);
+    if (JwtUtil.validateRefreshToken(refreshToken, userDetails)) {
+      return JwtUtil.generateJwtToken(userDetails);
     }
-    throw new BadRequest("invalidRefreshToken", refreshToken);
+    throw new BadRequestException("invalidRefreshToken", refreshToken);
   }
 }

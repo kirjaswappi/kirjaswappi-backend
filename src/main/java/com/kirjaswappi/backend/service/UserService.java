@@ -16,9 +16,9 @@ import com.kirjaswappi.backend.jpa.daos.UserDao;
 import com.kirjaswappi.backend.jpa.repositories.UserRepository;
 import com.kirjaswappi.backend.mapper.UserMapper;
 import com.kirjaswappi.backend.service.entities.User;
-import com.kirjaswappi.backend.service.exceptions.BadRequest;
-import com.kirjaswappi.backend.service.exceptions.UserAlreadyExists;
-import com.kirjaswappi.backend.service.exceptions.UserNotFound;
+import com.kirjaswappi.backend.service.exceptions.BadRequestException;
+import com.kirjaswappi.backend.service.exceptions.UserAlreadyExistsException;
+import com.kirjaswappi.backend.service.exceptions.UserNotFoundException;
 
 @Service
 @Transactional
@@ -48,20 +48,20 @@ public class UserService {
 
   private void checkIfUserAlreadyExists(User user) {
     if (userRepository.findByEmailAndIsEmailVerified(user.getEmail(), true).isPresent()) {
-      throw new UserAlreadyExists(user.getEmail());
+      throw new UserAlreadyExistsException(user.getEmail());
     }
   }
 
   private void checkUserExistButNotVerified(User user) {
     // validate user exists and email is not verified:
     if (userRepository.findByEmailAndIsEmailVerified(user.getEmail(), false).isPresent()) {
-      throw new BadRequest("userExistsButNotVerified", user.getEmail());
+      throw new BadRequestException("userExistsButNotVerified", user.getEmail());
     }
   }
 
   public User getUser(String id) {
     return mapper.toEntity(userRepository.findById(id)
-        .orElseThrow(() -> new UserNotFound(id)));
+        .orElseThrow(() -> new UserNotFoundException(id)));
   }
 
   public List<User> getUsers() {
@@ -75,11 +75,11 @@ public class UserService {
   public User updateUser(User user) {
     // validate user exists:
     var dao = userRepository.findById(user.getId())
-        .orElseThrow(() -> new UserNotFound(user.getId()));
+        .orElseThrow(() -> new UserNotFoundException(user.getId()));
 
     // check email verification status:
     if (!dao.isEmailVerified()) {
-      throw new BadRequest("userExistsButNotVerified", user.getEmail());
+      throw new BadRequestException("userExistsButNotVerified", user.getEmail());
     }
 
     // update user details:
@@ -104,11 +104,11 @@ public class UserService {
   public User verifyLogin(User user) {
     // get salt from email:
     UserDao dao = userRepository.findByEmail(user.getEmail())
-        .orElseThrow(() -> new UserNotFound(user.getEmail()));
+        .orElseThrow(() -> new UserNotFoundException(user.getEmail()));
 
     // check email verification status:
     if (!dao.isEmailVerified()) {
-      throw new BadRequest("userExistsButNotVerified", user.getEmail());
+      throw new BadRequestException("userExistsButNotVerified", user.getEmail());
     }
 
     // hash password with salt:
@@ -122,27 +122,27 @@ public class UserService {
   public void verifyCurrentPassword(User user) {
     // get salt from email:
     UserDao dao = userRepository.findByEmail(user.getEmail())
-        .orElseThrow(() -> new UserNotFound(user.getEmail()));
+        .orElseThrow(() -> new UserNotFoundException(user.getEmail()));
 
     // hash password with salt:
     String password = Util.hashPassword(user.getPassword(), dao.getSalt());
 
     // validate email and password:
     if (userRepository.findByEmailAndPassword(dao.getEmail(), password).isEmpty()) {
-      throw new BadRequest("currentPasswordMismatch", user.getPassword());
+      throw new BadRequestException("currentPasswordMismatch", user.getPassword());
     }
   }
 
   public String changePassword(User user) {
     // get user from email:
     UserDao dao = userRepository.findByEmail(user.getEmail())
-        .orElseThrow(() -> new UserNotFound(user.getEmail()));
+        .orElseThrow(() -> new UserNotFoundException(user.getEmail()));
 
     // forbid newPassword to be the same as currentPassword:
     String currentPassword = dao.getPassword();
     String newPassword = Util.hashPassword(user.getPassword(), dao.getSalt());
     if (currentPassword.equals(newPassword)) {
-      throw new BadRequest("newPasswordCannotBeSameAsCurrentPassword", newPassword);
+      throw new BadRequestException("newPasswordCannotBeSameAsCurrentPassword", newPassword);
     }
 
     // add new salt to new password:
@@ -160,7 +160,7 @@ public class UserService {
   public String verifyEmail(String email) {
     // get user from email:
     UserDao dao = userRepository.findByEmail(email)
-        .orElseThrow(() -> new UserNotFound(email));
+        .orElseThrow(() -> new UserNotFoundException(email));
 
     // update email verification status:
     dao.setEmailVerified(true);

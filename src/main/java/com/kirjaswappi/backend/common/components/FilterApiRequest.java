@@ -12,9 +12,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import io.jsonwebtoken.MalformedJwtException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,14 +34,12 @@ import com.kirjaswappi.backend.common.utils.JwtUtil;
 public class FilterApiRequest extends OncePerRequestFilter {
   @Autowired
   private AdminUserService adminUserService;
-  @Autowired
-  private JwtUtil jwtUtil;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
     // 1. Extract Token
-    String jwt = jwtUtil.extractJwtToken(request);
+    String jwt = JwtUtil.extractJwtToken(request);
 
     // 2. Early Exit if No Token
     if (jwt == null || SecurityContextHolder.getContext().getAuthentication() != null) {
@@ -54,10 +55,13 @@ public class FilterApiRequest extends OncePerRequestFilter {
   }
 
   private void validateTokenAndUser(HttpServletRequest request, String jwt) {
-    String username = jwtUtil.extractUsername(jwt);
-    AdminUser userDetails = adminUserService.getAdminUserInfo(username);
-    if (jwtUtil.validateJwtToken(jwt, userDetails)) {
-      setAuthentication(request, jwt, userDetails);
+    try {
+      String username = JwtUtil.extractUsername(jwt);
+      AdminUser userDetails = adminUserService.getAdminUserInfo(username);
+      if (JwtUtil.validateJwtToken(jwt, userDetails))
+        setAuthentication(request, jwt, userDetails);
+    } catch (MalformedJwtException | AuthenticationException e) {
+      SecurityContextHolder.clearContext();
     }
   }
 
@@ -68,7 +72,7 @@ public class FilterApiRequest extends OncePerRequestFilter {
 
   private UsernamePasswordAuthenticationToken createAuthenticationToken(String jwt, AdminUser userDetails,
       HttpServletRequest request) {
-    String role = jwtUtil.extractRole(jwt);
+    String role = JwtUtil.extractRole(jwt);
     List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
         userDetails, null, authorities);

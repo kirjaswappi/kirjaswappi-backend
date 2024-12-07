@@ -6,8 +6,8 @@ package com.kirjaswappi.backend.service.exceptions;
 
 import com.kirjaswappi.backend.common.exceptions.BusinessException;
 
-public class BadRequest extends BusinessException {
-  public BadRequest(String messageKey, Object... params) {
-    super(messageKey, params);
+public class UserNotFoundException extends BusinessException {
+  public UserNotFoundException(Object... params) {
+    super("userNotFound", params);
   }
 }

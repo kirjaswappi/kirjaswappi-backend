@@ -17,9 +17,9 @@ import com.kirjaswappi.backend.common.jpa.repositories.OTPRepository;
 import com.kirjaswappi.backend.common.service.entities.OTP;
 import com.kirjaswappi.backend.common.service.mappers.OTPMapper;
 import com.kirjaswappi.backend.service.UserService;
-import com.kirjaswappi.backend.service.exceptions.BadRequest;
-import com.kirjaswappi.backend.service.exceptions.ResourceNotFound;
-import com.kirjaswappi.backend.service.exceptions.UserNotFound;
+import com.kirjaswappi.backend.service.exceptions.BadRequestException;
+import com.kirjaswappi.backend.service.exceptions.ResourceNotFoundException;
+import com.kirjaswappi.backend.service.exceptions.UserNotFoundException;
 
 @Service
 @Transactional
@@ -44,7 +44,7 @@ public class OTPService {
 
   private OTP getOTP(String email) {
     return otpMapper.toEntity(otpRepository.findByEmail(email)
-        .orElseThrow(() -> new ResourceNotFound("otpNotFound", email)));
+        .orElseThrow(() -> new ResourceNotFoundException("otpNotFound", email)));
   }
 
   public String verifyOTPByEmail(OTP otp) {
@@ -52,12 +52,12 @@ public class OTPService {
 
     // check provided OTP with the stored OTP:
     if (!otpEntity.getOtp().equals(otp.getOtp())) {
-      throw new BadRequest("otpDoesNotMatch", otp);
+      throw new BadRequestException("otpDoesNotMatch", otp);
     }
 
     // check createAt of OTP with current time plus 15 minutes:
     if (otpEntity.getCreatedAt().getTime() + 15 * 60 * 1000 < System.currentTimeMillis()) {
-      throw new BadRequest("otpExpired", otp);
+      throw new BadRequestException("otpExpired", otp);
     }
 
     // Delete the OTP after verification:
@@ -72,7 +72,7 @@ public class OTPService {
   public String saveAndSendOTP(String email) throws IOException {
     // Check if the user exists:
     if (!checkUserExists(email)) {
-      throw new UserNotFound(email);
+      throw new UserNotFoundException(email);
     }
 
     // Delete all the previous OTPs:

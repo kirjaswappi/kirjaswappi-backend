@@ -32,20 +32,20 @@ public class JwtUtil {
   private static final long TOKEN_EXPIRATION_MS = 5 * 60 * 1000;
   private static final String TOKEN_TYPE = "jwtToken";
 
-  public String extractUsername(String token) {
+  public static String extractUsername(String token) {
     return extractClaim(token, Claims::getSubject);
   }
 
-  public Date extractExpiration(String token) {
+  private static Date extractExpiration(String token) {
     return extractClaim(token, Claims::getExpiration);
   }
 
-  public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+  private static <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
     final Claims claims = extractAllClaims(token);
     return claimsResolver.apply(claims);
   }
 
-  private Claims extractAllClaims(String token) {
+  private static Claims extractAllClaims(String token) {
     return Jwts.parser()
         .verifyWith(SECRET_KEY)
         .build()
@@ -53,19 +53,19 @@ public class JwtUtil {
         .getPayload();
   }
 
-  private boolean isTokenExpired(String token) {
+  private static boolean isTokenExpired(String token) {
     return extractExpiration(token)
         .before(new Date());
   }
 
-  public String generateJwtToken(AdminUser adminUser) {
+  public static String generateJwtToken(AdminUser adminUser) {
     Map<String, Object> claims = new HashMap<>();
     claims.put(ROLE, adminUser.getRole());
     claims.put(TOKEN_TYPE, true);
     return createJwtToken(claims, adminUser.getUsername());
   }
 
-  private String createJwtToken(Map<String, Object> claims, String subject) {
+  private static String createJwtToken(Map<String, Object> claims, String subject) {
     return Jwts.builder()
         .claims(claims)
         .subject(subject)
@@ -75,34 +75,34 @@ public class JwtUtil {
         .compact();
   }
 
-  public boolean validateJwtToken(String token, AdminUser adminUser) {
+  public static boolean validateJwtToken(String token, AdminUser adminUser) {
     final String username = extractUsername(token);
     return (username.equals(adminUser.getUsername()) && !isTokenExpired(token)) && isValidTokenType(token);
   }
 
-  public boolean validateRefreshToken(String token, AdminUser adminUser) {
+  public static boolean validateRefreshToken(String token, AdminUser adminUser) {
     final String username = extractUsername(token);
     return (username.equals(adminUser.getUsername()) && !isTokenExpired(token)) && !isValidTokenType(token);
   }
 
-  private boolean isValidTokenType(String token) {
+  private static boolean isValidTokenType(String token) {
     Claims claims = extractAllClaims(token);
     return claims.get(TOKEN_TYPE, Boolean.class);
   }
 
-  public String extractRole(String token) {
+  public static String extractRole(String token) {
     Claims claims = extractAllClaims(token);
     return claims.get(ROLE, String.class);
   }
 
-  public String generateRefreshToken(AdminUser adminUser) {
+  public static String generateRefreshToken(AdminUser adminUser) {
     Map<String, Object> claims = new HashMap<>();
     claims.put(ROLE, adminUser.getRole());
     claims.put(TOKEN_TYPE, false);
     return createRefreshToken(claims, adminUser.getUsername());
   }
 
-  private String createRefreshToken(Map<String, Object> claims, String subject) {
+  private static String createRefreshToken(Map<String, Object> claims, String subject) {
     return Jwts.builder()
         .claims(claims)
         .subject(subject)
@@ -112,7 +112,7 @@ public class JwtUtil {
         .compact();
   }
 
-  public String extractJwtToken(HttpServletRequest request) {
+  public static String extractJwtToken(HttpServletRequest request) {
     final String authorizationHeader = request.getHeader("Authorization");
     if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
       return authorizationHeader.substring(7);

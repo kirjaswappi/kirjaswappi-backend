@@ -9,7 +9,7 @@ import lombok.Setter;
 
 import com.kirjaswappi.backend.http.validations.ValidationUtil;
 import com.kirjaswappi.backend.service.entities.Genre;
-import com.kirjaswappi.backend.service.exceptions.BadRequest;
+import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 
 @Getter
 @Setter
@@ -26,7 +26,7 @@ public class GenreCreateRequest {
   private void validateProperties() {
     // validate genre name:
     if (!ValidationUtil.validateNotBlank(this.name)) {
-      throw new BadRequest("genreNameCannotBeBlank", this.name);
+      throw new BadRequestException("genreNameCannotBeBlank", this.name);
     }
   }
 }

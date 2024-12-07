@@ -11,7 +11,7 @@ import lombok.Setter;
 
 import com.kirjaswappi.backend.common.service.entities.OTP;
 import com.kirjaswappi.backend.http.validations.ValidationUtil;
-import com.kirjaswappi.backend.service.exceptions.BadRequest;
+import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 
 @Getter
 @Setter
@@ -26,10 +26,10 @@ public class VerifyOtpRequest {
 
   private void validateProperties() {
     if (!ValidationUtil.validateEmail(this.email)) {
-      throw new BadRequest("invalidEmailAddress", email);
+      throw new BadRequestException("invalidEmailAddress", email);
     }
     if (!ValidationUtil.validateOtp(this.otp)) {
-      throw new BadRequest("invalidOtp", otp);
+      throw new BadRequestException("invalidOtp", otp);
     }
   }
 }

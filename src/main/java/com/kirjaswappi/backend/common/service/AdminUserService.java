@@ -16,8 +16,8 @@ import com.kirjaswappi.backend.common.service.entities.AdminUser;
 import com.kirjaswappi.backend.common.service.exceptions.InvalidCredentials;
 import com.kirjaswappi.backend.common.service.mappers.AdminUserMapper;
 import com.kirjaswappi.backend.common.utils.JwtUtil;
-import com.kirjaswappi.backend.service.exceptions.UserAlreadyExists;
-import com.kirjaswappi.backend.service.exceptions.UserNotFound;
+import com.kirjaswappi.backend.service.exceptions.UserAlreadyExistsException;
+import com.kirjaswappi.backend.service.exceptions.UserNotFoundException;
 
 @Service
 @Transactional
@@ -31,13 +31,13 @@ public class AdminUserService {
 
   public AdminUser getAdminUserInfo(String username) {
     return mapper.toEntity(adminUserRepository.findByUsername(username)
-        .orElseThrow(() -> new UserNotFound(username)));
+        .orElseThrow(() -> new UserNotFoundException(username)));
   }
 
   public AdminUser addUser(AdminUser adminUser) {
     // validate username exists:
     if (adminUserRepository.findByUsername(adminUser.getUsername()).isPresent()) {
-      throw new UserAlreadyExists(adminUser.getUsername());
+      throw new UserAlreadyExistsException(adminUser.getUsername());
     }
     AdminUserDao dao = mapper.toDao(adminUser);
     return mapper.toEntity(adminUserRepository.save(dao));
