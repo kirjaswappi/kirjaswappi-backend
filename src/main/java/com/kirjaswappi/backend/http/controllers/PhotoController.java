@@ -11,6 +11,7 @@ import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -34,15 +35,33 @@ public class PhotoController {
   private GridFSBucket gridFSBucket;
 
   @PostMapping("/profile")
-  public String addProfilePhoto(@RequestParam("userId") String userId, @RequestParam("image") MultipartFile image)
+  public ResponseEntity<String> addProfilePhoto(@RequestParam("userId") String userId,
+      @RequestParam("image") MultipartFile image)
       throws IOException {
-    return photoService.addProfilePhoto(userId, image);
+    ResponseEntity<String> UNSUPPORTED_MEDIA_TYPE = checkIfTheMediaIsSupported(image);
+    if (UNSUPPORTED_MEDIA_TYPE != null)
+      return UNSUPPORTED_MEDIA_TYPE;
+    return ResponseEntity.ok(photoService.addProfilePhoto(userId, image));
+  }
+
+  private static ResponseEntity<String> checkIfTheMediaIsSupported(MultipartFile image) {
+    String contentType = image.getContentType();
+    String fileName = image.getOriginalFilename();
+    if (contentType == null || !contentType.startsWith("image/") ||
+        fileName == null || !fileName.matches("([^\\s]+(\\.(?i)(jpg|jpeg|png|gif|bmp))$)")) {
+      return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body("Only image files are allowed!");
+    }
+    return null;
   }
 
   @PostMapping("/cover")
-  public String addCoverPhoto(@RequestParam("userId") String userId, @RequestParam("image") MultipartFile image)
+  public ResponseEntity<String> addCoverPhoto(@RequestParam("userId") String userId,
+      @RequestParam("image") MultipartFile image)
       throws IOException {
-    return photoService.addCoverPhoto(userId, image);
+    ResponseEntity<String> UNSUPPORTED_MEDIA_TYPE = checkIfTheMediaIsSupported(image);
+    if (UNSUPPORTED_MEDIA_TYPE != null)
+      return UNSUPPORTED_MEDIA_TYPE;
+    return ResponseEntity.ok(photoService.addCoverPhoto(userId, image));
   }
 
   @DeleteMapping("/profile")

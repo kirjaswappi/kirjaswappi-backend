@@ -43,11 +43,11 @@ public class PhotoService {
   private UserMapper userMapper;
 
   public String addProfilePhoto(String userId, MultipartFile file) throws IOException {
-    return addPhoto(userId, file, "profile-photo");
+    return addPhoto(userId, file, "Profile photo");
   }
 
   public String addCoverPhoto(String userId, MultipartFile file) throws IOException {
-    return addPhoto(userId, file, "cover-photo");
+    return addPhoto(userId, file, "Cover photo");
   }
 
   public void deleteProfilePhoto(String userId) {
@@ -62,7 +62,7 @@ public class PhotoService {
     var userDao = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
     // Delete the old photo if it exists
-    var oldPhoto = "profile-photo".equals(title) ? userDao.getProfilePhoto() : userDao.getCoverPhoto();
+    var oldPhoto = "Profile photo".equals(title) ? userDao.getProfilePhoto() : userDao.getCoverPhoto();
     if (oldPhoto != null) {
       gridFSBucket.delete(oldPhoto.getFileId());
     }
@@ -81,14 +81,14 @@ public class PhotoService {
     photoRepository.save(photoDao);
 
     // Update the user with the new photo
-    if ("profile-photo".equals(title)) {
+    if ("Profile photo".equals(title)) {
       userDao.setProfilePhoto(photoDao);
     } else {
       userDao.setCoverPhoto(photoDao);
     }
     userRepository.save(userDao);
 
-    return fileId.toString();
+    return title + " is added successfully.";
   }
 
   public GridFSFile getPhotoByUserEmail(String email, boolean isProfilePhoto) {
