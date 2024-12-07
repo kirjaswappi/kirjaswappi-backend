@@ -6,8 +6,8 @@ package com.kirjaswappi.backend.service.exceptions;
 
 import com.kirjaswappi.backend.common.exceptions.BusinessException;
 
-public class GenreNotFound extends BusinessException {
-  public GenreNotFound(Object... params) {
-    super("genreNotFound", params);
+public class BadRequestException extends BusinessException {
+  public BadRequestException(String messageKey, Object... params) {
+    super(messageKey, params);
   }
 }

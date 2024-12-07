@@ -11,7 +11,7 @@ import lombok.Setter;
 
 import com.kirjaswappi.backend.http.validations.ValidationUtil;
 import com.kirjaswappi.backend.service.entities.User;
-import com.kirjaswappi.backend.service.exceptions.BadRequest;
+import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 
 @Getter
 @Setter
@@ -48,11 +48,11 @@ public class UserUpdateRequest {
   private void validateProperties() {
     // validate first name:
     if (!ValidationUtil.validateNotBlank(this.firstName)) {
-      throw new BadRequest("firstNameCannotBeBlank", this.firstName);
+      throw new BadRequestException("firstNameCannotBeBlank", this.firstName);
     }
     // validate last name:
     if (!ValidationUtil.validateNotBlank(this.lastName)) {
-      throw new BadRequest("lastNameCannotBeBlank", this.lastName);
+      throw new BadRequestException("lastNameCannotBeBlank", this.lastName);
     }
   }
 }

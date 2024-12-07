@@ -6,8 +6,8 @@ package com.kirjaswappi.backend.service.exceptions;
 
 import com.kirjaswappi.backend.common.exceptions.BusinessException;
 
-public class ResourceNotFound extends BusinessException {
-  public ResourceNotFound(String messageKey, Object... params) {
-    super(messageKey, params);
+public class UserAlreadyExistsException extends BusinessException {
+  public UserAlreadyExistsException(Object... params) {
+    super("userAlreadyExists", params);
   }
 }

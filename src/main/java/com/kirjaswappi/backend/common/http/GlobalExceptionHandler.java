@@ -26,10 +26,11 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import com.kirjaswappi.backend.common.exceptions.BusinessException;
+import com.kirjaswappi.backend.common.exceptions.InvalidJwtTokenException;
 import com.kirjaswappi.backend.common.exceptions.SystemException;
 import com.kirjaswappi.backend.common.service.exceptions.InvalidCredentials;
-import com.kirjaswappi.backend.service.exceptions.ResourceNotFound;
-import com.kirjaswappi.backend.service.exceptions.UserNotFound;
+import com.kirjaswappi.backend.service.exceptions.ResourceNotFoundException;
+import com.kirjaswappi.backend.service.exceptions.UserNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -49,15 +50,15 @@ public class GlobalExceptionHandler {
     return this.buildErrorResponse(exception, webRequest);
   }
 
-  @ExceptionHandler(ResourceNotFound.class)
+  @ExceptionHandler(ResourceNotFoundException.class)
   @ResponseStatus(HttpStatus.NOT_FOUND)
-  public ErrorResponse handleResourceNotFoundException(ResourceNotFound exception, WebRequest webRequest) {
+  public ErrorResponse handleResourceNotFoundException(ResourceNotFoundException exception, WebRequest webRequest) {
     return this.buildErrorResponse(exception, webRequest);
   }
 
-  @ExceptionHandler(UserNotFound.class)
+  @ExceptionHandler(UserNotFoundException.class)
   @ResponseStatus(HttpStatus.NOT_FOUND)
-  public ErrorResponse handleUserNotFoundException(UserNotFound exception, WebRequest webRequest) {
+  public ErrorResponse handleUserNotFoundException(UserNotFoundException exception, WebRequest webRequest) {
     return this.buildErrorResponse(exception, webRequest);
   }
 
@@ -66,6 +67,13 @@ public class GlobalExceptionHandler {
   public ErrorResponse handleGenericSystemException(SystemException exception, WebRequest webRequest) {
     return new ErrorResponse(new ErrorResponse.Error(exception.getCode(),
         this.resolveMessage(INTERNAL_ERROR, null, webRequest.getLocale())));
+  }
+
+  @ExceptionHandler(InvalidJwtTokenException.class)
+  @ResponseStatus(HttpStatus.UNAUTHORIZED)
+  public ErrorResponse handleInvalidJwtTokenException(InvalidJwtTokenException exception, WebRequest webRequest) {
+    return new ErrorResponse(new ErrorResponse.Error(exception.getCode(),
+        this.resolveMessage(exception.getCode(), null, webRequest.getLocale()), getCurrentPath()));
   }
 
   @ExceptionHandler(NoHandlerFoundException.class)

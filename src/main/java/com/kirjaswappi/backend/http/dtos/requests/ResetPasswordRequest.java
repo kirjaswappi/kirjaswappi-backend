@@ -9,7 +9,7 @@ import lombok.Setter;
 
 import com.kirjaswappi.backend.http.validations.ValidationUtil;
 import com.kirjaswappi.backend.service.entities.User;
-import com.kirjaswappi.backend.service.exceptions.BadRequest;
+import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 
 @Getter
 @Setter
@@ -28,19 +28,19 @@ public class ResetPasswordRequest {
   private void validateProperties(String email) {
     // validate email:
     if (!ValidationUtil.validateEmail(email)) {
-      throw new BadRequest("invalidEmailAddress", email);
+      throw new BadRequestException("invalidEmailAddress", email);
     }
     // validate new password:
     if (!ValidationUtil.validateNotBlank(this.newPassword)) {
-      throw new BadRequest("newPasswordCannotBeBlank", this.newPassword);
+      throw new BadRequestException("newPasswordCannotBeBlank", this.newPassword);
     }
     // validate confirm password:
     if (!ValidationUtil.validateNotBlank(this.confirmPassword)) {
-      throw new BadRequest("confirmPasswordCannotBeBlank", this.confirmPassword);
+      throw new BadRequestException("confirmPasswordCannotBeBlank", this.confirmPassword);
     }
     // validate new password and confirm password matches:
     if (!this.newPassword.equals(this.confirmPassword)) {
-      throw new BadRequest("passwordsDoNotMatch", this.confirmPassword);
+      throw new BadRequestException("passwordsDoNotMatch", this.confirmPassword);
     }
   }
 }

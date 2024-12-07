@@ -37,7 +37,7 @@ import com.kirjaswappi.backend.http.dtos.responses.UserUpdateResponse;
 import com.kirjaswappi.backend.http.dtos.responses.VerifyEmailResponse;
 import com.kirjaswappi.backend.service.UserService;
 import com.kirjaswappi.backend.service.entities.User;
-import com.kirjaswappi.backend.service.exceptions.BadRequest;
+import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 
 @RestController
 @RequestMapping(API_BASE + USERS)
@@ -65,7 +65,7 @@ public class UserController {
   public ResponseEntity<UserUpdateResponse> updateUser(@PathVariable String id, @RequestBody UserUpdateRequest user) {
     // validate id:
     if (!id.equals(user.getId())) {
-      throw new BadRequest("idMismatch", id, user.getId());
+      throw new BadRequestException("idMismatch", id, user.getId());
     }
     User updatedUser = userService.updateUser(user.toEntity());
     return ResponseEntity.status(HttpStatus.OK).body(new UserUpdateResponse(updatedUser));

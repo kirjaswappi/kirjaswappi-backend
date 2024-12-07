@@ -21,8 +21,8 @@ import com.kirjaswappi.backend.jpa.repositories.UserRepository;
 import com.kirjaswappi.backend.mapper.UserMapper;
 import com.kirjaswappi.backend.service.entities.Photo;
 import com.kirjaswappi.backend.service.entities.User;
-import com.kirjaswappi.backend.service.exceptions.ResourceNotFound;
-import com.kirjaswappi.backend.service.exceptions.UserNotFound;
+import com.kirjaswappi.backend.service.exceptions.ResourceNotFoundException;
+import com.kirjaswappi.backend.service.exceptions.UserNotFoundException;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import com.mongodb.client.gridfs.model.GridFSUploadOptions;
@@ -59,7 +59,7 @@ public class PhotoService {
   }
 
   private String addPhoto(String userId, MultipartFile file, String title) throws IOException {
-    var userDao = userRepository.findById(userId).orElseThrow(UserNotFound::new);
+    var userDao = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
     // Delete the old photo if it exists
     var oldPhoto = "profile-photo".equals(title) ? userDao.getProfilePhoto() : userDao.getCoverPhoto();
@@ -92,12 +92,12 @@ public class PhotoService {
   }
 
   public GridFSFile getPhotoByUserEmail(String email, boolean isProfilePhoto) {
-    User user = userMapper.toEntity(userRepository.findByEmail(email).orElseThrow(UserNotFound::new));
+    User user = userMapper.toEntity(userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new));
     return getGridFSFile(isProfilePhoto, user);
   }
 
   public GridFSFile getPhotoByUserId(String userId, boolean isProfilePhoto) {
-    User user = userMapper.toEntity(userRepository.findById(userId).orElseThrow(UserNotFound::new));
+    User user = userMapper.toEntity(userRepository.findById(userId).orElseThrow(UserNotFoundException::new));
     return getGridFSFile(isProfilePhoto, user);
   }
 
@@ -109,12 +109,12 @@ public class PhotoService {
 
   private static void checkIfPhotoExists(boolean photo) {
     if (photo) {
-      throw new ResourceNotFound("photoNotFound");
+      throw new ResourceNotFoundException("photoNotFound");
     }
   }
 
   private void deletePhoto(String userId, boolean isProfilePhoto) {
-    var userDao = userRepository.findById(userId).orElseThrow(UserNotFound::new);
+    var userDao = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
     var photo = isProfilePhoto ? userDao.getProfilePhoto() : userDao.getCoverPhoto();
 
     checkIfPhotoExists(photo == null);
