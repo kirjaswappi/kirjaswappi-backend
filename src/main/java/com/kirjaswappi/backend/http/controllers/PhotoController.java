@@ -14,8 +14,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,13 +31,15 @@ public class PhotoController {
   private PhotoService photoService;
 
   @PostMapping("/profile")
-  public ResponseEntity<Photo> addProfilePhoto(@RequestBody CreatePhotoRequest request) throws IOException {
-    return ResponseEntity.ok(photoService.addProfilePhoto(request.getUserId(), request.getImage()));
+  public ResponseEntity<byte[]> addProfilePhoto(@ModelAttribute CreatePhotoRequest request) throws IOException {
+    Photo photo = photoService.addProfilePhoto(request.getUserId(), request.getImage());
+    return getPhotoResponse(photo.getFileBytes());
   }
 
   @PostMapping("/cover")
-  public ResponseEntity<Photo> addCoverPhoto(@RequestBody CreatePhotoRequest request) throws IOException {
-    return ResponseEntity.ok(photoService.addCoverPhoto(request.getUserId(), request.getImage()));
+  public ResponseEntity<byte[]> addCoverPhoto(@ModelAttribute CreatePhotoRequest request) throws IOException {
+    Photo photo = photoService.addCoverPhoto(request.getUserId(), request.getImage());
+    return getPhotoResponse(photo.getFileBytes());
   }
 
   @DeleteMapping("/profile")

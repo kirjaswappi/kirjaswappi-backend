@@ -19,9 +19,9 @@ public class CreatePhotoRequest {
   private MultipartFile image;
 
   public CreatePhotoRequest(String userId, MultipartFile image) {
-    this.validateProperties();
     this.userId = userId;
     this.image = image;
+    this.validateProperties();
   }
 
   private void validateProperties() {

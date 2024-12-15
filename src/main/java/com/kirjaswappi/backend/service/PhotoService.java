@@ -108,17 +108,21 @@ public class PhotoService {
 
   public byte[] getPhotoByUserEmail(String email, boolean isProfilePhoto) {
     User user = UserMapper.toEntity(userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new));
-    return getPhoto(isProfilePhoto, user);
+    return getUserPhoto(isProfilePhoto, user);
   }
 
   public byte[] getPhotoByUserId(String userId, boolean isProfilePhoto) {
     User user = UserMapper.toEntity(userRepository.findById(userId).orElseThrow(UserNotFoundException::new));
-    return getPhoto(isProfilePhoto, user);
+    return getUserPhoto(isProfilePhoto, user);
   }
 
-  private byte[] getPhoto(boolean isProfilePhoto, User user) {
+  private byte[] getUserPhoto(boolean isProfilePhoto, User user) {
     Photo photo = isProfilePhoto ? user.getProfilePhoto() : user.getCoverPhoto();
     checkIfPhotoExists(photo == null);
+    return getPhoto(photo);
+  }
+
+  private byte[] getPhoto(Photo photo) {
     var gridFSFile = getGridFSFile(photo.getFileId());
     if (gridFSFile == null) {
       throw new ResourceNotFoundException("photoNotFound");
