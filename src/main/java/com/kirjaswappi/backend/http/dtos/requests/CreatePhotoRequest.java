@@ -25,11 +25,9 @@ public class CreatePhotoRequest {
   }
 
   private void validateProperties() {
-    // validate email:
     if (!ValidationUtil.validateNotBlank(this.userId)) {
       throw new BadRequestException("userIdCannotBeBlank", this.userId);
     }
-
     // validate image:
     if (this.image == null) {
       throw new BadRequestException("imageCannotBeNull", this.image);

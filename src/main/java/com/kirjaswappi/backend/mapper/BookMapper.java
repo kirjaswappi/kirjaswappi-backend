@@ -38,7 +38,9 @@ public class BookMapper {
   // This is without the genres
   public static BookDao toDao(Book entity) {
     var dao = new BookDao();
-    dao.setId(entity.getId());
+    if (entity.getId() != null) {
+      dao.setId(entity.getId());
+    }
     dao.setTitle(entity.getTitle());
     dao.setAuthor(entity.getAuthor());
     dao.setDescription(entity.getDescription());

@@ -28,4 +28,5 @@ public class Book {
   private List<String> genres;
   @Nullable
   private Photo coverPhoto;
+  private User owner;
 }

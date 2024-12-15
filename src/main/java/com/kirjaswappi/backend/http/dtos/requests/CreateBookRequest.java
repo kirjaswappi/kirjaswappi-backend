@@ -6,13 +6,19 @@ package com.kirjaswappi.backend.http.dtos.requests;
 
 import java.util.List;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import org.springframework.web.multipart.MultipartFile;
 
 import com.kirjaswappi.backend.http.validations.ValidationUtil;
 import com.kirjaswappi.backend.service.entities.Book;
 import com.kirjaswappi.backend.service.entities.Photo;
+import com.kirjaswappi.backend.service.entities.User;
 import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 
+@Getter
+@Setter
 public class CreateBookRequest {
   private String title;
   private String author;
@@ -21,6 +27,7 @@ public class CreateBookRequest {
   private String condition;
   private List<String> genres;
   private MultipartFile coverPhoto;
+  private String ownerId;
 
   public Book toEntity() {
     this.validateProperties();
@@ -36,6 +43,9 @@ public class CreateBookRequest {
       photo.setFile(coverPhoto);
       book.setCoverPhoto(photo);
     }
+    var user = new User();
+    user.setId(ownerId);
+    book.setOwner(user);
     return book;
   }
 
@@ -57,6 +67,9 @@ public class CreateBookRequest {
     }
     if (this.coverPhoto != null) {
       ValidationUtil.validateMediaType(coverPhoto);
+    }
+    if (!ValidationUtil.validateNotBlank(this.ownerId)) {
+      throw new BadRequestException("ownerIdCannotBeBlank", this.ownerId);
     }
   }
 }

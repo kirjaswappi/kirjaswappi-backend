@@ -101,7 +101,7 @@ public class UserService {
     dao.setAboutMe(user.getAboutMe());
     // update favGenres:
     var favGenres = user.getFavGenres().stream()
-        .map(genre -> genreRepository.findByNameIgnoreCase(genre)
+        .map(genre -> genreRepository.findByName(genre)
             .orElseThrow(() -> new BadRequestException("genreNotFound", genre)))
         .toList();
     dao.setFavGenres(favGenres);

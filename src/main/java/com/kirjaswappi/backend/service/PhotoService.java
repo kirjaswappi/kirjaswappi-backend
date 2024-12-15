@@ -44,15 +44,15 @@ public class PhotoService {
   private BookRepository bookRepository;
 
   public Photo addProfilePhoto(String userId, MultipartFile file) throws IOException {
-    return addPhoto(userId, file, "Profile photo");
+    return addUserPhoto(userId, file, "Profile photo");
   }
 
   public Photo addCoverPhoto(String userId, MultipartFile file) throws IOException {
-    return addPhoto(userId, file, "Cover photo");
+    return addUserPhoto(userId, file, "Cover photo");
   }
 
   public Photo addBookPhoto(String bookId, MultipartFile file) throws IOException {
-    return addPhoto(bookId, file, "Book photo");
+    return addBookCoverPhoto(bookId, file, "Book photo");
   }
 
   public void deleteBookPhoto(String bookId) {
@@ -70,7 +70,7 @@ public class PhotoService {
     deleteUserPhoto(userId, false);
   }
 
-  private Photo addPhoto(String userId, MultipartFile file, String title) throws IOException {
+  private Photo addUserPhoto(String userId, MultipartFile file, String title) throws IOException {
     var userDao = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
     // Delete the old photo if it exists
@@ -99,6 +99,32 @@ public class PhotoService {
       userDao.setCoverPhoto(updatedPhotodao);
     }
     userRepository.save(userDao);
+
+    var photo = PhotoMapper.toEntity(updatedPhotodao);
+    // add the photo bytes
+    photo.setFileBytes(file.getBytes());
+    return photo;
+  }
+
+  private Photo addBookCoverPhoto(String bookId, MultipartFile file, String title) throws IOException {
+    var book = bookRepository.findById(bookId).orElseThrow(BookNotFoundException::new);
+    // This ensures we don't have dangling cover photos for a book
+    if (book.getCoverPhoto() != null && book.getCoverPhoto().getId() != null) {
+      deleteBookPhoto(book.getCoverPhoto().getId());
+    }
+
+    // Save the new photo
+    var photoDao = new PhotoDao();
+    photoDao.setTitle("Book photo");
+    photoRepository.save(photoDao);
+
+    // Save the photo to GridFS
+    GridFSUploadOptions options = new GridFSUploadOptions().metadata(new Document("type", "image"));
+    ObjectId fileId = gridFSBucket.uploadFromStream(photoDao.getId(), file.getInputStream(), options);
+
+    // Update the photoDao with the fileId
+    photoDao.setFileId(fileId);
+    var updatedPhotodao = photoRepository.save(photoDao);
 
     var photo = PhotoMapper.toEntity(updatedPhotodao);
     // add the photo bytes

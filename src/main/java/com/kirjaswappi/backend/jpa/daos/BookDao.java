@@ -46,4 +46,8 @@ public class BookDao {
   @Nullable
   @DBRef
   private PhotoDao coverPhoto;
+
+  @NotNull
+  @DBRef
+  private UserDao owner;
 }
