@@ -15,7 +15,7 @@ import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 
 @Getter
 @Setter
-public class UserUpdateRequest {
+public class UpdateUserRequest {
   private String id;
   private String firstName;
   private String lastName;

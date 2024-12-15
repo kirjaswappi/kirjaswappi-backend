@@ -6,6 +6,7 @@ package com.kirjaswappi.backend.service;
 
 import static com.mongodb.client.model.Filters.eq;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import org.bson.Document;
@@ -16,11 +17,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.kirjaswappi.backend.jpa.daos.PhotoDao;
+import com.kirjaswappi.backend.jpa.repositories.BookRepository;
 import com.kirjaswappi.backend.jpa.repositories.PhotoRepository;
 import com.kirjaswappi.backend.jpa.repositories.UserRepository;
+import com.kirjaswappi.backend.mapper.PhotoMapper;
 import com.kirjaswappi.backend.mapper.UserMapper;
 import com.kirjaswappi.backend.service.entities.Photo;
 import com.kirjaswappi.backend.service.entities.User;
+import com.kirjaswappi.backend.service.exceptions.BookNotFoundException;
 import com.kirjaswappi.backend.service.exceptions.ResourceNotFoundException;
 import com.kirjaswappi.backend.service.exceptions.UserNotFoundException;
 import com.mongodb.client.gridfs.GridFSBucket;
@@ -32,39 +36,47 @@ import com.mongodb.client.gridfs.model.GridFSUploadOptions;
 public class PhotoService {
   @Autowired
   private GridFSBucket gridFSBucket;
-
   @Autowired
   private PhotoRepository photoRepository;
-
   @Autowired
   private UserRepository userRepository;
-
   @Autowired
-  private UserMapper userMapper;
+  private BookRepository bookRepository;
 
-  public String addProfilePhoto(String userId, MultipartFile file) throws IOException {
+  public Photo addProfilePhoto(String userId, MultipartFile file) throws IOException {
     return addPhoto(userId, file, "Profile photo");
   }
 
-  public String addCoverPhoto(String userId, MultipartFile file) throws IOException {
+  public Photo addCoverPhoto(String userId, MultipartFile file) throws IOException {
     return addPhoto(userId, file, "Cover photo");
   }
 
+  public Photo addBookPhoto(String bookId, MultipartFile file) throws IOException {
+    return addPhoto(bookId, file, "Book photo");
+  }
+
+  public void deleteBookPhoto(String bookId) {
+    var bookDao = bookRepository.findById(bookId).orElseThrow(BookNotFoundException::new);
+    if (bookDao.getCoverPhoto() != null) {
+      deletePhotoFromGridFs(bookDao.getCoverPhoto().getFileId());
+    }
+  }
+
   public void deleteProfilePhoto(String userId) {
-    deletePhoto(userId, true);
+    deleteUserPhoto(userId, true);
   }
 
   public void deleteCoverPhoto(String userId) {
-    deletePhoto(userId, false);
+    deleteUserPhoto(userId, false);
   }
 
-  private String addPhoto(String userId, MultipartFile file, String title) throws IOException {
+  private Photo addPhoto(String userId, MultipartFile file, String title) throws IOException {
     var userDao = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
     // Delete the old photo if it exists
     var oldPhoto = "Profile photo".equals(title) ? userDao.getProfilePhoto() : userDao.getCoverPhoto();
     if (oldPhoto != null) {
-      gridFSBucket.delete(oldPhoto.getFileId());
+      deletePhotoFromGridFs(oldPhoto.getFileId());
     }
 
     // Save the new photo
@@ -78,33 +90,46 @@ public class PhotoService {
 
     // Update the photoDao with the fileId
     photoDao.setFileId(fileId);
-    photoRepository.save(photoDao);
+    var updatedPhotodao = photoRepository.save(photoDao);
 
     // Update the user with the new photo
     if ("Profile photo".equals(title)) {
-      userDao.setProfilePhoto(photoDao);
+      userDao.setProfilePhoto(updatedPhotodao);
     } else {
-      userDao.setCoverPhoto(photoDao);
+      userDao.setCoverPhoto(updatedPhotodao);
     }
     userRepository.save(userDao);
 
-    return title + " is added successfully.";
+    var photo = PhotoMapper.toEntity(updatedPhotodao);
+    // add the photo bytes
+    photo.setFileBytes(file.getBytes());
+    return photo;
   }
 
-  public GridFSFile getPhotoByUserEmail(String email, boolean isProfilePhoto) {
-    User user = userMapper.toEntity(userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new));
-    return getGridFSFile(isProfilePhoto, user);
+  public byte[] getPhotoByUserEmail(String email, boolean isProfilePhoto) {
+    User user = UserMapper.toEntity(userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new));
+    return getPhoto(isProfilePhoto, user);
   }
 
-  public GridFSFile getPhotoByUserId(String userId, boolean isProfilePhoto) {
-    User user = userMapper.toEntity(userRepository.findById(userId).orElseThrow(UserNotFoundException::new));
-    return getGridFSFile(isProfilePhoto, user);
+  public byte[] getPhotoByUserId(String userId, boolean isProfilePhoto) {
+    User user = UserMapper.toEntity(userRepository.findById(userId).orElseThrow(UserNotFoundException::new));
+    return getPhoto(isProfilePhoto, user);
   }
 
-  private GridFSFile getGridFSFile(boolean isProfilePhoto, User user) {
+  private byte[] getPhoto(boolean isProfilePhoto, User user) {
     Photo photo = isProfilePhoto ? user.getProfilePhoto() : user.getCoverPhoto();
     checkIfPhotoExists(photo == null);
-    return gridFSBucket.find(eq("_id", photo.getFileId())).first();
+    var gridFSFile = getGridFSFile(photo.getFileId());
+    if (gridFSFile == null) {
+      throw new ResourceNotFoundException("photoNotFound");
+    }
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    gridFSBucket.downloadToStream(gridFSFile.getObjectId(), baos);
+    return baos.toByteArray();
+  }
+
+  private GridFSFile getGridFSFile(ObjectId fileId) {
+    return gridFSBucket.find(eq("_id", fileId)).first();
   }
 
   private static void checkIfPhotoExists(boolean photo) {
@@ -113,14 +138,13 @@ public class PhotoService {
     }
   }
 
-  private void deletePhoto(String userId, boolean isProfilePhoto) {
+  private void deleteUserPhoto(String userId, boolean isProfilePhoto) {
     var userDao = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
     var photo = isProfilePhoto ? userDao.getProfilePhoto() : userDao.getCoverPhoto();
 
     checkIfPhotoExists(photo == null);
 
-    // Delete the photo from GridFS
-    gridFSBucket.delete(photo.getFileId());
+    deletePhotoFromGridFs(photo.getFileId());
 
     // Update the user
     if (isProfilePhoto) {
@@ -129,5 +153,10 @@ public class PhotoService {
       userDao.setCoverPhoto(null);
     }
     userRepository.save(userDao);
+  }
+
+  private void deletePhotoFromGridFs(ObjectId fileId) {
+    // Delete the photo from GridFS
+    gridFSBucket.delete(fileId);
   }
 }

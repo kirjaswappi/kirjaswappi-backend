@@ -14,11 +14,11 @@ import com.kirjaswappi.backend.service.entities.Genre;
 @Component
 @NoArgsConstructor
 public class GenreMapper {
-  public Genre toEntity(GenreDao dao) {
+  public static Genre toEntity(GenreDao dao) {
     return new Genre(dao.getId(), dao.getName());
   }
 
-  public GenreDao toDao(Genre entity) {
+  public static GenreDao toDao(Genre entity) {
     return new GenreDao(entity.getId(), entity.getName());
   }
 }

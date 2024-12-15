@@ -13,7 +13,7 @@ import com.kirjaswappi.backend.service.entities.User;
 
 @Getter
 @Setter
-public class UserUpdateResponse {
+public class UpdateUserResponse {
   private String id;
   private String firstName;
   private String lastName;
@@ -27,7 +27,7 @@ public class UserUpdateResponse {
   private String aboutMe;
   private List<String> favGenres;
 
-  public UserUpdateResponse(User entity) {
+  public UpdateUserResponse(User entity) {
     this.id = entity.getId();
     this.firstName = entity.getFirstName();
     this.lastName = entity.getLastName();

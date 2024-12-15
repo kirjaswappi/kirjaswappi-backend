@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import org.springframework.stereotype.Component;
 
+import com.kirjaswappi.backend.jpa.daos.GenreDao;
 import com.kirjaswappi.backend.jpa.daos.UserDao;
 import com.kirjaswappi.backend.service.entities.User;
 
@@ -15,9 +16,7 @@ import com.kirjaswappi.backend.service.entities.User;
 @NoArgsConstructor
 public class UserMapper {
 
-  private PhotoMapper photoMapper = new PhotoMapper();
-
-  public User toEntity(UserDao dao) {
+  public static User toEntity(UserDao dao) {
     var entity = new User();
     entity.setId(dao.getId());
     entity.setFirstName(dao.getFirstName());
@@ -31,35 +30,22 @@ public class UserMapper {
     entity.setCountry(dao.getCountry());
     entity.setPhoneNumber(dao.getPhoneNumber());
     entity.setAboutMe(dao.getAboutMe());
-    entity.setFavGenres(dao.getFavGenres());
-    entity.setProfilePhoto(dao.getProfilePhoto() != null ? photoMapper.toEntity(dao.getProfilePhoto()) : null);
-    entity.setCoverPhoto(dao.getCoverPhoto() != null ? photoMapper.toEntity(dao.getCoverPhoto()) : null);
+    if (dao.getFavGenres() != null) {
+      entity.setFavGenres(dao.getFavGenres().stream().map(GenreDao::getName).toList());
+    }
+    entity.setProfilePhoto(dao.getProfilePhoto() != null ? PhotoMapper.toEntity(dao.getProfilePhoto()) : null);
+    entity.setCoverPhoto(dao.getCoverPhoto() != null ? PhotoMapper.toEntity(dao.getCoverPhoto()) : null);
     return entity;
   }
 
-  // This method is used to create a new user dao with salt
-  public UserDao toDao(User entity, String salt) {
+  // This method is used to create a new user
+  public static UserDao toDao(User entity, String salt) {
     var dao = new UserDao();
-    dao.setId(entity.getId());
     dao.setFirstName(entity.getFirstName());
     dao.setLastName(entity.getLastName());
     dao.setEmail(entity.getEmail());
     dao.setPassword(entity.getPassword());
     dao.setSalt(salt);
-    dao.setStreetName(entity.getStreetName());
-    dao.setHouseNumber(entity.getHouseNumber());
-    dao.setZipCode(entity.getZipCode());
-    dao.setCity(entity.getCity());
-    dao.setCountry(entity.getCountry());
-    dao.setPhoneNumber(entity.getPhoneNumber());
-    dao.setAboutMe(entity.getAboutMe());
-    dao.setFavGenres(entity.getFavGenres());
-    if (entity.getProfilePhoto() != null) {
-      dao.setProfilePhoto(photoMapper.toDao(entity.getProfilePhoto()));
-    }
-    if (entity.getCoverPhoto() != null) {
-      dao.setCoverPhoto(photoMapper.toDao(entity.getCoverPhoto()));
-    }
     return dao;
   }
 

@@ -13,7 +13,7 @@ import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 
 @Getter
 @Setter
-public class GenreCreateRequest {
+public class CreateGenreRequest {
   private String name;
 
   public Genre toEntity() {

@@ -11,13 +11,13 @@ import com.kirjaswappi.backend.service.entities.User;
 
 @Getter
 @Setter
-public class UserCreateResponse {
+public class CreateUserResponse {
   private String id;
   private String firstName;
   private String lastName;
   private String email;
 
-  public UserCreateResponse(User entity) {
+  public CreateUserResponse(User entity) {
     this.id = entity.getId();
     this.firstName = entity.getFirstName();
     this.lastName = entity.getLastName();

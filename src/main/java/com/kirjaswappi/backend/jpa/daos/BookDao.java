@@ -19,56 +19,31 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.mongodb.lang.Nullable;
 
-@Document(collection = "users")
+@Document(collection = "books")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDao {
+public class BookDao {
   @Id
   private String id;
 
   @NotNull
-  private String firstName;
+  private String title;
   @NotNull
-  private String lastName;
+  private String author;
+  @Nullable
+  private String description;
   @NotNull
-  private String email;
+  private String language;
   @NotNull
-  private String password;
-  @NotNull
-  private String salt;
-  @NotNull
-  private boolean isEmailVerified;
+  private String condition;
 
-  @Nullable
-  private String streetName;
-  @Nullable
-  private String houseNumber;
-  @Nullable
-  private Integer zipCode;
-  @Nullable
-  private String city;
-  @Nullable
-  private String country;
-  @Nullable
-  private String phoneNumber;
-  @Nullable
-  private String aboutMe;
-
-  @Nullable
+  @NotNull
   @DBRef
-  private List<GenreDao> favGenres;
-
-  @Nullable
-  @DBRef
-  private PhotoDao profilePhoto;
+  private List<GenreDao> genres;
 
   @Nullable
   @DBRef
   private PhotoDao coverPhoto;
-
-  @Nullable
-  @DBRef
-  private List<BookDao> books;
 }

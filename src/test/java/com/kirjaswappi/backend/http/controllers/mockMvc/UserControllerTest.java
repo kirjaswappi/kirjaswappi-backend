@@ -48,8 +48,8 @@ public class UserControllerTest {
   private OTPService otpService;
 
   private User user;
-  private UserCreateRequest userCreateRequest;
-  private UserCreateResponse userCreateResponse;
+  private CreateUserRequest createUserRequest;
+  private CreateUserResponse createUserResponse;
   private static final String API_BASE = "/api/v1/users";
 
   @TestConfiguration
@@ -77,13 +77,13 @@ public class UserControllerTest {
     user.setId("1");
     user.setEmail("test@example.com");
 
-    userCreateRequest = new UserCreateRequest();
-    userCreateRequest.setFirstName("Test");
-    userCreateRequest.setLastName("User");
-    userCreateRequest.setEmail("test@example.com");
-    userCreateRequest.setPassword("password");
-    userCreateRequest.setConfirmPassword("password");
-    userCreateResponse = new UserCreateResponse(user);
+    createUserRequest = new CreateUserRequest();
+    createUserRequest.setFirstName("Test");
+    createUserRequest.setLastName("User");
+    createUserRequest.setEmail("test@example.com");
+    createUserRequest.setPassword("password");
+    createUserRequest.setConfirmPassword("password");
+    createUserResponse = new CreateUserResponse(user);
   }
 
   @Test
@@ -94,7 +94,7 @@ public class UserControllerTest {
 
     mockMvc.perform(post(API_BASE + "/signup")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(userCreateRequest))
+                    .content(objectMapper.writeValueAsString(createUserRequest))
                     .header("Authorization ", "Bearer a.b.c"))
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.email").value(user.getEmail()));
@@ -121,7 +121,7 @@ public class UserControllerTest {
   @Test
   @DisplayName("Should update user")
   void shouldUpdateUser() throws Exception {
-    UserUpdateRequest request = getUserUpdateRequest();
+    UpdateUserRequest request = getUserUpdateRequest();
     User updatedUser = getUpdatedUser();
 
     when(userService.updateUser(any(User.class))).thenReturn(updatedUser);
@@ -167,7 +167,7 @@ public class UserControllerTest {
   @Test
   @DisplayName("Should login user")
   void shouldLogin() throws Exception {
-    UserAuthenticationRequest request = new UserAuthenticationRequest();
+    AuthenticateUserRequest request = new AuthenticateUserRequest();
     request.setEmail("test@example.com");
     request.setPassword("password");
 
@@ -232,8 +232,8 @@ public class UserControllerTest {
     return updatedUser;
   }
 
-  private static UserUpdateRequest getUserUpdateRequest() {
-    UserUpdateRequest request = new UserUpdateRequest();
+  private static UpdateUserRequest getUserUpdateRequest() {
+    UpdateUserRequest request = new UpdateUserRequest();
     request.setId("1");
     request.setFirstName("UpdatedFirstName");
     request.setLastName("UpdatedLastName");

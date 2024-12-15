@@ -4,14 +4,9 @@
  */
 package com.kirjaswappi.backend.jpa.repositories;
 
-import java.util.Optional;
-
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import com.kirjaswappi.backend.jpa.daos.GenreDao;
+import com.kirjaswappi.backend.jpa.daos.BookDao;
 
-public interface GenreRepository extends MongoRepository<GenreDao, String> {
-  boolean existsByName(String name);
-
-  Optional<GenreDao> findByNameIgnoreCase(String name);
+public interface BookRepository extends MongoRepository<BookDao, String> {
 }

@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.kirjaswappi.backend.http.dtos.requests.GenreCreateRequest;
+import com.kirjaswappi.backend.http.dtos.requests.CreateGenreRequest;
 import com.kirjaswappi.backend.http.dtos.responses.GenreResponse;
 import com.kirjaswappi.backend.service.GenreService;
 import com.kirjaswappi.backend.service.entities.Genre;
@@ -38,7 +38,7 @@ public class GenreController {
   }
 
   @PostMapping
-  public ResponseEntity<GenreResponse> createGenre(@RequestBody GenreCreateRequest request) {
+  public ResponseEntity<GenreResponse> createGenre(@RequestBody CreateGenreRequest request) {
     Genre savedGenre = genreService.addGenre(request.toEntity());
     return ResponseEntity.status(HttpStatus.CREATED).body(new GenreResponse(savedGenre));
   }
