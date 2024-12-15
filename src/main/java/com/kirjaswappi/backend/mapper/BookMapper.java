@@ -35,7 +35,7 @@ public class BookMapper {
     return book;
   }
 
-  // This is without the genres
+  // This is without the genres and owner
   public static BookDao toDao(Book entity) {
     var dao = new BookDao();
     if (entity.getId() != null) {
