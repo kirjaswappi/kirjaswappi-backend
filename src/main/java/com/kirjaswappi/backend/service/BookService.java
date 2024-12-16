@@ -14,12 +14,14 @@ import org.springframework.transaction.annotation.Transactional;
 import com.kirjaswappi.backend.jpa.daos.BookDao;
 import com.kirjaswappi.backend.jpa.repositories.BookRepository;
 import com.kirjaswappi.backend.jpa.repositories.GenreRepository;
+import com.kirjaswappi.backend.jpa.repositories.UserRepository;
 import com.kirjaswappi.backend.mapper.BookMapper;
 import com.kirjaswappi.backend.mapper.PhotoMapper;
-import com.kirjaswappi.backend.mapper.UserMapper;
 import com.kirjaswappi.backend.service.entities.Book;
+import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 import com.kirjaswappi.backend.service.exceptions.BookNotFoundException;
 import com.kirjaswappi.backend.service.exceptions.GenreNotFoundException;
+import com.kirjaswappi.backend.service.exceptions.UserNotFoundException;
 
 @Service
 @Transactional
@@ -29,9 +31,9 @@ public class BookService {
   @Autowired
   private GenreRepository genreRepository;
   @Autowired
-  private PhotoService photoService;
+  private UserRepository userRepository;
   @Autowired
-  private UserService userService;
+  private PhotoService photoService;
 
   public Book createBook(Book book) throws IOException {
     // convert book to dao without genres, owner and cover photo:
@@ -39,23 +41,39 @@ public class BookService {
     // add genres to book:
     addGenresToTheBook(book, bookDao);
     // set the owner of the book:
-    var owner = userService.getUser(book.getOwner().getId());
-    bookDao.setOwner(UserMapper.toDao(owner));
-    // save the book without cover photo first:
-    bookDao.setCoverPhoto(null);
-    bookRepository.save(bookDao);
-    // set the id of the book
-    book.setId(bookDao.getId());
-    return addCoverPhotoToTheBookIfAny(book, bookDao);
+    addOwnerToTheBook(book, bookDao);
+    // add cover photo to the book if any:
+    addCoverPhotoToTheBookIfAny(book, bookDao);
+    var savedDao = bookRepository.save(bookDao);
+    return BookMapper.toEntity(savedDao);
   }
 
-  private Book addCoverPhotoToTheBookIfAny(Book book, BookDao dao) throws IOException {
+  private void addOwnerToTheBook(Book book, BookDao bookDao) {
+    var owner = userRepository.findById(book.getOwner().getId())
+        .orElseThrow(() -> new UserNotFoundException(book.getOwner().getId()));
+    bookDao.setOwner(owner);
+  }
+
+  private void addGenresToTheBook(Book book, BookDao bookDao) {
+    bookDao.setGenres(book.getGenres().stream()
+        .map(genreName -> genreRepository.findByName(genreName)
+            .orElseThrow(() -> new GenreNotFoundException(genreName)))
+        .toList());
+  }
+
+  private void addCoverPhotoToTheBookIfAny(Book book, BookDao dao) throws IOException {
     if (book.getCoverPhoto() != null) {
-      var photo = photoService.addBookPhoto(book.getId(), book.getCoverPhoto().getFile());
+      deleteExistingCoverPhoto(dao);
+      var photo = photoService.addBookCoverPhoto(book.getCoverPhoto().getFile());
       dao.setCoverPhoto(PhotoMapper.toDao(photo));
-      dao = bookRepository.save(dao);
     }
-    return BookMapper.toEntity(dao);
+  }
+
+  private void deleteExistingCoverPhoto(BookDao dao) {
+    // This ensures we don't have dangling cover photos for a book
+    if (dao.getCoverPhoto() != null) {
+      photoService.deleteBookCoverPhoto(dao.getCoverPhoto().getFileId());
+    }
   }
 
   public Book getBookById(String id) {
@@ -69,17 +87,16 @@ public class BookService {
   }
 
   public Book updateBook(Book book) throws IOException {
-    BookDao bookDao = BookMapper.toDao(book);
+    var bookDao = bookRepository.findById(book.getId())
+        .orElseThrow(() -> new BookNotFoundException(book.getId()));
+    // restrict changing the owner of the book:
+    if (!book.getOwner().getId().equals(bookDao.getOwner().getId())) {
+      throw new BadRequestException("bookOwnerCannotBeChanged");
+    }
     addGenresToTheBook(book, bookDao);
-    return addCoverPhotoToTheBookIfAny(book, bookDao);
-  }
-
-  private void addGenresToTheBook(Book book, BookDao bookDao) {
-    // add genres to book:
-    bookDao.setGenres(book.getGenres().stream()
-        .map(genreName -> genreRepository.findByName(genreName)
-            .orElseThrow(() -> new GenreNotFoundException(genreName)))
-        .toList());
+    addCoverPhotoToTheBookIfAny(book, bookDao);
+    var updatedBook = bookRepository.save(bookDao);
+    return BookMapper.toEntity(updatedBook);
   }
 
   public void deleteBook(String id) {

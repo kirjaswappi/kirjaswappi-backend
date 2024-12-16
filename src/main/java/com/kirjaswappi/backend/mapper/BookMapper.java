@@ -32,10 +32,11 @@ public class BookMapper {
     if (dao.getCoverPhoto() != null) {
       book.setCoverPhoto(PhotoMapper.toEntity(dao.getCoverPhoto()));
     }
+    book.setOwner(UserMapper.toEntity(dao.getOwner()));
     return book;
   }
 
-  // This is without the genres and owner
+  // This is without the genres, cover photo and owner
   public static BookDao toDao(Book entity) {
     var dao = new BookDao();
     if (entity.getId() != null) {
@@ -46,9 +47,6 @@ public class BookMapper {
     dao.setDescription(entity.getDescription());
     dao.setLanguage(entity.getLanguage());
     dao.setCondition(entity.getCondition());
-    if (entity.getCoverPhoto() != null) {
-      dao.setCoverPhoto(PhotoMapper.toDao(entity.getCoverPhoto()));
-    }
     return dao;
   }
 }

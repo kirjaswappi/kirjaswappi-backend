@@ -24,7 +24,6 @@ import com.kirjaswappi.backend.mapper.PhotoMapper;
 import com.kirjaswappi.backend.mapper.UserMapper;
 import com.kirjaswappi.backend.service.entities.Photo;
 import com.kirjaswappi.backend.service.entities.User;
-import com.kirjaswappi.backend.service.exceptions.BookNotFoundException;
 import com.kirjaswappi.backend.service.exceptions.ResourceNotFoundException;
 import com.kirjaswappi.backend.service.exceptions.UserNotFoundException;
 import com.mongodb.client.gridfs.GridFSBucket;
@@ -51,15 +50,12 @@ public class PhotoService {
     return addUserPhoto(userId, file, "Cover photo");
   }
 
-  public Photo addBookPhoto(String bookId, MultipartFile file) throws IOException {
-    return addBookCoverPhoto(bookId, file, "Book photo");
+  public Photo addBookCoverPhoto(MultipartFile file) throws IOException {
+    return savePhoto(file, "Book photo");
   }
 
-  public void deleteBookPhoto(String bookId) {
-    var bookDao = bookRepository.findById(bookId).orElseThrow(BookNotFoundException::new);
-    if (bookDao.getCoverPhoto() != null) {
-      deletePhotoFromGridFs(bookDao.getCoverPhoto().getFileId());
-    }
+  public void deleteBookCoverPhoto(ObjectId fileId) {
+    deletePhotoFromGridFs(fileId);
   }
 
   public void deleteProfilePhoto(String userId) {
@@ -80,42 +76,24 @@ public class PhotoService {
     }
 
     // Save the new photo
-    var photoDao = new PhotoDao();
-    photoDao.setTitle(title);
-    photoRepository.save(photoDao);
-
-    // Save the photo to GridFS
-    GridFSUploadOptions options = new GridFSUploadOptions().metadata(new Document("type", "image"));
-    ObjectId fileId = gridFSBucket.uploadFromStream(photoDao.getId(), file.getInputStream(), options);
-
-    // Update the photoDao with the fileId
-    photoDao.setFileId(fileId);
-    var updatedPhotodao = photoRepository.save(photoDao);
+    var photo = savePhoto(file, title);
+    var photoDao = PhotoMapper.toDao(photo);
 
     // Update the user with the new photo
     if ("Profile photo".equals(title)) {
-      userDao.setProfilePhoto(updatedPhotodao);
+      userDao.setProfilePhoto(photoDao);
     } else {
-      userDao.setCoverPhoto(updatedPhotodao);
+      userDao.setCoverPhoto(photoDao);
     }
     userRepository.save(userDao);
 
-    var photo = PhotoMapper.toEntity(updatedPhotodao);
-    // add the photo bytes
-    photo.setFileBytes(file.getBytes());
     return photo;
   }
 
-  private Photo addBookCoverPhoto(String bookId, MultipartFile file, String title) throws IOException {
-    var book = bookRepository.findById(bookId).orElseThrow(BookNotFoundException::new);
-    // This ensures we don't have dangling cover photos for a book
-    if (book.getCoverPhoto() != null && book.getCoverPhoto().getId() != null) {
-      deleteBookPhoto(book.getCoverPhoto().getId());
-    }
-
+  private Photo savePhoto(MultipartFile file, String title) throws IOException {
     // Save the new photo
     var photoDao = new PhotoDao();
-    photoDao.setTitle("Book photo");
+    photoDao.setTitle(title);
     photoRepository.save(photoDao);
 
     // Save the photo to GridFS

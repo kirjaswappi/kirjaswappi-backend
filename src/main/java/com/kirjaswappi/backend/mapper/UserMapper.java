@@ -15,7 +15,6 @@ import com.kirjaswappi.backend.service.entities.User;
 @Component
 @NoArgsConstructor
 public class UserMapper {
-
   public static User toEntity(UserDao dao) {
     var entity = new User();
     entity.setId(dao.getId());
@@ -48,22 +47,4 @@ public class UserMapper {
     dao.setSalt(salt);
     return dao;
   }
-
-  public static UserDao toDao(User entity) {
-    var dao = new UserDao();
-    dao.setId(entity.getId());
-    dao.setFirstName(entity.getFirstName());
-    dao.setLastName(entity.getLastName());
-    dao.setEmail(entity.getEmail());
-    dao.setPassword(entity.getPassword());
-    dao.setStreetName(entity.getStreetName());
-    dao.setHouseNumber(entity.getHouseNumber());
-    dao.setZipCode(entity.getZipCode());
-    dao.setCity(entity.getCity());
-    dao.setCountry(entity.getCountry());
-    dao.setPhoneNumber(entity.getPhoneNumber());
-    dao.setAboutMe(entity.getAboutMe());
-    return dao;
-  }
-
 }
