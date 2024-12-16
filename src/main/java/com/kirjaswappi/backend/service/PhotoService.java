@@ -54,8 +54,9 @@ public class PhotoService {
     return savePhoto(file, "Book photo");
   }
 
-  public void deleteBookCoverPhoto(ObjectId fileId) {
-    deletePhotoFromGridFs(fileId);
+  public void deleteBookCoverPhoto(Photo photo) {
+    deletePhotoFromGridFs(photo.getFileId());
+    deletePhotoFromPhotoRepository(photo.getId());
   }
 
   public void deleteProfilePhoto(String userId) {
@@ -153,6 +154,7 @@ public class PhotoService {
     checkIfPhotoExists(photo == null);
 
     deletePhotoFromGridFs(photo.getFileId());
+    deletePhotoFromPhotoRepository(photo.getId());
 
     // Update the user
     if (isProfilePhoto) {
@@ -161,6 +163,10 @@ public class PhotoService {
       userDao.setCoverPhoto(null);
     }
     userRepository.save(userDao);
+  }
+
+  private void deletePhotoFromPhotoRepository(String id) {
+    photoRepository.deleteById(id);
   }
 
   private void deletePhotoFromGridFs(ObjectId fileId) {

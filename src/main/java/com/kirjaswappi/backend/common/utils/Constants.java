@@ -29,4 +29,9 @@ public class Constants {
   public static final String SEND_OTP = "/send-otp";
   public static final String VERIFY_OTP = "/verify-otp";
   public static final String NUMERIC = "0123456789";
+  public static final String PHOTOS = "/photos";
+  public static final String PROFILE_PHOTO = "/profile";
+  public static final String COVER_PHOTO = "/cover";
+  public static final String BY_EMAIL = "/by-email";
+  public static final String BY_ID = "/by-id";
 }

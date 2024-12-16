@@ -18,7 +18,6 @@ import com.kirjaswappi.backend.jpa.repositories.UserRepository;
 import com.kirjaswappi.backend.mapper.BookMapper;
 import com.kirjaswappi.backend.mapper.PhotoMapper;
 import com.kirjaswappi.backend.service.entities.Book;
-import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 import com.kirjaswappi.backend.service.exceptions.BookNotFoundException;
 import com.kirjaswappi.backend.service.exceptions.GenreNotFoundException;
 import com.kirjaswappi.backend.service.exceptions.UserNotFoundException;
@@ -72,7 +71,7 @@ public class BookService {
   private void deleteExistingCoverPhoto(BookDao dao) {
     // This ensures we don't have dangling cover photos for a book
     if (dao.getCoverPhoto() != null) {
-      photoService.deleteBookCoverPhoto(dao.getCoverPhoto().getFileId());
+      photoService.deleteBookCoverPhoto(PhotoMapper.toEntity(dao.getCoverPhoto()));
     }
   }
 
@@ -87,22 +86,24 @@ public class BookService {
   }
 
   public Book updateBook(Book book) throws IOException {
-    var bookDao = bookRepository.findById(book.getId())
-        .orElseThrow(() -> new BookNotFoundException(book.getId()));
-    // restrict changing the owner of the book:
-    if (!book.getOwner().getId().equals(bookDao.getOwner().getId())) {
-      throw new BadRequestException("bookOwnerCannotBeChanged");
-    }
-    addGenresToTheBook(book, bookDao);
-    addCoverPhotoToTheBookIfAny(book, bookDao);
-    var updatedBook = bookRepository.save(bookDao);
+    // convert book to dao without genres, owner and cover photo:
+    var dao = BookMapper.toDao(book);
+    findAndSetOwnerToTheBook(book, dao);
+    addGenresToTheBook(book, dao);
+    addCoverPhotoToTheBookIfAny(book, dao);
+    var updatedBook = bookRepository.save(dao);
     return BookMapper.toEntity(updatedBook);
   }
 
+  private void findAndSetOwnerToTheBook(Book book, BookDao dao) {
+    var owner = bookRepository.findById(book.getId())
+        .orElseThrow(() -> new BookNotFoundException(book.getId())).getOwner();
+    dao.setOwner(owner);
+  }
+
   public void deleteBook(String id) {
-    if (!bookRepository.existsById(id)) {
-      throw new BookNotFoundException(id);
-    }
+    var dao = bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException(id));
+    deleteExistingCoverPhoto(dao);
     bookRepository.deleteById(id);
   }
 }

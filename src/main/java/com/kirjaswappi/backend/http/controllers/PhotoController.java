@@ -5,6 +5,11 @@
 package com.kirjaswappi.backend.http.controllers;
 
 import static com.kirjaswappi.backend.common.utils.Constants.API_BASE;
+import static com.kirjaswappi.backend.common.utils.Constants.BY_EMAIL;
+import static com.kirjaswappi.backend.common.utils.Constants.BY_ID;
+import static com.kirjaswappi.backend.common.utils.Constants.COVER_PHOTO;
+import static com.kirjaswappi.backend.common.utils.Constants.PHOTOS;
+import static com.kirjaswappi.backend.common.utils.Constants.PROFILE_PHOTO;
 
 import java.io.IOException;
 
@@ -25,52 +30,51 @@ import com.kirjaswappi.backend.service.PhotoService;
 import com.kirjaswappi.backend.service.entities.Photo;
 
 @RestController
-@RequestMapping(API_BASE + "/photos")
+@RequestMapping(API_BASE + PHOTOS)
 public class PhotoController {
   @Autowired
   private PhotoService photoService;
 
-  @PostMapping("/profile")
+  @PostMapping(PROFILE_PHOTO)
   public ResponseEntity<byte[]> addProfilePhoto(@ModelAttribute CreatePhotoRequest request) throws IOException {
     Photo photo = photoService.addProfilePhoto(request.getUserId(), request.getImage());
     return getPhotoResponse(photo.getFileBytes());
   }
 
-  @PostMapping("/cover")
+  @PostMapping(COVER_PHOTO)
   public ResponseEntity<byte[]> addCoverPhoto(@ModelAttribute CreatePhotoRequest request) throws IOException {
     Photo photo = photoService.addCoverPhoto(request.getUserId(), request.getImage());
     return getPhotoResponse(photo.getFileBytes());
   }
 
-  @DeleteMapping("/profile")
+  @DeleteMapping(PROFILE_PHOTO)
   public ResponseEntity<Void> deleteProfilePhoto(@RequestParam("userId") String userId) {
     photoService.deleteProfilePhoto(userId);
     return ResponseEntity.noContent().build();
   }
 
-  @DeleteMapping("/cover")
-  public ResponseEntity<Void> deleteCoverPhoto(@RequestParam("userId") String userId)
-      throws IOException {
+  @DeleteMapping(COVER_PHOTO)
+  public ResponseEntity<Void> deleteCoverPhoto(@RequestParam("userId") String userId) {
     photoService.deleteCoverPhoto(userId);
     return ResponseEntity.noContent().build();
   }
 
-  @GetMapping("/profile/by-email")
+  @GetMapping(PROFILE_PHOTO + BY_EMAIL)
   public ResponseEntity<byte[]> getProfilePhotoByEmail(@RequestParam("email") String email) {
     return getPhotoResponse(photoService.getPhotoByUserEmail(email, true));
   }
 
-  @GetMapping("/cover/by-email")
+  @GetMapping(COVER_PHOTO + BY_EMAIL)
   public ResponseEntity<byte[]> getCoverPhotoByEmail(@RequestParam("email") String email) {
     return getPhotoResponse(photoService.getPhotoByUserEmail(email, false));
   }
 
-  @GetMapping("/profile/by-id")
+  @GetMapping(PROFILE_PHOTO + BY_ID)
   public ResponseEntity<byte[]> getProfilePhotoById(@RequestParam("userId") String userId) {
     return getPhotoResponse(photoService.getPhotoByUserId(userId, true));
   }
 
-  @GetMapping("/cover/by-id")
+  @GetMapping(COVER_PHOTO + BY_ID)
   public ResponseEntity<byte[]> getCoverPhotoById(@RequestParam("userId") String userId) {
     return getPhotoResponse(photoService.getPhotoByUserId(userId, false));
   }

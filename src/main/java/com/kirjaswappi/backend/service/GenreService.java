@@ -42,4 +42,10 @@ public class GenreService {
     genreRepository.deleteById(id);
   }
 
+  public Genre updateGenre(Genre entity) {
+    var dao = genreRepository.findById(entity.getId())
+        .orElseThrow(() -> new GenreNotFoundException(entity.getId()));
+    dao.setName(entity.getName());
+    return GenreMapper.toEntity(genreRepository.save(dao));
+  }
 }
