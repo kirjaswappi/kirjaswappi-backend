@@ -34,6 +34,7 @@ public class UserMapper {
     }
     entity.setProfilePhoto(dao.getProfilePhoto() != null ? PhotoMapper.toEntity(dao.getProfilePhoto()) : null);
     entity.setCoverPhoto(dao.getCoverPhoto() != null ? PhotoMapper.toEntity(dao.getCoverPhoto()) : null);
+    entity.setBooks(dao.getBooks() != null ? dao.getBooks().stream().map(BookMapper::toEntity).toList() : null);
     return entity;
   }
 

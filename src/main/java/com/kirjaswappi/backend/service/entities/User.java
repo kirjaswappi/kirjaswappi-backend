@@ -37,6 +37,8 @@ public class User {
   private Photo profilePhoto;
   @Nullable
   private Photo coverPhoto;
+  @Nullable
+  private List<Book> books;
 
   public void setPassword(String password, String salt) {
     this.password = hashPassword(password, salt);

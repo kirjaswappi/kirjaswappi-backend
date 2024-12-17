@@ -26,6 +26,7 @@ public class UserResponse {
   private String phoneNumber;
   private String aboutMe;
   private List<String> favGenres;
+  private List<BookResponse> books;
 
   public UserResponse(User entity) {
     this.id = entity.getId();
@@ -40,5 +41,6 @@ public class UserResponse {
     this.phoneNumber = entity.getPhoneNumber();
     this.aboutMe = entity.getAboutMe();
     this.favGenres = entity.getFavGenres();
+    this.books = entity.getBooks() != null ? entity.getBooks().stream().map(BookResponse::new).toList() : null;
   }
 }
