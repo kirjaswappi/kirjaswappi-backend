@@ -10,10 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.kirjaswappi.backend.jpa.repositories.BookRepository;
 import com.kirjaswappi.backend.jpa.repositories.GenreRepository;
+import com.kirjaswappi.backend.jpa.repositories.UserRepository;
 import com.kirjaswappi.backend.mapper.GenreMapper;
 import com.kirjaswappi.backend.service.entities.Genre;
 import com.kirjaswappi.backend.service.exceptions.GenreAlreadyExistsException;
+import com.kirjaswappi.backend.service.exceptions.GenreCannotBeDeletedException;
 import com.kirjaswappi.backend.service.exceptions.GenreNotFoundException;
 
 @Service
@@ -21,6 +24,10 @@ import com.kirjaswappi.backend.service.exceptions.GenreNotFoundException;
 public class GenreService {
   @Autowired
   GenreRepository genreRepository;
+  @Autowired
+  BookRepository bookRepository;
+  @Autowired
+  UserRepository userRepository;
 
   public List<Genre> getGenres() {
     return genreRepository.findAll().stream().map(GenreMapper::toEntity).toList();
@@ -35,11 +42,26 @@ public class GenreService {
   }
 
   public void deleteGenre(String id) {
-    // check if genre exists:
+    // Check if genre exists:
     if (!genreRepository.existsById(id)) {
       throw new GenreNotFoundException(id);
     }
+
+    // Check if genre is associated with any user or book:
+    boolean isGenreUsed = isIsGenreUsed(id);
+    if (isGenreUsed) {
+      throw new GenreCannotBeDeletedException(id);
+    }
+
     genreRepository.deleteById(id);
+  }
+
+  private boolean isIsGenreUsed(String id) {
+    return userRepository.findAll().stream()
+        .anyMatch(user -> (user.getFavGenres() != null
+            && user.getFavGenres().stream().anyMatch(favGenre -> favGenre.getId().equals(id))) ||
+            (user.getBooks() != null && user.getBooks().stream()
+                .anyMatch(book -> book.getGenres().stream().anyMatch(genre -> genre.getId().equals(id)))));
   }
 
   public Genre updateGenre(Genre entity) {

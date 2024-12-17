@@ -5,7 +5,9 @@
 package com.kirjaswappi.backend.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,7 +46,18 @@ public class BookService {
     // add cover photo to the book if any:
     addCoverPhotoToTheBookIfAny(book, bookDao);
     var savedDao = bookRepository.save(bookDao);
-    return BookMapper.toEntity(savedDao);
+    // finally, add book to the owner's book list:
+    addBookToOwner(savedDao);
+    var savedBook = BookMapper.toEntity(savedDao);
+    return BookMapper.setOwner(savedDao.getOwner(), savedBook);
+  }
+
+  private void addBookToOwner(BookDao savedDao) {
+    var owner = userRepository.findById(savedDao.getOwner().getId())
+        .orElseThrow(() -> new UserNotFoundException(savedDao.getOwner().getId()));
+    owner.setBooks(Optional.ofNullable(owner.getBooks()).orElseGet(ArrayList::new));
+    owner.getBooks().add(savedDao);
+    userRepository.save(owner);
   }
 
   private void addOwnerToTheBook(Book book, BookDao bookDao) {
@@ -76,8 +89,10 @@ public class BookService {
   }
 
   public Book getBookById(String id) {
-    return BookMapper.toEntity(bookRepository.findById(id)
-        .orElseThrow(() -> new BookNotFoundException(id)));
+    var bookDao = bookRepository.findById(id)
+        .orElseThrow(() -> new BookNotFoundException(id));
+    var book = BookMapper.toEntity(bookDao);
+    return BookMapper.setOwner(bookDao.getOwner(), book);
   }
 
   public List<Book> getAllBooks() {
@@ -91,8 +106,10 @@ public class BookService {
     findAndSetOwnerToTheBook(book, dao);
     addGenresToTheBook(book, dao);
     addCoverPhotoToTheBookIfAny(book, dao);
-    var updatedBook = bookRepository.save(dao);
-    return BookMapper.toEntity(updatedBook);
+    var updatedBookDao = bookRepository.save(dao);
+    addBookToOwner(updatedBookDao);
+    var updatedBook = BookMapper.toEntity(updatedBookDao);
+    return BookMapper.setOwner(updatedBookDao.getOwner(), updatedBook);
   }
 
   private void findAndSetOwnerToTheBook(Book book, BookDao dao) {
@@ -104,6 +121,19 @@ public class BookService {
   public void deleteBook(String id) {
     var dao = bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException(id));
     deleteExistingCoverPhoto(dao);
+    findOwnerAndRemoveBookFromOwner(dao);
     bookRepository.deleteById(id);
+  }
+
+  private void findOwnerAndRemoveBookFromOwner(BookDao dao) {
+    var owner = userRepository.findById(dao.getOwner().getId())
+        .orElseThrow(() -> new UserNotFoundException(dao.getOwner().getId()));
+    if (owner.getBooks() == null) {
+      return;
+    }
+    owner.setBooks(owner.getBooks().stream()
+        .filter(book -> !book.getId().equals(dao.getId()))
+        .toList());
+    userRepository.save(owner);
   }
 }

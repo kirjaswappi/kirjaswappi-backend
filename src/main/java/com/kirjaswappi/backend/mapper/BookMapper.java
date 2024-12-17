@@ -6,20 +6,16 @@ package com.kirjaswappi.backend.mapper;
 
 import lombok.NoArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.kirjaswappi.backend.jpa.daos.BookDao;
 import com.kirjaswappi.backend.jpa.daos.GenreDao;
-import com.kirjaswappi.backend.jpa.repositories.GenreRepository;
+import com.kirjaswappi.backend.jpa.daos.UserDao;
 import com.kirjaswappi.backend.service.entities.Book;
 
 @Component
 @NoArgsConstructor
 public class BookMapper {
-  @Autowired
-  private GenreRepository genreRepository;
-
   public static Book toEntity(BookDao dao) {
     var book = new Book();
     book.setId(dao.getId());
@@ -32,7 +28,11 @@ public class BookMapper {
     if (dao.getCoverPhoto() != null) {
       book.setCoverPhoto(PhotoMapper.toEntity(dao.getCoverPhoto()));
     }
-    book.setOwner(UserMapper.toEntity(dao.getOwner()));
+    return book;
+  }
+
+  public static Book setOwner(UserDao owner, Book book) {
+    book.setOwner(UserMapper.toEntity(owner));
     return book;
   }
 

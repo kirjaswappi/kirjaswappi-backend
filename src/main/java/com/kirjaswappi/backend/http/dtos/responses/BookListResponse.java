@@ -11,11 +11,10 @@ import lombok.Setter;
 
 import com.kirjaswappi.backend.service.entities.Book;
 import com.kirjaswappi.backend.service.entities.Photo;
-import com.kirjaswappi.backend.service.entities.User;
 
 @Getter
 @Setter
-public class BookResponse {
+public class BookListResponse {
   private final String id;
   private final String title;
   private final String author;
@@ -24,9 +23,8 @@ public class BookResponse {
   private String description;
   private String condition;
   private PhotoResponse coverPhoto;
-  private OwnerResponse owner;
 
-  public BookResponse(Book entity) {
+  public BookListResponse(Book entity) {
     this.id = entity.getId();
     this.title = entity.getTitle();
     this.author = entity.getAuthor();
@@ -35,7 +33,6 @@ public class BookResponse {
     this.description = entity.getDescription();
     this.condition = entity.getCondition();
     this.coverPhoto = entity.getCoverPhoto() != null ? new PhotoResponse(entity.getCoverPhoto()) : null;
-    this.owner = new OwnerResponse(entity.getOwner());
   }
 
   @Setter
@@ -51,17 +48,4 @@ public class BookResponse {
       this.fileId = entity.getFileId().toHexString();
     }
   }
-
-  @Setter
-  @Getter
-  static class OwnerResponse {
-    private final String id;
-    private final String name;
-
-    public OwnerResponse(User entity) {
-      this.id = entity.getId();
-      this.name = entity.getFirstName() + " " + entity.getLastName();
-    }
-  }
-
 }

@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kirjaswappi.backend.http.dtos.requests.CreateBookRequest;
 import com.kirjaswappi.backend.http.dtos.requests.UpdateBookRequest;
+import com.kirjaswappi.backend.http.dtos.responses.BookListResponse;
 import com.kirjaswappi.backend.http.dtos.responses.BookResponse;
 import com.kirjaswappi.backend.service.BookService;
 import com.kirjaswappi.backend.service.entities.Book;
@@ -49,9 +50,9 @@ public class BookController {
   }
 
   @GetMapping
-  public ResponseEntity<List<BookResponse>> getAllBooks() {
+  public ResponseEntity<List<BookListResponse>> getAllBooks() {
     List<Book> books = bookService.getAllBooks();
-    return ResponseEntity.status(HttpStatus.OK).body(books.stream().map(BookResponse::new).toList());
+    return ResponseEntity.status(HttpStatus.OK).body(books.stream().map(BookListResponse::new).toList());
   }
 
   @PutMapping(ID)
