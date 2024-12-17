@@ -17,13 +17,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.kirjaswappi.backend.jpa.daos.PhotoDao;
+import com.kirjaswappi.backend.jpa.daos.UserDao;
 import com.kirjaswappi.backend.jpa.repositories.BookRepository;
 import com.kirjaswappi.backend.jpa.repositories.PhotoRepository;
 import com.kirjaswappi.backend.jpa.repositories.UserRepository;
 import com.kirjaswappi.backend.mapper.PhotoMapper;
-import com.kirjaswappi.backend.mapper.UserMapper;
 import com.kirjaswappi.backend.service.entities.Photo;
-import com.kirjaswappi.backend.service.entities.User;
+import com.kirjaswappi.backend.service.exceptions.BookNotFoundException;
 import com.kirjaswappi.backend.service.exceptions.ResourceNotFoundException;
 import com.kirjaswappi.backend.service.exceptions.UserNotFoundException;
 import com.mongodb.client.gridfs.GridFSBucket;
@@ -112,22 +112,22 @@ public class PhotoService {
   }
 
   public byte[] getPhotoByUserEmail(String email, boolean isProfilePhoto) {
-    User user = UserMapper.toEntity(userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new));
+    var user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
     return getUserPhoto(isProfilePhoto, user);
   }
 
   public byte[] getPhotoByUserId(String userId, boolean isProfilePhoto) {
-    User user = UserMapper.toEntity(userRepository.findById(userId).orElseThrow(UserNotFoundException::new));
+    var user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
     return getUserPhoto(isProfilePhoto, user);
   }
 
-  private byte[] getUserPhoto(boolean isProfilePhoto, User user) {
-    Photo photo = isProfilePhoto ? user.getProfilePhoto() : user.getCoverPhoto();
+  private byte[] getUserPhoto(boolean isProfilePhoto, UserDao user) {
+    var photo = isProfilePhoto ? user.getProfilePhoto() : user.getCoverPhoto();
     checkIfPhotoExists(photo == null);
     return getPhoto(photo);
   }
 
-  private byte[] getPhoto(Photo photo) {
+  private byte[] getPhoto(PhotoDao photo) {
     var gridFSFile = getGridFSFile(photo.getFileId());
     if (gridFSFile == null) {
       throw new ResourceNotFoundException("photoNotFound");
@@ -172,5 +172,14 @@ public class PhotoService {
   private void deletePhotoFromGridFs(ObjectId fileId) {
     // Delete the photo from GridFS
     gridFSBucket.delete(fileId);
+  }
+
+  public byte[] getBookCoverById(String bookId) {
+    var bookDao = bookRepository.findById(bookId).orElseThrow(() -> new BookNotFoundException(bookId));
+    var photo = bookDao.getCoverPhoto();
+    if (photo == null) {
+      return new byte[0];
+    }
+    return getPhoto(photo);
   }
 }
