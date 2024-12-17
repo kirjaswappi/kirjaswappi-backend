@@ -21,11 +21,9 @@ import com.kirjaswappi.backend.service.exceptions.GenreNotFoundException;
 public class GenreService {
   @Autowired
   GenreRepository genreRepository;
-  @Autowired
-  GenreMapper mapper;
 
   public List<Genre> getGenres() {
-    return genreRepository.findAll().stream().map(mapper::toEntity).toList();
+    return genreRepository.findAll().stream().map(GenreMapper::toEntity).toList();
   }
 
   public Genre addGenre(Genre genre) {
@@ -33,7 +31,7 @@ public class GenreService {
     if (genreRepository.existsByName(genre.getName())) {
       throw new GenreAlreadyExistsException(genre.getName());
     }
-    return mapper.toEntity(genreRepository.save(mapper.toDao(genre)));
+    return GenreMapper.toEntity(genreRepository.save(GenreMapper.toDao(genre)));
   }
 
   public void deleteGenre(String id) {
@@ -44,4 +42,10 @@ public class GenreService {
     genreRepository.deleteById(id);
   }
 
+  public Genre updateGenre(Genre entity) {
+    var dao = genreRepository.findById(entity.getId())
+        .orElseThrow(() -> new GenreNotFoundException(entity.getId()));
+    dao.setName(entity.getName());
+    return GenreMapper.toEntity(genreRepository.save(dao));
+  }
 }

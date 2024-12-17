@@ -6,6 +6,10 @@ package com.kirjaswappi.backend.http.validations;
 
 import java.util.regex.Pattern;
 
+import org.springframework.web.multipart.MultipartFile;
+
+import com.kirjaswappi.backend.service.exceptions.UnsupportedMediaTypeException;
+
 public class ValidationUtil {
   public static boolean validateNotBlank(String input) {
     return input != null && !input.trim().isEmpty();
@@ -21,5 +25,15 @@ public class ValidationUtil {
         && !otp.trim().isEmpty()
         && otp.length() == 6
         && otp.chars().allMatch(Character::isDigit);
+  }
+
+  public static void validateMediaType(MultipartFile image) {
+    String fileEnding = "([^\\s]+(\\.(?i)(jpg|jpeg|png|gif|bmp))$)";
+    String contentType = image.getContentType();
+    String fileName = image.getOriginalFilename();
+    if (contentType == null || !contentType.startsWith("image/") ||
+        fileName == null || !fileName.matches(fileEnding)) {
+      throw new UnsupportedMediaTypeException(image);
+    }
   }
 }

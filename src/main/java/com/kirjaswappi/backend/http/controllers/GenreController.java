@@ -6,6 +6,7 @@ package com.kirjaswappi.backend.http.controllers;
 
 import static com.kirjaswappi.backend.common.utils.Constants.API_BASE;
 import static com.kirjaswappi.backend.common.utils.Constants.GENRES;
+import static com.kirjaswappi.backend.common.utils.Constants.ID;
 
 import java.util.List;
 
@@ -16,11 +17,13 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.kirjaswappi.backend.http.dtos.requests.GenreCreateRequest;
+import com.kirjaswappi.backend.http.dtos.requests.CreateGenreRequest;
+import com.kirjaswappi.backend.http.dtos.requests.UpdateGenreRequest;
 import com.kirjaswappi.backend.http.dtos.responses.GenreResponse;
 import com.kirjaswappi.backend.service.GenreService;
 import com.kirjaswappi.backend.service.entities.Genre;
@@ -38,12 +41,18 @@ public class GenreController {
   }
 
   @PostMapping
-  public ResponseEntity<GenreResponse> createGenre(@RequestBody GenreCreateRequest request) {
+  public ResponseEntity<GenreResponse> createGenre(@RequestBody CreateGenreRequest request) {
     Genre savedGenre = genreService.addGenre(request.toEntity());
     return ResponseEntity.status(HttpStatus.CREATED).body(new GenreResponse(savedGenre));
   }
 
-  @DeleteMapping
+  @PutMapping(ID)
+  public ResponseEntity<GenreResponse> updateGenre(@RequestBody UpdateGenreRequest request) {
+    Genre updatedGenre = genreService.updateGenre(request.toEntity());
+    return ResponseEntity.status(HttpStatus.OK).body(new GenreResponse(updatedGenre));
+  }
+
+  @DeleteMapping(ID)
   public ResponseEntity<Void> deleteGenre(@PathVariable String id) {
     genreService.deleteGenre(id);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

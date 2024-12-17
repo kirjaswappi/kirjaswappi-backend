@@ -5,109 +5,84 @@
 package com.kirjaswappi.backend.http.controllers;
 
 import static com.kirjaswappi.backend.common.utils.Constants.API_BASE;
+import static com.kirjaswappi.backend.common.utils.Constants.BY_EMAIL;
+import static com.kirjaswappi.backend.common.utils.Constants.BY_ID;
+import static com.kirjaswappi.backend.common.utils.Constants.COVER_PHOTO;
+import static com.kirjaswappi.backend.common.utils.Constants.PHOTOS;
+import static com.kirjaswappi.backend.common.utils.Constants.PROFILE_PHOTO;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
+import com.kirjaswappi.backend.http.dtos.requests.CreatePhotoRequest;
 import com.kirjaswappi.backend.service.PhotoService;
-import com.mongodb.client.gridfs.GridFSBucket;
-import com.mongodb.client.gridfs.model.GridFSFile;
+import com.kirjaswappi.backend.service.entities.Photo;
 
 @RestController
-@RequestMapping(API_BASE + "/photos")
+@RequestMapping(API_BASE + PHOTOS)
 public class PhotoController {
   @Autowired
   private PhotoService photoService;
-  @Autowired
-  private GridFSBucket gridFSBucket;
 
-  @PostMapping("/profile")
-  public ResponseEntity<String> addProfilePhoto(@RequestParam("userId") String userId,
-      @RequestParam("image") MultipartFile image)
-      throws IOException {
-    ResponseEntity<String> UNSUPPORTED_MEDIA_TYPE = checkIfTheMediaIsSupported(image);
-    if (UNSUPPORTED_MEDIA_TYPE != null)
-      return UNSUPPORTED_MEDIA_TYPE;
-    return ResponseEntity.ok(photoService.addProfilePhoto(userId, image));
+  @PostMapping(PROFILE_PHOTO)
+  public ResponseEntity<byte[]> addProfilePhoto(@ModelAttribute CreatePhotoRequest request) throws IOException {
+    Photo photo = photoService.addProfilePhoto(request.getUserId(), request.getImage());
+    return getPhotoResponse(photo.getFileBytes());
   }
 
-  private static ResponseEntity<String> checkIfTheMediaIsSupported(MultipartFile image) {
-    String contentType = image.getContentType();
-    String fileName = image.getOriginalFilename();
-    if (contentType == null || !contentType.startsWith("image/") ||
-        fileName == null || !fileName.matches("([^\\s]+(\\.(?i)(jpg|jpeg|png|gif|bmp))$)")) {
-      return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body("Only image files are allowed!");
-    }
-    return null;
+  @PostMapping(COVER_PHOTO)
+  public ResponseEntity<byte[]> addCoverPhoto(@ModelAttribute CreatePhotoRequest request) throws IOException {
+    Photo photo = photoService.addCoverPhoto(request.getUserId(), request.getImage());
+    return getPhotoResponse(photo.getFileBytes());
   }
 
-  @PostMapping("/cover")
-  public ResponseEntity<String> addCoverPhoto(@RequestParam("userId") String userId,
-      @RequestParam("image") MultipartFile image)
-      throws IOException {
-    ResponseEntity<String> UNSUPPORTED_MEDIA_TYPE = checkIfTheMediaIsSupported(image);
-    if (UNSUPPORTED_MEDIA_TYPE != null)
-      return UNSUPPORTED_MEDIA_TYPE;
-    return ResponseEntity.ok(photoService.addCoverPhoto(userId, image));
-  }
-
-  @DeleteMapping("/profile")
+  @DeleteMapping(PROFILE_PHOTO)
   public ResponseEntity<Void> deleteProfilePhoto(@RequestParam("userId") String userId) {
     photoService.deleteProfilePhoto(userId);
     return ResponseEntity.noContent().build();
   }
 
-  @DeleteMapping("/cover")
-  public ResponseEntity<Void> deleteCoverPhoto(@RequestParam("userId") String userId)
-      throws IOException {
+  @DeleteMapping(COVER_PHOTO)
+  public ResponseEntity<Void> deleteCoverPhoto(@RequestParam("userId") String userId) {
     photoService.deleteCoverPhoto(userId);
     return ResponseEntity.noContent().build();
   }
 
-  @GetMapping("/profile/by-email")
+  @GetMapping(PROFILE_PHOTO + BY_EMAIL)
   public ResponseEntity<byte[]> getProfilePhotoByEmail(@RequestParam("email") String email) {
     return getPhotoResponse(photoService.getPhotoByUserEmail(email, true));
   }
 
-  @GetMapping("/cover/by-email")
+  @GetMapping(COVER_PHOTO + BY_EMAIL)
   public ResponseEntity<byte[]> getCoverPhotoByEmail(@RequestParam("email") String email) {
     return getPhotoResponse(photoService.getPhotoByUserEmail(email, false));
   }
 
-  @GetMapping("/profile/by-id")
+  @GetMapping(PROFILE_PHOTO + BY_ID)
   public ResponseEntity<byte[]> getProfilePhotoById(@RequestParam("userId") String userId) {
     return getPhotoResponse(photoService.getPhotoByUserId(userId, true));
   }
 
-  @GetMapping("/cover/by-id")
+  @GetMapping(COVER_PHOTO + BY_ID)
   public ResponseEntity<byte[]> getCoverPhotoById(@RequestParam("userId") String userId) {
     return getPhotoResponse(photoService.getPhotoByUserId(userId, false));
   }
 
-  private ResponseEntity<byte[]> getPhotoResponse(GridFSFile gridFSFile) {
-    if (gridFSFile == null) {
-      return ResponseEntity.notFound().build();
-    }
-
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    gridFSBucket.downloadToStream(gridFSFile.getObjectId(), baos);
-
+  private ResponseEntity<byte[]> getPhotoResponse(byte[] photoBytes) {
     return ResponseEntity.ok()
         .contentType(MediaType.IMAGE_JPEG)
-        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + gridFSFile.getFilename() + "\"")
-        .body(baos.toByteArray());
+        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=photo.jpg")
+        .body(photoBytes);
   }
 }

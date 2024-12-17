@@ -13,17 +13,23 @@ import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 
 @Getter
 @Setter
-public class GenreCreateRequest {
+public class UpdateGenreRequest {
+  private String id;
   private String name;
 
   public Genre toEntity() {
     this.validateProperties();
     var entity = new Genre();
+    entity.setId(this.id);
     entity.setName(this.name);
     return entity;
   }
 
   private void validateProperties() {
+    // validate genre id:
+    if (!ValidationUtil.validateNotBlank(this.id)) {
+      throw new BadRequestException("genreIdCannotBeBlank", this.id);
+    }
     // validate genre name:
     if (!ValidationUtil.validateNotBlank(this.name)) {
       throw new BadRequestException("genreNameCannotBeBlank", this.name);

@@ -11,6 +11,7 @@ public class Constants {
   public static final String API_BASE = API + API_VERSION;
   public static final String USERS = "/users";
   public static final String GENRES = "/genres";
+  public static final String BOOKS = "/books";
   public static final String ADMIN_USERS = "/admin-users";
   public static final String SIGNUP = "/signup";
   public static final String VERIFY_EMAIL = "/verify-email";
@@ -28,4 +29,9 @@ public class Constants {
   public static final String SEND_OTP = "/send-otp";
   public static final String VERIFY_OTP = "/verify-otp";
   public static final String NUMERIC = "0123456789";
+  public static final String PHOTOS = "/photos";
+  public static final String PROFILE_PHOTO = "/profile";
+  public static final String COVER_PHOTO = "/cover";
+  public static final String BY_EMAIL = "/by-email";
+  public static final String BY_ID = "/by-id";
 }

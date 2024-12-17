@@ -4,30 +4,29 @@
  */
 package com.kirjaswappi.backend.service.entities;
 
+import java.util.List;
+
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import org.bson.types.ObjectId;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.mongodb.lang.Nullable;
 
 @Getter
 @Setter
 @NoArgsConstructor
-public class Photo {
+@AllArgsConstructor
+public class Book {
   private String id;
   private String title;
-  private ObjectId fileId;
+  private String author;
+  private String description;
+  private String isbn;
+  private String language;
+  private String condition;
+  private List<String> genres;
   @Nullable
-  private MultipartFile file;
-  @Nullable
-  private byte[] fileBytes;
-
-  public Photo(String id, String title, ObjectId fileId) {
-    this.id = id;
-    this.title = title;
-    this.fileId = fileId;
-  }
+  private Photo coverPhoto;
+  private User owner;
 }

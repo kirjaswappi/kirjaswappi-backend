@@ -22,18 +22,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kirjaswappi.backend.common.service.OTPService;
+import com.kirjaswappi.backend.http.dtos.requests.AuthenticateUserRequest;
 import com.kirjaswappi.backend.http.dtos.requests.ChangePasswordRequest;
+import com.kirjaswappi.backend.http.dtos.requests.CreateUserRequest;
 import com.kirjaswappi.backend.http.dtos.requests.ResetPasswordRequest;
-import com.kirjaswappi.backend.http.dtos.requests.UserAuthenticationRequest;
-import com.kirjaswappi.backend.http.dtos.requests.UserCreateRequest;
-import com.kirjaswappi.backend.http.dtos.requests.UserUpdateRequest;
+import com.kirjaswappi.backend.http.dtos.requests.UpdateUserRequest;
 import com.kirjaswappi.backend.http.dtos.requests.VerifyEmailRequest;
 import com.kirjaswappi.backend.http.dtos.responses.ChangePasswordResponse;
+import com.kirjaswappi.backend.http.dtos.responses.CreateUserResponse;
 import com.kirjaswappi.backend.http.dtos.responses.ResetPasswordResponse;
-import com.kirjaswappi.backend.http.dtos.responses.UserCreateResponse;
+import com.kirjaswappi.backend.http.dtos.responses.UpdateUserResponse;
 import com.kirjaswappi.backend.http.dtos.responses.UserListResponse;
 import com.kirjaswappi.backend.http.dtos.responses.UserResponse;
-import com.kirjaswappi.backend.http.dtos.responses.UserUpdateResponse;
 import com.kirjaswappi.backend.http.dtos.responses.VerifyEmailResponse;
 import com.kirjaswappi.backend.service.UserService;
 import com.kirjaswappi.backend.service.entities.User;
@@ -48,10 +48,10 @@ public class UserController {
   private OTPService otpService;
 
   @PostMapping(SIGNUP)
-  public ResponseEntity<UserCreateResponse> createUser(@RequestBody UserCreateRequest user) throws IOException {
+  public ResponseEntity<CreateUserResponse> createUser(@RequestBody CreateUserRequest user) throws IOException {
     User savedUser = userService.addUser(user.toEntity());
     otpService.saveAndSendOTP(savedUser.getEmail());
-    return ResponseEntity.status(HttpStatus.CREATED).body(new UserCreateResponse(savedUser));
+    return ResponseEntity.status(HttpStatus.CREATED).body(new CreateUserResponse(savedUser));
   }
 
   @PostMapping(VERIFY_EMAIL)
@@ -62,13 +62,13 @@ public class UserController {
   }
 
   @PutMapping(ID)
-  public ResponseEntity<UserUpdateResponse> updateUser(@PathVariable String id, @RequestBody UserUpdateRequest user) {
+  public ResponseEntity<UpdateUserResponse> updateUser(@PathVariable String id, @RequestBody UpdateUserRequest user) {
     // validate id:
     if (!id.equals(user.getId())) {
       throw new BadRequestException("idMismatch", id, user.getId());
     }
     User updatedUser = userService.updateUser(user.toEntity());
-    return ResponseEntity.status(HttpStatus.OK).body(new UserUpdateResponse(updatedUser));
+    return ResponseEntity.status(HttpStatus.OK).body(new UpdateUserResponse(updatedUser));
   }
 
   @GetMapping(ID)
@@ -90,8 +90,8 @@ public class UserController {
   }
 
   @PostMapping(LOGIN)
-  public ResponseEntity<UserResponse> login(@RequestBody UserAuthenticationRequest userAuthenticationRequest) {
-    User user = userService.verifyLogin(userAuthenticationRequest.toEntity());
+  public ResponseEntity<UserResponse> login(@RequestBody AuthenticateUserRequest authenticateUserRequest) {
+    User user = userService.verifyLogin(authenticateUserRequest.toEntity());
     return ResponseEntity.status(HttpStatus.OK).body(new UserResponse(user));
   }
 
