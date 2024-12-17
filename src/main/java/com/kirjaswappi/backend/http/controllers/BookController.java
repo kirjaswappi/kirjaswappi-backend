@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kirjaswappi.backend.http.dtos.requests.CreateBookRequest;
@@ -71,7 +70,8 @@ public class BookController {
   }
 
   @GetMapping(COVER_PHOTO)
-  public ResponseEntity<byte[]> getCoverPhotosByBookIds(@RequestParam List<String> bookIds) throws IOException {
+  public ResponseEntity<byte[]> getCoverPhotosOfAllBooks() throws IOException {
+    List<String> bookIds = bookService.getAllBooks().stream().map(Book::getId).toList();
     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
     ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream);
 
