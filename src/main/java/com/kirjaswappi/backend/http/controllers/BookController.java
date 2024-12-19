@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -37,6 +38,7 @@ import com.kirjaswappi.backend.service.BookService;
 import com.kirjaswappi.backend.service.PhotoService;
 import com.kirjaswappi.backend.service.entities.Book;
 import com.kirjaswappi.backend.service.exceptions.BadRequestException;
+import com.kirjaswappi.backend.service.filters.GetAllBooksFilter;
 
 @RestController
 @RequestMapping(API_BASE + BOOKS)
@@ -64,8 +66,12 @@ public class BookController {
   }
 
   @GetMapping
-  public ResponseEntity<List<BookListResponse>> getAllBooks() {
-    List<Book> books = bookService.getAllBooks();
+  public ResponseEntity<List<BookListResponse>> getAllBooks(@ParameterObject GetAllBooksFilter filter) {
+    List<Book> books;
+    if (filter == null) {
+      books = bookService.getAllBooks();
+    } else
+      books = bookService.getAllBooksByFilter(filter);
     return ResponseEntity.status(HttpStatus.OK).body(books.stream().map(BookListResponse::new).toList());
   }
 
