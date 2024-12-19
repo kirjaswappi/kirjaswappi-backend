@@ -32,7 +32,6 @@ import com.kirjaswappi.backend.http.dtos.responses.ChangePasswordResponse;
 import com.kirjaswappi.backend.http.dtos.responses.CreateUserResponse;
 import com.kirjaswappi.backend.http.dtos.responses.ResetPasswordResponse;
 import com.kirjaswappi.backend.http.dtos.responses.UpdateUserResponse;
-import com.kirjaswappi.backend.http.dtos.responses.UserListResponse;
 import com.kirjaswappi.backend.http.dtos.responses.UserResponse;
 import com.kirjaswappi.backend.http.dtos.responses.VerifyEmailResponse;
 import com.kirjaswappi.backend.service.UserService;
@@ -78,9 +77,9 @@ public class UserController {
   }
 
   @GetMapping
-  public ResponseEntity<List<UserListResponse>> getUsers() {
-    var userListResponses = userService.getUsers().stream().map(UserListResponse::new).toList();
-    return ResponseEntity.status(HttpStatus.OK).body(userListResponses);
+  public ResponseEntity<List<UserResponse>> getUsers() {
+    var userResponses = userService.getUsers().stream().map(UserResponse::new).toList();
+    return ResponseEntity.status(HttpStatus.OK).body(userResponses);
   }
 
   @DeleteMapping(ID)
