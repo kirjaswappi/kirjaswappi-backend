@@ -8,6 +8,8 @@ import static com.kirjaswappi.backend.common.utils.Constants.API_BASE;
 import static com.kirjaswappi.backend.common.utils.Constants.AUTHENTICATE;
 import static com.kirjaswappi.backend.common.utils.Constants.REFRESH;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,6 +31,8 @@ public class AuthController {
   private AuthService authService;
 
   @PostMapping
+  @Operation(summary = "Authenticate a user.", description = "Authenticate a user and generate a JWT token.", responses = {
+      @ApiResponse(responseCode = "200", description = "JWT token generated.")})
   public ResponseEntity<AuthenticationResponse> createAuthToken(@RequestBody AuthenticationRequest request) {
     AdminUser adminUser = authService.verifyLogin(request.toEntity());
     String jwtToken = authService.generateJwtToken(adminUser);
@@ -37,6 +41,8 @@ public class AuthController {
   }
 
   @PostMapping(REFRESH)
+  @Operation(summary = "Refresh an authentication token.", description = "Refresh an authentication token using a refresh token.", responses = {
+      @ApiResponse(responseCode = "200", description = "JWT token refreshed.")})
   public ResponseEntity<RefreshAuthenticationResponse> refreshAuthToken(
       @RequestBody RefreshAuthenticationRequest request) {
     String jwtToken = authService.verifyRefreshToken(request.getRefreshToken());
