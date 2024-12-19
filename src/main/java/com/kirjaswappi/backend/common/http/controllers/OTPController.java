@@ -8,6 +8,9 @@ import static com.kirjaswappi.backend.common.utils.Constants.*;
 
 import java.io.IOException;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,12 +32,16 @@ public class OTPController {
   private OTPService otpService;
 
   @PostMapping(SEND_OTP)
+  @Operation(summary = "Send OTP to a user.", description = "Send OTP to a user using email.", responses = {
+      @ApiResponse(responseCode = "200", description = "OTP sent.") })
   public ResponseEntity<SendOtpResponse> sendOTP(@RequestBody SendOtpRequest request) throws IOException {
     String userEmail = otpService.saveAndSendOTP(request.toEntity());
     return ResponseEntity.status(HttpStatus.OK).body(new SendOtpResponse(userEmail));
   }
 
   @PostMapping(VERIFY_OTP)
+  @Operation(summary = "Send OTP to a user.", description = "Send OTP to a user using email.", responses = {
+      @ApiResponse(responseCode = "200", description = "OTP sent.") })
   public ResponseEntity<VerifyOtpResponse> verifyOTP(@RequestBody VerifyOtpRequest request) {
     String email = otpService.verifyOTPByEmail(request.toEntity());
     return ResponseEntity.status(HttpStatus.OK).body(new VerifyOtpResponse(email));

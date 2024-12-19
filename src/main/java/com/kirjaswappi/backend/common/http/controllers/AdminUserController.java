@@ -9,6 +9,9 @@ import static com.kirjaswappi.backend.common.utils.Constants.API_BASE;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,12 +35,16 @@ public class AdminUserController {
   private AdminUserService adminUserService;
 
   @PostMapping
+  @Operation(summary = "Create an admin user.", responses = {
+      @ApiResponse(responseCode = "201", description = "Admin user created.") })
   public ResponseEntity<AdminUserResponse> createAdminUser(@RequestBody AdminUserCreateRequest request) {
     AdminUser savedUser = adminUserService.addUser(request.toEntity());
     return ResponseEntity.status(HttpStatus.CREATED).body(new AdminUserResponse(savedUser));
   }
 
   @GetMapping
+  @Operation(summary = "Get all admin users.", responses = {
+      @ApiResponse(responseCode = "200", description = "List of admin users.") })
   public ResponseEntity<List<AdminUserResponse>> getAdminUsers() {
     List<AdminUserResponse> userListResponses = adminUserService.getAdminUsers()
         .stream().map(AdminUserResponse::new).toList();
@@ -45,6 +52,8 @@ public class AdminUserController {
   }
 
   @DeleteMapping
+  @Operation(summary = "Delete an admin user.", responses = {
+      @ApiResponse(responseCode = "204", description = "Admin user deleted.") })
   public ResponseEntity<Void> deleteAdminUser(@PathVariable String username) {
     adminUserService.deleteUser(username);
     return ResponseEntity.noContent().build();

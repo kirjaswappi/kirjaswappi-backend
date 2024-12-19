@@ -9,6 +9,9 @@ import static com.kirjaswappi.backend.common.utils.Constants.*;
 import java.io.IOException;
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,6 +50,8 @@ public class UserController {
   private OTPService otpService;
 
   @PostMapping(SIGNUP)
+  @Operation(summary = "Create a user.", responses = {
+      @ApiResponse(responseCode = "201", description = "User created.") })
   public ResponseEntity<CreateUserResponse> createUser(@RequestBody CreateUserRequest user) throws IOException {
     User savedUser = userService.addUser(user.toEntity());
     otpService.saveAndSendOTP(savedUser.getEmail());
@@ -54,6 +59,8 @@ public class UserController {
   }
 
   @PostMapping(VERIFY_EMAIL)
+  @Operation(summary = "Verify email.", responses = {
+      @ApiResponse(responseCode = "200", description = "Email verified.") })
   public ResponseEntity<VerifyEmailResponse> verifyEmail(@RequestBody VerifyEmailRequest request) {
     String email = otpService.verifyOTPByEmail(request.toEntity());
     String verifiedEmail = userService.verifyEmail(email);
@@ -61,6 +68,8 @@ public class UserController {
   }
 
   @PutMapping(ID)
+  @Operation(summary = "Update a user.", responses = {
+      @ApiResponse(responseCode = "200", description = "User updated.") })
   public ResponseEntity<UpdateUserResponse> updateUser(@PathVariable String id, @RequestBody UpdateUserRequest user) {
     // validate id:
     if (!id.equals(user.getId())) {
@@ -71,30 +80,40 @@ public class UserController {
   }
 
   @GetMapping(ID)
+  @Operation(summary = "Get a user by User Id.", responses = {
+      @ApiResponse(responseCode = "200", description = "User found.") })
   public ResponseEntity<UserResponse> getUser(@PathVariable String id) {
     User user = userService.getUser(id);
     return ResponseEntity.status(HttpStatus.OK).body(new UserResponse(user));
   }
 
   @GetMapping
+  @Operation(summary = "Get all users.", responses = {
+      @ApiResponse(responseCode = "200", description = "List of users.") })
   public ResponseEntity<List<UserResponse>> getUsers() {
     var userResponses = userService.getUsers().stream().map(UserResponse::new).toList();
     return ResponseEntity.status(HttpStatus.OK).body(userResponses);
   }
 
   @DeleteMapping(ID)
+  @Operation(summary = "Delete a user.", responses = {
+      @ApiResponse(responseCode = "204", description = "User deleted.") })
   public ResponseEntity<Void> deleteUser(@PathVariable String id) {
     userService.deleteUser(id);
     return ResponseEntity.noContent().build();
   }
 
   @PostMapping(LOGIN)
+  @Operation(summary = "Login a user.", responses = {
+      @ApiResponse(responseCode = "200", description = "User logged in.") })
   public ResponseEntity<UserResponse> login(@RequestBody AuthenticateUserRequest authenticateUserRequest) {
     User user = userService.verifyLogin(authenticateUserRequest.toEntity());
     return ResponseEntity.status(HttpStatus.OK).body(new UserResponse(user));
   }
 
   @PostMapping(CHANGE_PASSWORD + EMAIL)
+  @Operation(summary = "Change password.", responses = {
+      @ApiResponse(responseCode = "200", description = "Password changed.") })
   public ResponseEntity<ChangePasswordResponse> changePassword(@PathVariable String email,
       @RequestBody ChangePasswordRequest request) {
     userService.verifyCurrentPassword(request.toVerifyPasswordEntity(email));
@@ -103,10 +122,11 @@ public class UserController {
   }
 
   @PostMapping(RESET_PASSWORD + EMAIL)
+  @Operation(summary = "Reset password.", responses = {
+      @ApiResponse(responseCode = "200", description = "Password reset.") })
   public ResponseEntity<ResetPasswordResponse> resetPassword(@PathVariable String email,
       @RequestBody ResetPasswordRequest request) {
     String userEmail = userService.changePassword(request.toUserEntity(email));
     return ResponseEntity.status(HttpStatus.OK).body(new ResetPasswordResponse(userEmail));
   }
-
 }
