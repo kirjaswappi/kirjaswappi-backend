@@ -32,7 +32,7 @@ public class AuthController {
   private AuthService authService;
 
   @PostMapping
-  @Operation(summary = "Authenticate a user.", description = "Authenticate a user and generate a JWT token.", responses = {
+  @Operation(summary = "Authenticate a user.", description = "Authenticate via system user and generate a JWT token.", responses = {
       @ApiResponse(responseCode = "200", description = "JWT token generated.") })
   public ResponseEntity<AuthenticationResponse> createAuthToken(@RequestBody AuthenticationRequest request) {
     AdminUser adminUser = authService.verifyLogin(request.toEntity());
