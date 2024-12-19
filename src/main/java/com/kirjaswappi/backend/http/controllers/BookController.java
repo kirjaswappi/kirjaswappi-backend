@@ -67,7 +67,11 @@ public class BookController {
 
   @GetMapping
   public ResponseEntity<List<BookListResponse>> getAllBooks(@ParameterObject GetAllBooksFilter filter) {
-    List<Book> books = bookService.getAllBooks();
+    List<Book> books;
+    if (filter == null) {
+      books = bookService.getAllBooks();
+    } else
+      books = bookService.getAllBooksByFilter(filter);
     return ResponseEntity.status(HttpStatus.OK).body(books.stream().map(BookListResponse::new).toList());
   }
 
