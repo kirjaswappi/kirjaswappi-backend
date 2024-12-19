@@ -23,6 +23,7 @@ import com.kirjaswappi.backend.service.entities.Book;
 import com.kirjaswappi.backend.service.exceptions.BookNotFoundException;
 import com.kirjaswappi.backend.service.exceptions.GenreNotFoundException;
 import com.kirjaswappi.backend.service.exceptions.UserNotFoundException;
+import com.kirjaswappi.backend.service.filters.GetAllBooksFilter;
 
 @Service
 @Transactional
@@ -135,5 +136,10 @@ public class BookService {
         .filter(book -> !book.getId().equals(dao.getId()))
         .toList());
     userRepository.save(owner);
+  }
+
+  public List<Book> getAllBooksByFilter(GetAllBooksFilter filter) {
+    return bookRepository.findAllBooksByFilter(filter).stream()
+        .map(BookMapper::toEntity).toList();
   }
 }

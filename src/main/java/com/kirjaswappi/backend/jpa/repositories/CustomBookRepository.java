@@ -4,9 +4,11 @@
  */
 package com.kirjaswappi.backend.jpa.repositories;
 
-import org.springframework.data.mongodb.repository.MongoRepository;
+import java.util.List;
 
 import com.kirjaswappi.backend.jpa.daos.BookDao;
+import com.kirjaswappi.backend.service.filters.GetAllBooksFilter;
 
-public interface BookRepository extends MongoRepository<BookDao, String>, CustomBookRepository {
+public interface CustomBookRepository {
+  List<BookDao> findAllBooksByFilter(GetAllBooksFilter filter);
 }
