@@ -12,6 +12,7 @@ import java.util.List;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +39,7 @@ public class GenreController {
 
   @GetMapping
   @Operation(summary = "Get all genres.", responses = {
-    @ApiResponse(responseCode = "200", description = "List of genres.")})
+      @ApiResponse(responseCode = "200", description = "List of genres.") })
   public ResponseEntity<List<GenreResponse>> getGenres() {
     var genreListResponses = genreService.getGenres().stream().map(GenreResponse::new).toList();
     return ResponseEntity.status(HttpStatus.OK).body(genreListResponses);
@@ -46,7 +47,7 @@ public class GenreController {
 
   @PostMapping
   @Operation(summary = "Create a genre.", responses = {
-      @ApiResponse(responseCode = "201", description = "Genre created.")})
+      @ApiResponse(responseCode = "201", description = "Genre created.") })
   public ResponseEntity<GenreResponse> createGenre(@RequestBody CreateGenreRequest request) {
     Genre savedGenre = genreService.addGenre(request.toEntity());
     return ResponseEntity.status(HttpStatus.CREATED).body(new GenreResponse(savedGenre));
@@ -54,7 +55,7 @@ public class GenreController {
 
   @PutMapping(ID)
   @Operation(summary = "Update a genre.", responses = {
-      @ApiResponse(responseCode = "200", description = "Genre updated.")})
+      @ApiResponse(responseCode = "200", description = "Genre updated.") })
   public ResponseEntity<GenreResponse> updateGenre(@RequestBody UpdateGenreRequest request) {
     Genre updatedGenre = genreService.updateGenre(request.toEntity());
     return ResponseEntity.status(HttpStatus.OK).body(new GenreResponse(updatedGenre));
@@ -62,7 +63,7 @@ public class GenreController {
 
   @DeleteMapping(ID)
   @Operation(summary = "Delete a genre.", responses = {
-      @ApiResponse(responseCode = "204", description = "Genre deleted.")})
+      @ApiResponse(responseCode = "204", description = "Genre deleted.") })
   public ResponseEntity<Void> deleteGenre(@PathVariable String id) {
     genreService.deleteGenre(id);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

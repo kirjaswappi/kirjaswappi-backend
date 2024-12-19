@@ -17,6 +17,7 @@ import java.util.zip.ZipOutputStream;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -52,7 +53,7 @@ public class BookController {
 
   @PostMapping
   @Operation(summary = "Adds a book to a user.", responses = {
-          @ApiResponse(responseCode = "201", description = "Book created.") })
+      @ApiResponse(responseCode = "201", description = "Book created.") })
   public ResponseEntity<BookResponse> createBook(@ModelAttribute CreateBookRequest book) throws IOException {
     Book savedBook = bookService.createBook(book.toEntity());
     return ResponseEntity.status(HttpStatus.CREATED).body(new BookResponse(savedBook));
@@ -60,7 +61,7 @@ public class BookController {
 
   @GetMapping(ID)
   @Operation(summary = "Get a book by Book Id.", responses = {
-          @ApiResponse(responseCode = "200", description = "Book found.") })
+      @ApiResponse(responseCode = "200", description = "Book found.") })
   public ResponseEntity<BookResponse> getBookById(@PathVariable String id) {
     Book book = bookService.getBookById(id);
     return ResponseEntity.status(HttpStatus.OK).body(new BookResponse(book));
@@ -68,14 +69,14 @@ public class BookController {
 
   @GetMapping(ID + COVER_PHOTO)
   @Operation(summary = "Get a book cover photo by Book Id.", responses = {
-          @ApiResponse(responseCode = "200", description = "Cover photo found.") })
+      @ApiResponse(responseCode = "200", description = "Cover photo found.") })
   public ResponseEntity<byte[]> getBookCoverPhotoById(@PathVariable String id) {
     return getPhotoResponse(photoService.getBookCoverById(id));
   }
 
   @GetMapping
   @Operation(summary = "Searches for books with optional filter properties.", responses = {
-          @ApiResponse(responseCode = "200", description = "List of Books.") })
+      @ApiResponse(responseCode = "200", description = "List of Books.") })
   public ResponseEntity<List<BookListResponse>> getAllBooks(@ParameterObject GetAllBooksFilter filter) {
     List<Book> books = (filter == null) ? bookService.getAllBooks() : bookService.getAllBooksByFilter(filter);
     return ResponseEntity.status(HttpStatus.OK).body(books.stream().map(BookListResponse::new).toList());
@@ -83,7 +84,7 @@ public class BookController {
 
   @GetMapping(COVER_PHOTO)
   @Operation(summary = "Get cover photos of all books as a zip.", responses = {
-          @ApiResponse(responseCode = "200", description = "Cover photos found.") })
+      @ApiResponse(responseCode = "200", description = "Cover photos found.") })
   public ResponseEntity<byte[]> getCoverPhotosOfAllBooks() throws IOException {
     List<String> bookIds = bookService.getAllBooks().stream().map(Book::getId).toList();
     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -108,7 +109,7 @@ public class BookController {
 
   @PutMapping(ID)
   @Operation(summary = "Updates a book by Book Id.", responses = {
-          @ApiResponse(responseCode = "200", description = "Book updated.") })
+      @ApiResponse(responseCode = "200", description = "Book updated.") })
   public ResponseEntity<BookResponse> updateBook(@PathVariable String id, @ModelAttribute UpdateBookRequest book)
       throws IOException {
     // validate id:
@@ -121,7 +122,7 @@ public class BookController {
 
   @DeleteMapping(ID)
   @Operation(summary = "Deletes a book by Book Id.", responses = {
-          @ApiResponse(responseCode = "204", description = "Book deleted.") })
+      @ApiResponse(responseCode = "204", description = "Book deleted.") })
   public ResponseEntity<Void> deleteBook(@PathVariable String id) {
     bookService.deleteBook(id);
     return ResponseEntity.noContent().build();
