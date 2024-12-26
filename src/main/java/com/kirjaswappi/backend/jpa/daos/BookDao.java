@@ -30,12 +30,16 @@ public class BookDao {
 
   @NotNull
   private String title;
+
   @NotNull
   private String author;
+
   @Nullable
   private String description;
+
   @NotNull
   private String language;
+
   @NotNull
   private String condition;
 
@@ -43,7 +47,7 @@ public class BookDao {
   @DBRef
   private List<GenreDao> genres;
 
-  @Nullable
+  @NotNull
   @DBRef
   private PhotoDao coverPhoto;
 

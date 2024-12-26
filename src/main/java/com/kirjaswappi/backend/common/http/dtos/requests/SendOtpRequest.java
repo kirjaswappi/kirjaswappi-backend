@@ -4,6 +4,9 @@
  */
 package com.kirjaswappi.backend.common.http.dtos.requests;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,6 +16,7 @@ import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 @Getter
 @Setter
 public class SendOtpRequest {
+  @Schema(description = "The email address of the user.", example = "abc@xyz.com", requiredMode = REQUIRED)
   private String email;
 
   public String toEntity() {

@@ -4,6 +4,9 @@
  */
 package com.kirjaswappi.backend.http.dtos.requests;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,7 +18,9 @@ import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 @Getter
 @Setter
 public class CreatePhotoRequest {
+  @Schema(description = "The user ID of the photo owner.", example = "123456", requiredMode = REQUIRED)
   private String userId;
+  @Schema(description = "The image file of the photo.", requiredMode = REQUIRED)
   private MultipartFile image;
 
   public CreatePhotoRequest(String userId, MultipartFile image) {

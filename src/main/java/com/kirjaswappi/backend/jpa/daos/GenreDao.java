@@ -22,6 +22,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class GenreDao {
   @Id
   private String id;
+
   @NotNull
   private String name;
 }

@@ -30,29 +30,40 @@ public class UserDao {
 
   @NotNull
   private String firstName;
+
   @NotNull
   private String lastName;
+
   @NotNull
   private String email;
+
   @NotNull
   private String password;
+
   @NotNull
   private String salt;
+
   @NotNull
   private boolean isEmailVerified;
 
   @Nullable
   private String streetName;
+
   @Nullable
   private String houseNumber;
+
   @Nullable
   private Integer zipCode;
+
   @Nullable
   private String city;
+
   @Nullable
   private String country;
+
   @Nullable
   private String phoneNumber;
+
   @Nullable
   private String aboutMe;
 

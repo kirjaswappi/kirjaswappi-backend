@@ -4,6 +4,9 @@
  */
 package com.kirjaswappi.backend.http.dtos.requests;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,6 +17,7 @@ import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 @Getter
 @Setter
 public class CreateGenreRequest {
+  @Schema(description = "The name of the genre.", example = "Fiction", requiredMode = REQUIRED)
   private String name;
 
   public Genre toEntity() {

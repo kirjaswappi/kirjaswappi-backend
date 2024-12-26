@@ -4,6 +4,9 @@
  */
 package com.kirjaswappi.backend.http.dtos.requests;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,7 +17,9 @@ import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 @Getter
 @Setter
 public class ResetPasswordRequest {
+  @Schema(description = "The new password of the user.", example = "newPassword", requiredMode = REQUIRED)
   private String newPassword;
+  @Schema(description = "The confirm password of the user.", example = "newPassword", requiredMode = REQUIRED)
   private String confirmPassword;
 
   public User toUserEntity(String email) {

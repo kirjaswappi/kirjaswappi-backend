@@ -28,7 +28,7 @@ public class VerifyOtpRequest {
     if (!ValidationUtil.validateEmail(this.email)) {
       throw new BadRequestException("invalidEmailAddress", email);
     }
-    if (!ValidationUtil.validateOtp(this.otp)) {
+    if (ValidationUtil.validateOtp(this.otp)) {
       throw new BadRequestException("invalidOtp", otp);
     }
   }
