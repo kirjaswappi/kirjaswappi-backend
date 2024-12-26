@@ -4,6 +4,9 @@
  */
 package com.kirjaswappi.backend.http.dtos.requests;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,10 +17,15 @@ import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 @Getter
 @Setter
 public class CreateUserRequest {
+  @Schema(description = "The first name of the user.", example = "Robert", requiredMode = REQUIRED)
   private String firstName;
+  @Schema(description = "The last name of the user.", example = "Smith", requiredMode = REQUIRED)
   private String lastName;
+  @Schema(description = "The email address of the user.", example = "abc@xyz.com", requiredMode = REQUIRED)
   private String email;
+  @Schema(description = "The password of the user.", example = "password", requiredMode = REQUIRED)
   private String password;
+  @Schema(description = "The confirm password of the user.", example = "password", requiredMode = REQUIRED)
   private String confirmPassword;
 
   public User toEntity() {

@@ -21,10 +21,10 @@ public class ValidationUtil {
   }
 
   public static boolean validateOtp(String otp) {
-    return otp != null
-        && !otp.trim().isEmpty()
-        && otp.length() == 6
-        && otp.chars().allMatch(Character::isDigit);
+    return otp == null
+        || otp.trim().isEmpty()
+        || otp.length() != 6
+        || !otp.chars().allMatch(Character::isDigit);
   }
 
   public static void validateMediaType(MultipartFile image) {

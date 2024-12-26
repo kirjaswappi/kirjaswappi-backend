@@ -31,6 +31,23 @@ public class BookMapper {
     return book;
   }
 
+  public static Book toEntity(BookDao dao, byte[] fileBytes) {
+    var book = new Book();
+    book.setId(dao.getId());
+    book.setTitle(dao.getTitle());
+    book.setAuthor(dao.getAuthor());
+    book.setDescription(dao.getDescription());
+    book.setLanguage(dao.getLanguage());
+    book.setCondition(dao.getCondition());
+    book.setGenres(dao.getGenres().stream().map(GenreDao::getName).toList());
+    if (dao.getCoverPhoto() != null) {
+      book.setCoverPhoto(PhotoMapper.toEntity(dao.getCoverPhoto()));
+      assert book.getCoverPhoto() != null;
+      book.getCoverPhoto().setFileBytes(fileBytes);
+    }
+    return book;
+  }
+
   public static Book setOwner(UserDao owner, Book book) {
     book.setOwner(UserMapper.toEntity(owner));
     return book;

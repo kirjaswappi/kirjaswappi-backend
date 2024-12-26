@@ -10,7 +10,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import com.kirjaswappi.backend.service.entities.Book;
-import com.kirjaswappi.backend.service.entities.Photo;
 
 @Getter
 @Setter
@@ -22,7 +21,7 @@ public class BookListResponse {
   private String language;
   private String description;
   private String condition;
-  private PhotoResponse coverPhoto;
+  private byte[] coverPhoto;
 
   public BookListResponse(Book entity) {
     this.id = entity.getId();
@@ -32,20 +31,6 @@ public class BookListResponse {
     this.language = entity.getLanguage();
     this.description = entity.getDescription();
     this.condition = entity.getCondition();
-    this.coverPhoto = entity.getCoverPhoto() != null ? new PhotoResponse(entity.getCoverPhoto()) : null;
-  }
-
-  @Setter
-  @Getter
-  static class PhotoResponse {
-    private final String id;
-    private final String title;
-    private final String fileId;
-
-    public PhotoResponse(Photo entity) {
-      this.id = entity.getId();
-      this.title = entity.getTitle();
-      this.fileId = entity.getFileId().toHexString();
-    }
+    this.coverPhoto = entity.getCoverPhoto() != null ? entity.getCoverPhoto().getFileBytes() : null;
   }
 }
