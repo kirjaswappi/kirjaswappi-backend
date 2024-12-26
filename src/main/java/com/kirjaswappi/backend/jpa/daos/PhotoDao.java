@@ -4,6 +4,8 @@
  */
 package com.kirjaswappi.backend.jpa.daos;
 
+import jakarta.validation.constraints.NotNull;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +23,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class PhotoDao {
   @Id
   private String id;
+
+  @NotNull
   private String title;
+
+  @NotNull
   private ObjectId fileId;
 }

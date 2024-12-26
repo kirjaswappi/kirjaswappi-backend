@@ -11,8 +11,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import com.mongodb.lang.Nullable;
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -26,7 +24,6 @@ public class Book {
   private String language;
   private String condition;
   private List<String> genres;
-  @Nullable
   private Photo coverPhoto;
   private User owner;
 }

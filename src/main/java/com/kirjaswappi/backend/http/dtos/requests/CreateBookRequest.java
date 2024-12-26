@@ -50,11 +50,9 @@ public class CreateBookRequest {
     book.setLanguage(language);
     book.setCondition(condition);
     book.setGenres(genres);
-    if (coverPhoto != null) {
-      var photo = new Photo();
-      photo.setFile(coverPhoto);
-      book.setCoverPhoto(photo);
-    }
+    var photo = new Photo();
+    photo.setFile(coverPhoto);
+    book.setCoverPhoto(photo);
     var user = new User();
     user.setId(ownerId);
     book.setOwner(user);
