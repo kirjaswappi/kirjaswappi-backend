@@ -47,8 +47,6 @@ public class BookDao {
   @DBRef
   private List<GenreDao> genres;
 
-  @NotNull
-  @DBRef
   private String coverPhoto;
 
   @NotNull

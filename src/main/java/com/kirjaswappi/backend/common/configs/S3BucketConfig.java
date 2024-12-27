@@ -6,18 +6,23 @@ package com.kirjaswappi.backend.common.configs;
 
 import io.minio.MinioClient;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 
 @Configuration
-@Profile("local")
-public class LocalS3BucketConfig {
+public class S3BucketConfig {
+  @Value("${s3.url}")
+  private String s3Url;
+
+  @Value("${s3.accessKey}")
+  private String accessKey;
+
+  @Value("${s3.secretKey}")
+  private String secretKey;
+
   @Bean
   public MinioClient minioClient() {
-    String s3Url = "http://localhost:9000";
-    String accessKey = "test";
-    String secretKey = "test";
     return MinioClient.builder()
         .endpoint(s3Url)
         .credentials(accessKey, secretKey)

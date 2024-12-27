@@ -10,3 +10,9 @@ spring:
 
 server:
   port: 8080
+
+s3:
+  url: http://localhost:9000
+  bucket: kirjaswappi
+  accessKey: test
+  secretKey: test
