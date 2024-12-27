@@ -13,8 +13,6 @@ import java.util.stream.StreamSupport;
 import jakarta.validation.ElementKind;
 import jakarta.validation.Path;
 
-import lombok.AllArgsConstructor;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
@@ -25,10 +23,13 @@ import org.springframework.web.context.request.WebRequest;
 import com.kirjaswappi.backend.common.exceptions.BusinessException;
 
 @Component
-@AllArgsConstructor
 public class ErrorUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(ErrorUtils.class);
   private final MessageSource messageSource;
+
+  public ErrorUtils(MessageSource messageSource) {
+    this.messageSource = messageSource;
+  }
 
   public ErrorResponse buildErrorResponse(BusinessException exception) {
     String topLevelErrorMessage = this.resolveMessage(exception.getMessageKey(), exception.getMessageParams(),

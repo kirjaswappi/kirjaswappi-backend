@@ -27,6 +27,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kirjaswappi.backend.common.http.ErrorUtils;
 import com.kirjaswappi.backend.common.service.OTPService;
 import com.kirjaswappi.backend.http.controllers.UserController;
 import com.kirjaswappi.backend.http.dtos.requests.*;
@@ -41,11 +42,12 @@ public class UserControllerTest {
   private MockMvc mockMvc;
   @Autowired
   private ObjectMapper objectMapper;
-
   @MockBean
   private UserService userService;
   @MockBean
   private OTPService otpService;
+  @MockBean
+  private ErrorUtils errorUtils;
 
   private User user;
   private CreateUserRequest createUserRequest;

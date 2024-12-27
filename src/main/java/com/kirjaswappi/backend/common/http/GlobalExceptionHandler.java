@@ -6,7 +6,6 @@ package com.kirjaswappi.backend.common.http;
 
 import static com.kirjaswappi.backend.common.utils.PathProvider.getCurrentPath;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -22,11 +21,13 @@ import com.kirjaswappi.backend.service.exceptions.UserNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-  @Autowired
-  private ErrorUtils errorUtils;
-
+  private final ErrorUtils errorUtils;
   private static final String INTERNAL_ERROR = "internalServerError";
   private static final String PATH_NOT_FOUND = "pathNotFound";
+
+  public GlobalExceptionHandler(ErrorUtils errorUtils) {
+    this.errorUtils = errorUtils;
+  }
 
   @ExceptionHandler(InvalidCredentials.class)
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
