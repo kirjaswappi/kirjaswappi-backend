@@ -11,6 +11,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import com.kirjaswappi.backend.service.enums.Condition;
+import com.kirjaswappi.backend.service.enums.Language;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,9 +23,8 @@ public class Book {
   private String title;
   private String author;
   private String description;
-  private String isbn;
-  private String language;
-  private String condition;
+  private Language language;
+  private Condition condition;
   private List<String> genres;
   private Photo coverPhoto;
   private User owner;
