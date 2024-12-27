@@ -9,12 +9,16 @@ import static com.kirjaswappi.backend.common.utils.Constants.*;
 import java.io.IOException;
 import java.util.List;
 
+import jakarta.validation.Valid;
+
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,6 +47,7 @@ import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 
 @RestController
 @RequestMapping(API_BASE + USERS)
+@Validated
 public class UserController {
   @Autowired
   private UserService userService;
@@ -52,7 +57,7 @@ public class UserController {
   @PostMapping(SIGNUP)
   @Operation(summary = "Create a user.", responses = {
       @ApiResponse(responseCode = "201", description = "User created.") })
-  public ResponseEntity<CreateUserResponse> createUser(@RequestBody CreateUserRequest user) throws IOException {
+  public ResponseEntity<CreateUserResponse> createUser(@Valid @RequestBody CreateUserRequest user) throws IOException {
     User savedUser = userService.addUser(user.toEntity());
     otpService.saveAndSendOTP(savedUser.getEmail());
     return ResponseEntity.status(HttpStatus.CREATED).body(new CreateUserResponse(savedUser));
@@ -61,7 +66,7 @@ public class UserController {
   @PostMapping(VERIFY_EMAIL)
   @Operation(summary = "Verify email.", responses = {
       @ApiResponse(responseCode = "200", description = "Email verified.") })
-  public ResponseEntity<VerifyEmailResponse> verifyEmail(@RequestBody VerifyEmailRequest request) {
+  public ResponseEntity<VerifyEmailResponse> verifyEmail(@Valid @RequestBody VerifyEmailRequest request) {
     String email = otpService.verifyOTPByEmail(request.toEntity());
     String verifiedEmail = userService.verifyEmail(email);
     return ResponseEntity.status(HttpStatus.OK).body(new VerifyEmailResponse(verifiedEmail));
@@ -70,7 +75,8 @@ public class UserController {
   @PutMapping(ID)
   @Operation(summary = "Update a user.", responses = {
       @ApiResponse(responseCode = "200", description = "User updated.") })
-  public ResponseEntity<UpdateUserResponse> updateUser(@PathVariable String id, @RequestBody UpdateUserRequest user) {
+  public ResponseEntity<UpdateUserResponse> updateUser(@Parameter(description = "User Id.") @PathVariable String id,
+      @Valid @RequestBody UpdateUserRequest user) {
     // validate id:
     if (!id.equals(user.getId())) {
       throw new BadRequestException("idMismatch", id, user.getId());
@@ -82,7 +88,7 @@ public class UserController {
   @GetMapping(ID)
   @Operation(summary = "Get a user by User Id.", responses = {
       @ApiResponse(responseCode = "200", description = "User found.") })
-  public ResponseEntity<UserResponse> getUser(@PathVariable String id) {
+  public ResponseEntity<UserResponse> getUser(@Parameter(description = "User Id.") @PathVariable String id) {
     User user = userService.getUser(id);
     return ResponseEntity.status(HttpStatus.OK).body(new UserResponse(user));
   }
@@ -98,7 +104,7 @@ public class UserController {
   @DeleteMapping(ID)
   @Operation(summary = "Delete a user.", responses = {
       @ApiResponse(responseCode = "204", description = "User deleted.") })
-  public ResponseEntity<Void> deleteUser(@PathVariable String id) {
+  public ResponseEntity<Void> deleteUser(@Parameter(description = "User Id.") @PathVariable String id) {
     userService.deleteUser(id);
     return ResponseEntity.noContent().build();
   }
@@ -106,7 +112,7 @@ public class UserController {
   @PostMapping(LOGIN)
   @Operation(summary = "Login a user.", responses = {
       @ApiResponse(responseCode = "200", description = "User logged in.") })
-  public ResponseEntity<UserResponse> login(@RequestBody AuthenticateUserRequest authenticateUserRequest) {
+  public ResponseEntity<UserResponse> login(@Valid @RequestBody AuthenticateUserRequest authenticateUserRequest) {
     User user = userService.verifyLogin(authenticateUserRequest.toEntity());
     return ResponseEntity.status(HttpStatus.OK).body(new UserResponse(user));
   }
@@ -114,8 +120,9 @@ public class UserController {
   @PostMapping(CHANGE_PASSWORD + EMAIL)
   @Operation(summary = "Change password.", responses = {
       @ApiResponse(responseCode = "200", description = "Password changed.") })
-  public ResponseEntity<ChangePasswordResponse> changePassword(@PathVariable String email,
-      @RequestBody ChangePasswordRequest request) {
+  public ResponseEntity<ChangePasswordResponse> changePassword(
+      @Parameter(description = "User Email.") @PathVariable String email,
+      @Valid @RequestBody ChangePasswordRequest request) {
     userService.verifyCurrentPassword(request.toVerifyPasswordEntity(email));
     String userEmail = userService.changePassword(request.toChangePasswordEntity(email));
     return ResponseEntity.status(HttpStatus.OK).body(new ChangePasswordResponse(userEmail));
@@ -124,8 +131,9 @@ public class UserController {
   @PostMapping(RESET_PASSWORD + EMAIL)
   @Operation(summary = "Reset password.", responses = {
       @ApiResponse(responseCode = "200", description = "Password reset.") })
-  public ResponseEntity<ResetPasswordResponse> resetPassword(@PathVariable String email,
-      @RequestBody ResetPasswordRequest request) {
+  public ResponseEntity<ResetPasswordResponse> resetPassword(
+      @Parameter(description = "User Email.") @PathVariable String email,
+      @Valid @RequestBody ResetPasswordRequest request) {
     String userEmail = userService.changePassword(request.toUserEntity(email));
     return ResponseEntity.status(HttpStatus.OK).body(new ResetPasswordResponse(userEmail));
   }

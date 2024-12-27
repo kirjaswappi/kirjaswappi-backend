@@ -53,9 +53,14 @@ public class JwtUtil {
         .getPayload();
   }
 
-  private static boolean isTokenExpired(String token) {
-    return extractExpiration(token)
+  private static boolean isTokenValid(String token) {
+    return !extractExpiration(token)
         .before(new Date());
+  }
+
+  private static boolean isValidUser(String token, AdminUser adminUser) {
+    final String username = extractUsername(token);
+    return username.equals(adminUser.getUsername());
   }
 
   public static String generateJwtToken(AdminUser adminUser) {
@@ -76,13 +81,11 @@ public class JwtUtil {
   }
 
   public static boolean validateJwtToken(String token, AdminUser adminUser) {
-    final String username = extractUsername(token);
-    return (username.equals(adminUser.getUsername()) && !isTokenExpired(token)) && isValidTokenType(token);
+    return isValidUser(token, adminUser) && isTokenValid(token) && isValidTokenType(token);
   }
 
   public static boolean validateRefreshToken(String token, AdminUser adminUser) {
-    final String username = extractUsername(token);
-    return (username.equals(adminUser.getUsername()) && !isTokenExpired(token)) && !isValidTokenType(token);
+    return isValidUser(token, adminUser) && isTokenValid(token) && !isValidTokenType(token);
   }
 
   private static boolean isValidTokenType(String token) {

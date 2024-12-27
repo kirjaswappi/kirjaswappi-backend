@@ -4,13 +4,8 @@
  */
 package com.kirjaswappi.backend.common.exceptions;
 
-public class InvalidJwtTokenException extends GlobalSystemException {
-  public InvalidJwtTokenException() {
-    super("invalidJwtToken");
-  }
-
-  @Override
-  public String getCode() {
-    return "invalidJwtToken";
+public class InvalidJwtTokenException extends BusinessException {
+  public InvalidJwtTokenException(Object... params) {
+    super("invalidJwtToken", params);
   }
 }

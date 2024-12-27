@@ -48,6 +48,8 @@ public class AdminUserService {
   }
 
   public void deleteUser(String username) {
+    adminUserRepository.findByUsername(username)
+        .orElseThrow(() -> new UserNotFoundException(username));
     adminUserRepository.deleteByUsername(username);
   }
 

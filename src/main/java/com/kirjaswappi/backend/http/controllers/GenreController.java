@@ -10,12 +10,16 @@ import static com.kirjaswappi.backend.common.utils.Constants.ID;
 
 import java.util.List;
 
+import jakarta.validation.Valid;
+
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,9 +34,11 @@ import com.kirjaswappi.backend.http.dtos.requests.UpdateGenreRequest;
 import com.kirjaswappi.backend.http.dtos.responses.GenreResponse;
 import com.kirjaswappi.backend.service.GenreService;
 import com.kirjaswappi.backend.service.entities.Genre;
+import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 
 @RestController
 @RequestMapping(API_BASE + GENRES)
+@Validated
 public class GenreController {
   @Autowired
   private GenreService genreService;
@@ -48,7 +54,7 @@ public class GenreController {
   @PostMapping
   @Operation(summary = "Create a genre.", responses = {
       @ApiResponse(responseCode = "201", description = "Genre created.") })
-  public ResponseEntity<GenreResponse> createGenre(@RequestBody CreateGenreRequest request) {
+  public ResponseEntity<GenreResponse> createGenre(@Valid @RequestBody CreateGenreRequest request) {
     Genre savedGenre = genreService.addGenre(request.toEntity());
     return ResponseEntity.status(HttpStatus.CREATED).body(new GenreResponse(savedGenre));
   }
@@ -56,7 +62,12 @@ public class GenreController {
   @PutMapping(ID)
   @Operation(summary = "Update a genre.", responses = {
       @ApiResponse(responseCode = "200", description = "Genre updated.") })
-  public ResponseEntity<GenreResponse> updateGenre(@RequestBody UpdateGenreRequest request) {
+  public ResponseEntity<GenreResponse> updateGenre(@Parameter(description = "Genre Id.") @PathVariable String id,
+      @Valid @RequestBody UpdateGenreRequest request) {
+    // validate id:
+    if (!id.equals(request.getId())) {
+      throw new BadRequestException("idMismatch", id, request.getId());
+    }
     Genre updatedGenre = genreService.updateGenre(request.toEntity());
     return ResponseEntity.status(HttpStatus.OK).body(new GenreResponse(updatedGenre));
   }
@@ -64,8 +75,8 @@ public class GenreController {
   @DeleteMapping(ID)
   @Operation(summary = "Delete a genre.", responses = {
       @ApiResponse(responseCode = "204", description = "Genre deleted.") })
-  public ResponseEntity<Void> deleteGenre(@PathVariable String id) {
+  public ResponseEntity<Void> deleteGenre(@Parameter(description = "Genre Id.") @PathVariable String id) {
     genreService.deleteGenre(id);
-    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    return ResponseEntity.noContent().build();
   }
 }

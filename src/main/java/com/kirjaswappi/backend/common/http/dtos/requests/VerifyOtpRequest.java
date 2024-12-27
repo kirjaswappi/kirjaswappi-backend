@@ -4,8 +4,11 @@
  */
 package com.kirjaswappi.backend.common.http.dtos.requests;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
 import java.util.Date;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,7 +19,9 @@ import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 @Getter
 @Setter
 public class VerifyOtpRequest {
+  @Schema(description = "Email of the user.", example = "abc@xyz.com", requiredMode = REQUIRED)
   private String email;
+  @Schema(description = "6 digit OTP sent to the email.", example = "123456", requiredMode = REQUIRED)
   private String otp;
 
   public OTP toEntity() {
