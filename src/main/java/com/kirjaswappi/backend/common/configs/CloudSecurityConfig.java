@@ -13,7 +13,6 @@ import static org.springframework.http.HttpMethod.POST;
 import java.util.Arrays;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -26,16 +25,12 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.kirjaswappi.backend.common.components.CustomAuthenticationEntryPoint;
 import com.kirjaswappi.backend.common.components.FilterApiRequest;
 
 @Configuration
 @EnableWebSecurity
 @Profile("cloud")
 public class CloudSecurityConfig {
-  @Autowired
-  private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
-
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
@@ -58,8 +53,6 @@ public class CloudSecurityConfig {
       throws Exception {
     return http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .csrf(csrf -> csrf.disable()) // Disable CSRF protection
-        .exceptionHandling(exceptionHandling -> exceptionHandling
-            .authenticationEntryPoint(customAuthenticationEntryPoint)) // Custom authentication entry point
         .authorizeHttpRequests(authorize -> authorize
             .requestMatchers(HEALTH, API_DOCS, SWAGGER_UI, API_BASE + AUTHENTICATE,
                 API_BASE + AUTHENTICATE + REFRESH)

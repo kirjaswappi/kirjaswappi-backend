@@ -8,11 +8,14 @@ import static com.kirjaswappi.backend.common.utils.Constants.API_BASE;
 import static com.kirjaswappi.backend.common.utils.Constants.AUTHENTICATE;
 import static com.kirjaswappi.backend.common.utils.Constants.REFRESH;
 
+import jakarta.validation.Valid;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,14 +30,17 @@ import com.kirjaswappi.backend.common.service.entities.AdminUser;
 
 @RestController
 @RequestMapping(API_BASE + AUTHENTICATE)
+@Validated
 public class AuthController {
   @Autowired
   private AuthService authService;
 
   @PostMapping
-  @Operation(summary = "Authenticate a user.", description = "Authenticate via system user and generate a JWT token.", responses = {
-      @ApiResponse(responseCode = "200", description = "JWT token generated.") })
-  public ResponseEntity<AuthenticationResponse> createAuthToken(@RequestBody AuthenticationRequest request) {
+  @Operation(summary = "Authenticate an admin user.", description = "Authenticate via admin user and generate a JWT token.", responses = {
+      @ApiResponse(responseCode = "200", description = "JWT token generated."),
+      @ApiResponse(responseCode = "401", description = "Invalid credentials."),
+  })
+  public ResponseEntity<AuthenticationResponse> createAuthToken(@Valid @RequestBody AuthenticationRequest request) {
     AdminUser adminUser = authService.verifyLogin(request.toEntity());
     String jwtToken = authService.generateJwtToken(adminUser);
     String refreshToken = authService.generateRefreshToken(adminUser);
@@ -45,7 +51,7 @@ public class AuthController {
   @Operation(summary = "Refresh an authentication token.", description = "Refresh an authentication token using a refresh token.", responses = {
       @ApiResponse(responseCode = "200", description = "JWT token refreshed.") })
   public ResponseEntity<RefreshAuthenticationResponse> refreshAuthToken(
-      @RequestBody RefreshAuthenticationRequest request) {
+      @Valid @RequestBody RefreshAuthenticationRequest request) {
     String jwtToken = authService.verifyRefreshToken(request.getRefreshToken());
     return ResponseEntity.ok(new RefreshAuthenticationResponse(jwtToken));
   }

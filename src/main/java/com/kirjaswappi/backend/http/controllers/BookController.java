@@ -11,13 +11,17 @@ import static com.kirjaswappi.backend.common.utils.Constants.ID;
 import java.io.IOException;
 import java.util.List;
 
+import jakarta.validation.Valid;
+
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -38,6 +42,7 @@ import com.kirjaswappi.backend.service.filters.GetAllBooksFilter;
 
 @RestController
 @RequestMapping(API_BASE + BOOKS)
+@Validated
 public class BookController {
   @Autowired
   private BookService bookService;
@@ -45,7 +50,7 @@ public class BookController {
   @PostMapping
   @Operation(summary = "Adds a book to a user.", responses = {
       @ApiResponse(responseCode = "201", description = "Book created.") })
-  public ResponseEntity<BookResponse> createBook(@ModelAttribute CreateBookRequest book) throws IOException {
+  public ResponseEntity<BookResponse> createBook(@Valid @ModelAttribute CreateBookRequest book) throws IOException {
     Book savedBook = bookService.createBook(book.toEntity());
     return ResponseEntity.status(HttpStatus.CREATED).body(new BookResponse(savedBook));
   }
@@ -53,7 +58,7 @@ public class BookController {
   @GetMapping(ID)
   @Operation(summary = "Get a book by Book Id.", responses = {
       @ApiResponse(responseCode = "200", description = "Book found.") })
-  public ResponseEntity<BookResponse> getBookById(@PathVariable String id) {
+  public ResponseEntity<BookResponse> getBookById(@Parameter(description = "Book Id.") @PathVariable String id) {
     Book book = bookService.getBookById(id);
     return ResponseEntity.status(HttpStatus.OK).body(new BookResponse(book));
   }
@@ -61,7 +66,7 @@ public class BookController {
   @GetMapping
   @Operation(summary = "Search for books with (optional) filter properties.", responses = {
       @ApiResponse(responseCode = "200", description = "List of Books.") })
-  public ResponseEntity<List<BookListResponse>> getAllBooks(@ParameterObject GetAllBooksFilter filter) {
+  public ResponseEntity<List<BookListResponse>> getAllBooks(@Valid @ParameterObject GetAllBooksFilter filter) {
     List<Book> books = (filter == null) ? bookService.getAllBooks() : bookService.getAllBooksByFilter(filter);
     return ResponseEntity.status(HttpStatus.OK).body(books.stream().map(BookListResponse::new).toList());
   }
@@ -69,20 +74,21 @@ public class BookController {
   @PutMapping(ID)
   @Operation(summary = "Updates a book by Book Id.", responses = {
       @ApiResponse(responseCode = "200", description = "Book updated.") })
-  public ResponseEntity<BookResponse> updateBook(@PathVariable String id, @ModelAttribute UpdateBookRequest book)
+  public ResponseEntity<BookResponse> updateBook(@Parameter(description = "Book Id.") @PathVariable String id,
+      @Valid @ModelAttribute UpdateBookRequest request)
       throws IOException {
     // validate id:
-    if (!id.equals(book.getId())) {
-      throw new BadRequestException("idMismatch", id, book.getId());
+    if (!id.equals(request.getId())) {
+      throw new BadRequestException("idMismatch", id, request.getId());
     }
-    Book updatedBook = bookService.updateBook(book.toEntity());
+    Book updatedBook = bookService.updateBook(request.toEntity());
     return ResponseEntity.status(HttpStatus.OK).body(new BookResponse(updatedBook));
   }
 
   @DeleteMapping(ID)
   @Operation(summary = "Deletes a book by Book Id.", responses = {
       @ApiResponse(responseCode = "204", description = "Book deleted.") })
-  public ResponseEntity<Void> deleteBook(@PathVariable String id) {
+  public ResponseEntity<Void> deleteBook(@Parameter(description = "Book Id.") @PathVariable String id) {
     bookService.deleteBook(id);
     return ResponseEntity.noContent().build();
   }
