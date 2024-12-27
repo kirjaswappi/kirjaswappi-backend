@@ -12,6 +12,8 @@ import com.kirjaswappi.backend.jpa.daos.BookDao;
 import com.kirjaswappi.backend.jpa.daos.GenreDao;
 import com.kirjaswappi.backend.jpa.daos.UserDao;
 import com.kirjaswappi.backend.service.entities.Book;
+import com.kirjaswappi.backend.service.enums.Condition;
+import com.kirjaswappi.backend.service.enums.Language;
 
 @Component
 @NoArgsConstructor
@@ -22,8 +24,8 @@ public class BookMapper {
     book.setTitle(dao.getTitle());
     book.setAuthor(dao.getAuthor());
     book.setDescription(dao.getDescription());
-    book.setLanguage(dao.getLanguage());
-    book.setCondition(dao.getCondition());
+    book.setLanguage(Language.fromString(dao.getLanguage()));
+    book.setCondition(Condition.fromString(dao.getCondition()));
     book.setGenres(dao.getGenres().stream().map(GenreDao::getName).toList());
     if (dao.getCoverPhoto() != null) {
       book.setCoverPhoto(PhotoMapper.toEntity(dao.getCoverPhoto()));
@@ -37,8 +39,8 @@ public class BookMapper {
     book.setTitle(dao.getTitle());
     book.setAuthor(dao.getAuthor());
     book.setDescription(dao.getDescription());
-    book.setLanguage(dao.getLanguage());
-    book.setCondition(dao.getCondition());
+    book.setLanguage(Language.fromString(dao.getLanguage()));
+    book.setCondition(Condition.fromString(dao.getCondition()));
     book.setGenres(dao.getGenres().stream().map(GenreDao::getName).toList());
     if (dao.getCoverPhoto() != null) {
       book.setCoverPhoto(PhotoMapper.toEntity(dao.getCoverPhoto()));
@@ -62,8 +64,8 @@ public class BookMapper {
     dao.setTitle(entity.getTitle());
     dao.setAuthor(entity.getAuthor());
     dao.setDescription(entity.getDescription());
-    dao.setLanguage(entity.getLanguage());
-    dao.setCondition(entity.getCondition());
+    dao.setLanguage(entity.getLanguage().name());
+    dao.setCondition(entity.getCondition().name());
     return dao;
   }
 }

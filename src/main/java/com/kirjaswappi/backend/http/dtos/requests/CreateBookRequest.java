@@ -19,6 +19,8 @@ import com.kirjaswappi.backend.http.validations.ValidationUtil;
 import com.kirjaswappi.backend.service.entities.Book;
 import com.kirjaswappi.backend.service.entities.Photo;
 import com.kirjaswappi.backend.service.entities.User;
+import com.kirjaswappi.backend.service.enums.Condition;
+import com.kirjaswappi.backend.service.enums.Language;
 import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 
 @Getter
@@ -47,8 +49,8 @@ public class CreateBookRequest {
     book.setTitle(title);
     book.setAuthor(author);
     book.setDescription(description);
-    book.setLanguage(language);
-    book.setCondition(condition);
+    book.setLanguage(Language.fromString(language));
+    book.setCondition(Condition.fromString(condition));
     book.setGenres(genres);
     var photo = new Photo();
     photo.setFile(coverPhoto);

@@ -28,9 +28,9 @@ public class BookListResponse {
     this.title = entity.getTitle();
     this.author = entity.getAuthor();
     this.genres = entity.getGenres();
-    this.language = entity.getLanguage();
+    this.language = entity.getLanguage().name();
     this.description = entity.getDescription();
-    this.condition = entity.getCondition();
+    this.condition = entity.getCondition().name();
     this.coverPhoto = entity.getCoverPhoto() != null ? entity.getCoverPhoto().getFileBytes() : null;
   }
 }

@@ -7,6 +7,8 @@ package com.kirjaswappi.backend.http.controllers;
 import static com.kirjaswappi.backend.common.utils.Constants.API_BASE;
 import static com.kirjaswappi.backend.common.utils.Constants.BOOKS;
 import static com.kirjaswappi.backend.common.utils.Constants.ID;
+import static com.kirjaswappi.backend.common.utils.Constants.SUPPORTED_CONDITIONS;
+import static com.kirjaswappi.backend.common.utils.Constants.SUPPORTED_LANGUAGES;
 
 import java.io.IOException;
 import java.util.List;
@@ -37,6 +39,8 @@ import com.kirjaswappi.backend.http.dtos.responses.BookListResponse;
 import com.kirjaswappi.backend.http.dtos.responses.BookResponse;
 import com.kirjaswappi.backend.service.BookService;
 import com.kirjaswappi.backend.service.entities.Book;
+import com.kirjaswappi.backend.service.enums.Condition;
+import com.kirjaswappi.backend.service.enums.Language;
 import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 import com.kirjaswappi.backend.service.filters.GetAllBooksFilter;
 
@@ -61,6 +65,20 @@ public class BookController {
   public ResponseEntity<BookResponse> getBookById(@Parameter(description = "Book Id.") @PathVariable String id) {
     Book book = bookService.getBookById(id);
     return ResponseEntity.status(HttpStatus.OK).body(new BookResponse(book));
+  }
+
+  @GetMapping(SUPPORTED_LANGUAGES)
+  @Operation(summary = "Get a list of supported languages.", responses = {
+      @ApiResponse(responseCode = "200", description = "List of supported languages.") })
+  public ResponseEntity<List<String>> getAllSupportedLanguges() {
+    return ResponseEntity.status(HttpStatus.OK).body(Language.getSupportedLanguages());
+  }
+
+  @GetMapping(SUPPORTED_CONDITIONS)
+  @Operation(summary = "Get a list of supported book conditions.", responses = {
+      @ApiResponse(responseCode = "200", description = "List of supported conditions.") })
+  public ResponseEntity<List<String>> getAllSupportedConditions() {
+    return ResponseEntity.status(HttpStatus.OK).body(Condition.getSupportedConditions());
   }
 
   @GetMapping
