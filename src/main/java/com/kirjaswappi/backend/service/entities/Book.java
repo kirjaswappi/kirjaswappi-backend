@@ -11,6 +11,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.kirjaswappi.backend.service.enums.Condition;
 import com.kirjaswappi.backend.service.enums.Language;
 
@@ -26,6 +28,7 @@ public class Book {
   private Language language;
   private Condition condition;
   private List<String> genres;
-  private Photo coverPhoto;
+  private String coverPhoto;
+  private MultipartFile coverPhotoFile;
   private User owner;
 }

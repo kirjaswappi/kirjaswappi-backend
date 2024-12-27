@@ -10,7 +10,6 @@ import static com.kirjaswappi.backend.common.utils.Constants.ID;
 import static com.kirjaswappi.backend.common.utils.Constants.SUPPORTED_CONDITIONS;
 import static com.kirjaswappi.backend.common.utils.Constants.SUPPORTED_LANGUAGES;
 
-import java.io.IOException;
 import java.util.List;
 
 import jakarta.validation.Valid;
@@ -54,7 +53,7 @@ public class BookController {
   @PostMapping
   @Operation(summary = "Adds a book to a user.", responses = {
       @ApiResponse(responseCode = "201", description = "Book created.") })
-  public ResponseEntity<BookResponse> createBook(@Valid @ModelAttribute CreateBookRequest book) throws IOException {
+  public ResponseEntity<BookResponse> createBook(@Valid @ModelAttribute CreateBookRequest book) {
     Book savedBook = bookService.createBook(book.toEntity());
     return ResponseEntity.status(HttpStatus.CREATED).body(new BookResponse(savedBook));
   }
@@ -62,7 +61,8 @@ public class BookController {
   @GetMapping(ID)
   @Operation(summary = "Get a book by Book Id.", responses = {
       @ApiResponse(responseCode = "200", description = "Book found.") })
-  public ResponseEntity<BookResponse> getBookById(@Parameter(description = "Book Id.") @PathVariable String id) {
+  public ResponseEntity<BookResponse> getBookById(@Parameter(description = "Book Id.") @PathVariable String id)
+      throws Exception {
     Book book = bookService.getBookById(id);
     return ResponseEntity.status(HttpStatus.OK).body(new BookResponse(book));
   }
@@ -70,7 +70,7 @@ public class BookController {
   @GetMapping(SUPPORTED_LANGUAGES)
   @Operation(summary = "Get a list of supported languages.", responses = {
       @ApiResponse(responseCode = "200", description = "List of supported languages.") })
-  public ResponseEntity<List<String>> getAllSupportedLanguges() {
+  public ResponseEntity<List<String>> getAllSupportedLanguages() {
     return ResponseEntity.status(HttpStatus.OK).body(Language.getSupportedLanguages());
   }
 
@@ -93,8 +93,7 @@ public class BookController {
   @Operation(summary = "Updates a book by Book Id.", responses = {
       @ApiResponse(responseCode = "200", description = "Book updated.") })
   public ResponseEntity<BookResponse> updateBook(@Parameter(description = "Book Id.") @PathVariable String id,
-      @Valid @ModelAttribute UpdateBookRequest request)
-      throws IOException {
+      @Valid @ModelAttribute UpdateBookRequest request) {
     // validate id:
     if (!id.equals(request.getId())) {
       throw new BadRequestException("idMismatch", id, request.getId());
@@ -106,7 +105,8 @@ public class BookController {
   @DeleteMapping(ID)
   @Operation(summary = "Deletes a book by Book Id.", responses = {
       @ApiResponse(responseCode = "204", description = "Book deleted.") })
-  public ResponseEntity<Void> deleteBook(@Parameter(description = "Book Id.") @PathVariable String id) {
+  public ResponseEntity<Void> deleteBook(@Parameter(description = "Book Id.") @PathVariable String id)
+      throws Exception {
     bookService.deleteBook(id);
     return ResponseEntity.noContent().build();
   }

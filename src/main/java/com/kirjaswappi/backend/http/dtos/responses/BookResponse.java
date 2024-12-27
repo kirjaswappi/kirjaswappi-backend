@@ -22,7 +22,7 @@ public class BookResponse {
   private String language;
   private String description;
   private String condition;
-  private byte[] coverPhoto;
+  private String coverPhotoUrl;
   private OwnerResponse owner;
 
   public BookResponse(Book entity) {
@@ -33,7 +33,7 @@ public class BookResponse {
     this.language = entity.getLanguage().name();
     this.description = entity.getDescription();
     this.condition = entity.getCondition().name();
-    this.coverPhoto = entity.getCoverPhoto() == null ? null : entity.getCoverPhoto().getFileBytes();
+    this.coverPhotoUrl = entity.getCoverPhoto() == null ? null : entity.getCoverPhoto();
     this.owner = new OwnerResponse(entity.getOwner());
   }
 

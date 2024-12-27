@@ -4,7 +4,6 @@
  */
 package com.kirjaswappi.backend.service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -18,10 +17,10 @@ import com.kirjaswappi.backend.jpa.repositories.BookRepository;
 import com.kirjaswappi.backend.jpa.repositories.GenreRepository;
 import com.kirjaswappi.backend.jpa.repositories.UserRepository;
 import com.kirjaswappi.backend.mapper.BookMapper;
-import com.kirjaswappi.backend.mapper.PhotoMapper;
 import com.kirjaswappi.backend.service.entities.Book;
 import com.kirjaswappi.backend.service.exceptions.BookNotFoundException;
 import com.kirjaswappi.backend.service.exceptions.GenreNotFoundException;
+import com.kirjaswappi.backend.service.exceptions.ResourceNotFoundException;
 import com.kirjaswappi.backend.service.exceptions.UserNotFoundException;
 import com.kirjaswappi.backend.service.filters.GetAllBooksFilter;
 
@@ -37,27 +36,27 @@ public class BookService {
   @Autowired
   private PhotoService photoService;
 
-  public Book createBook(Book book) throws IOException {
+  public Book createBook(Book book) {
     var bookDao = BookMapper.toDao(book);
     addGenresToBook(book, bookDao);
     setOwnerToBook(book, bookDao);
-    var photoBytes = addCoverPhotoToBook(book, bookDao);
+    addCoverPhotoToBook(book, bookDao);
     var savedDao = bookRepository.save(bookDao);
     addBookToOwner(savedDao);
-    return buildBookWithPhoto(savedDao, photoBytes);
+    return BookMapper.setOwner(savedDao.getOwner(), book);
   }
 
-  public Book updateBook(Book book) throws IOException {
+  public Book updateBook(Book book) {
     var dao = BookMapper.toDao(book);
     setOwnerToBook(book, dao);
     addGenresToBook(book, dao);
-    var photoBytes = addCoverPhotoToBook(book, dao);
+    addCoverPhotoToBook(book, dao);
     var updatedBookDao = bookRepository.save(dao);
     addBookToOwner(updatedBookDao);
-    return buildBookWithPhoto(updatedBookDao, photoBytes);
+    return BookMapper.setOwner(updatedBookDao.getOwner(), book);
   }
 
-  public Book getBookById(String id) {
+  public Book getBookById(String id) throws Exception {
     var bookDao = bookRepository.findById(id)
         .orElseThrow(() -> new BookNotFoundException(id));
     var book = BookMapper.toEntity(bookDao, photoService.getBookCoverById(id));
@@ -66,12 +65,26 @@ public class BookService {
 
   public List<Book> getAllBooks() {
     return bookRepository.findAll().stream().map(
-        bookDao -> BookMapper.toEntity(bookDao, photoService.getBookCoverById(bookDao.getId()))).toList();
+        bookDao -> {
+          try {
+            var imageUrl = photoService.getBookCoverById(bookDao.getId());
+            return BookMapper.toEntity(bookDao, imageUrl);
+          } catch (Exception e) {
+            throw new ResourceNotFoundException("Book cover photo not found", bookDao.getId());
+          }
+        }).toList();
   }
 
   public List<Book> getAllBooksByFilter(GetAllBooksFilter filter) {
     return bookRepository.findAllBooksByFilter(filter).stream().map(
-        bookDao -> BookMapper.toEntity(bookDao, photoService.getBookCoverById(bookDao.getId()))).toList();
+        bookDao -> {
+          try {
+            var imageUrl = photoService.getBookCoverById(bookDao.getId());
+            return BookMapper.toEntity(bookDao, imageUrl);
+          } catch (Exception e) {
+            throw new ResourceNotFoundException("Book cover photo not found", bookDao.getId());
+          }
+        }).toList();
   }
 
   public void deleteBook(String id) {
@@ -102,12 +115,9 @@ public class BookService {
         .toList());
   }
 
-  private byte[] addCoverPhotoToBook(Book book, BookDao dao) throws IOException {
-    deleteExistingCoverPhoto(dao);
-    assert book.getCoverPhoto() != null;
-    var photo = photoService.addBookCoverPhoto(book.getCoverPhoto().getFile());
-    dao.setCoverPhoto(PhotoMapper.toDao(photo));
-    return photo.getFileBytes();
+  private void addCoverPhotoToBook(Book book, BookDao dao) {
+    String coverPhoto = photoService.addBookCoverPhoto(book.getCoverPhotoFile());
+    dao.setCoverPhoto(coverPhoto);
   }
 
   private void deleteExistingCoverPhoto(BookDao dao) {
@@ -125,12 +135,5 @@ public class BookService {
           .toList());
       userRepository.save(owner);
     }
-  }
-
-  private Book buildBookWithPhoto(BookDao bookDao, byte[] photoBytes) {
-    var book = BookMapper.toEntity(bookDao);
-    assert book.getCoverPhoto() != null;
-    book.getCoverPhoto().setFileBytes(photoBytes);
-    return BookMapper.setOwner(bookDao.getOwner(), book);
   }
 }

@@ -49,7 +49,7 @@ public class BookDao {
 
   @NotNull
   @DBRef
-  private PhotoDao coverPhoto;
+  private String coverPhoto;
 
   @NotNull
   @DBRef

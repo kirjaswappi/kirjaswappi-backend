@@ -34,9 +34,9 @@ public class User {
   private String aboutMe;
   private List<String> favGenres;
   @Nullable
-  private Photo profilePhoto;
+  private String profilePhoto;
   @Nullable
-  private Photo coverPhoto;
+  private String coverPhoto;
   @Nullable
   private List<Book> books;
 
