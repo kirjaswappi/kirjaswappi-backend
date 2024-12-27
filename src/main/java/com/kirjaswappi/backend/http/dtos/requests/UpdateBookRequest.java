@@ -17,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.kirjaswappi.backend.http.validations.ValidationUtil;
 import com.kirjaswappi.backend.service.entities.Book;
-import com.kirjaswappi.backend.service.entities.Photo;
 import com.kirjaswappi.backend.service.enums.Condition;
 import com.kirjaswappi.backend.service.enums.Language;
 import com.kirjaswappi.backend.service.exceptions.BadRequestException;
@@ -52,9 +51,7 @@ public class UpdateBookRequest {
     book.setLanguage(Language.fromString(language));
     book.setCondition(Condition.fromString(condition));
     book.setGenres(genres);
-    var photo = new Photo();
-    photo.setFile(coverPhoto);
-    book.setCoverPhoto(photo);
+    book.setCoverPhotoFile(coverPhoto);
     return book;
   }
 

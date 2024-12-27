@@ -16,3 +16,9 @@ springdoc:
 server:
   forward-headers-strategy: native
   port: 10000
+
+s3:
+  url: ${S3_URL}
+  bucket: kirjaswappi
+  accessKey: ${S3_ACCESS_KEY}
+  secretKey: ${S3_SECRET_KEY}

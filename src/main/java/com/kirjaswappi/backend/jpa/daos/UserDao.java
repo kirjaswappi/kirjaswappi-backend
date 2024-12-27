@@ -72,12 +72,10 @@ public class UserDao {
   private List<GenreDao> favGenres;
 
   @Nullable
-  @DBRef
-  private PhotoDao profilePhoto;
+  private String profilePhoto;
 
   @Nullable
-  @DBRef
-  private PhotoDao coverPhoto;
+  private String coverPhoto;
 
   @Nullable
   @DBRef

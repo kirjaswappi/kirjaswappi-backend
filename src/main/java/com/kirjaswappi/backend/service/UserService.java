@@ -28,6 +28,8 @@ public class UserService {
   UserRepository userRepository;
   @Autowired
   GenreRepository genreRepository;
+  @Autowired
+  PhotoService photoService;
 
   public User addUser(User user) {
     this.checkUserExistButNotVerified(user);
@@ -61,12 +63,27 @@ public class UserService {
   }
 
   public User getUser(String id) {
-    return UserMapper.toEntity(userRepository.findById(id)
-        .orElseThrow(() -> new UserNotFoundException(id)));
+    var userDao = userRepository.findById(id)
+        .orElseThrow(() -> new UserNotFoundException(id));
+    if (userDao.getBooks() != null) {
+      userDao.getBooks().forEach(bookDao -> {
+        var imageUrl = photoService.getBookCoverPhoto(bookDao.getCoverPhoto());
+        bookDao.setCoverPhoto(imageUrl);
+      });
+    }
+    return UserMapper.toEntity(userDao);
   }
 
   public List<User> getUsers() {
-    return userRepository.findAll().stream().map(UserMapper::toEntity).toList();
+    return userRepository.findAll().stream().map(userDao -> {
+      if (userDao.getBooks() != null) {
+        userDao.getBooks().forEach(bookDao -> {
+          var imageUrl = photoService.getBookCoverPhoto(bookDao.getCoverPhoto());
+          bookDao.setCoverPhoto(imageUrl);
+        });
+      }
+      return UserMapper.toEntity(userDao);
+    }).toList();
   }
 
   public void deleteUser(String id) {

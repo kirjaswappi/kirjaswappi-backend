@@ -4,8 +4,10 @@
  */
 package com.kirjaswappi.backend.http.validations;
 
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.kirjaswappi.backend.service.exceptions.UnsupportedMediaTypeException;
@@ -28,11 +30,12 @@ public class ValidationUtil {
   }
 
   public static void validateMediaType(MultipartFile image) {
-    String fileEnding = "([^\\s]+(\\.(?i)(jpg|jpeg|png|gif|bmp))$)";
+    String[] allowedExtensions = { "jpg", "jpeg", "png", "gif", "bmp", "webp", "heic" };
     String contentType = image.getContentType();
-    String fileName = image.getOriginalFilename();
+    String fileExtension = FilenameUtils.getExtension(image.getOriginalFilename());
+
     if (contentType == null || !contentType.startsWith("image/") ||
-        fileName == null || !fileName.matches(fileEnding)) {
+        fileExtension == null || !Arrays.asList(allowedExtensions).contains(fileExtension.toLowerCase())) {
       throw new UnsupportedMediaTypeException(image);
     }
   }

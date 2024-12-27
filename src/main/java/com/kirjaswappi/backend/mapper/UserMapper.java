@@ -32,8 +32,8 @@ public class UserMapper {
     if (dao.getFavGenres() != null) {
       entity.setFavGenres(dao.getFavGenres().stream().map(GenreDao::getName).toList());
     }
-    entity.setProfilePhoto(dao.getProfilePhoto() != null ? PhotoMapper.toEntity(dao.getProfilePhoto()) : null);
-    entity.setCoverPhoto(dao.getCoverPhoto() != null ? PhotoMapper.toEntity(dao.getCoverPhoto()) : null);
+    entity.setProfilePhoto(dao.getProfilePhoto() != null ? dao.getProfilePhoto() : null);
+    entity.setCoverPhoto(dao.getCoverPhoto() != null ? dao.getCoverPhoto() : null);
     entity.setBooks(dao.getBooks() != null ? dao.getBooks().stream().map(BookMapper::toEntity).toList() : null);
     return entity;
   }

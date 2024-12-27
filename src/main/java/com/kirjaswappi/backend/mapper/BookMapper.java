@@ -28,12 +28,12 @@ public class BookMapper {
     book.setCondition(Condition.fromString(dao.getCondition()));
     book.setGenres(dao.getGenres().stream().map(GenreDao::getName).toList());
     if (dao.getCoverPhoto() != null) {
-      book.setCoverPhoto(PhotoMapper.toEntity(dao.getCoverPhoto()));
+      book.setCoverPhoto(dao.getCoverPhoto());
     }
     return book;
   }
 
-  public static Book toEntity(BookDao dao, byte[] fileBytes) {
+  public static Book toEntity(BookDao dao, String imageUrl) {
     var book = new Book();
     book.setId(dao.getId());
     book.setTitle(dao.getTitle());
@@ -42,11 +42,7 @@ public class BookMapper {
     book.setLanguage(Language.fromString(dao.getLanguage()));
     book.setCondition(Condition.fromString(dao.getCondition()));
     book.setGenres(dao.getGenres().stream().map(GenreDao::getName).toList());
-    if (dao.getCoverPhoto() != null) {
-      book.setCoverPhoto(PhotoMapper.toEntity(dao.getCoverPhoto()));
-      assert book.getCoverPhoto() != null;
-      book.getCoverPhoto().setFileBytes(fileBytes);
-    }
+    book.setCoverPhoto(imageUrl);
     return book;
   }
 

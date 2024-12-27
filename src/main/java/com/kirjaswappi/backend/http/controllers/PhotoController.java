@@ -13,8 +13,6 @@ import static com.kirjaswappi.backend.common.utils.Constants.ID;
 import static com.kirjaswappi.backend.common.utils.Constants.PHOTOS;
 import static com.kirjaswappi.backend.common.utils.Constants.PROFILE_PHOTO;
 
-import java.io.IOException;
-
 import jakarta.validation.Valid;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,8 +20,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,8 +31,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kirjaswappi.backend.http.dtos.requests.CreatePhotoRequest;
+import com.kirjaswappi.backend.http.dtos.responses.PhotoResponse;
 import com.kirjaswappi.backend.service.PhotoService;
-import com.kirjaswappi.backend.service.entities.Photo;
 
 @RestController
 @RequestMapping(API_BASE + PHOTOS)
@@ -48,17 +44,17 @@ public class PhotoController {
   @PostMapping(PROFILE_PHOTO)
   @Operation(summary = "Add a profile photo.", description = "Add a profile photo to a user.", responses = {
       @ApiResponse(responseCode = "200", description = "Profile Photo Added.") })
-  public ResponseEntity<byte[]> addProfilePhoto(@Valid @ModelAttribute CreatePhotoRequest request) throws IOException {
-    Photo photo = photoService.addProfilePhoto(request.getUserId(), request.getImage());
-    return getPhotoResponse(photo.getFileBytes());
+  public ResponseEntity<PhotoResponse> addProfilePhoto(@Valid @ModelAttribute CreatePhotoRequest request) {
+    var imageUrl = photoService.addProfilePhoto(request.getUserId(), request.getImage());
+    return ResponseEntity.ok(new PhotoResponse(imageUrl));
   }
 
   @PostMapping(COVER_PHOTO)
   @Operation(summary = "Add a cover photo.", description = "Add a cover photo to a user.", responses = {
       @ApiResponse(responseCode = "200", description = "Cover Photo Added.") })
-  public ResponseEntity<byte[]> addCoverPhoto(@Valid @ModelAttribute CreatePhotoRequest request) throws IOException {
-    Photo photo = photoService.addCoverPhoto(request.getUserId(), request.getImage());
-    return getPhotoResponse(photo.getFileBytes());
+  public ResponseEntity<PhotoResponse> addCoverPhoto(@Valid @ModelAttribute CreatePhotoRequest request) {
+    var imageUrl = photoService.addCoverPhoto(request.getUserId(), request.getImage());
+    return ResponseEntity.ok(new PhotoResponse(imageUrl));
   }
 
   @DeleteMapping(PROFILE_PHOTO + ID)
@@ -80,37 +76,35 @@ public class PhotoController {
   @GetMapping(PROFILE_PHOTO + BY_EMAIL + EMAIL)
   @Operation(summary = "Get a profile photo by email.", description = "Get a profile photo of a user by email.", responses = {
       @ApiResponse(responseCode = "200", description = "Profile Photo Found.") })
-  public ResponseEntity<byte[]> getProfilePhotoByEmail(
+  public ResponseEntity<PhotoResponse> getProfilePhotoByEmail(
       @Parameter(description = "User Email.") @PathVariable String email) {
-    return getPhotoResponse(photoService.getPhotoByUserEmail(email, true));
+    var imageUrl = photoService.getPhotoByUserEmail(email, true);
+    return ResponseEntity.ok(new PhotoResponse(imageUrl));
   }
 
   @GetMapping(COVER_PHOTO + BY_EMAIL + EMAIL)
   @Operation(summary = "Get a cover photo by email.", description = "Get a cover photo of a user by email.", responses = {
       @ApiResponse(responseCode = "200", description = "Cover Photo Found.") })
-  public ResponseEntity<byte[]> getCoverPhotoByEmail(
+  public ResponseEntity<PhotoResponse> getCoverPhotoByEmail(
       @Parameter(description = "User Email.") @PathVariable String email) {
-    return getPhotoResponse(photoService.getPhotoByUserEmail(email, false));
+    var imageUrl = photoService.getPhotoByUserEmail(email, false);
+    return ResponseEntity.ok(new PhotoResponse(imageUrl));
   }
 
   @GetMapping(PROFILE_PHOTO + BY_ID + ID)
   @Operation(summary = "Get a profile photo by user id.", description = "Get a profile photo of a user by user id.", responses = {
       @ApiResponse(responseCode = "200", description = "Profile Photo Found.") })
-  public ResponseEntity<byte[]> getProfilePhotoById(@Parameter(description = "User Id.") @PathVariable String id) {
-    return getPhotoResponse(photoService.getPhotoByUserId(id, true));
+  public ResponseEntity<PhotoResponse> getProfilePhotoById(
+      @Parameter(description = "User Id.") @PathVariable String id) {
+    var imageUrl = photoService.getPhotoByUserId(id, true);
+    return ResponseEntity.ok(new PhotoResponse(imageUrl));
   }
 
   @GetMapping(COVER_PHOTO + BY_ID + ID)
   @Operation(summary = "Get a cover photo by user id.", description = "Get a cover photo of a user by user id.", responses = {
       @ApiResponse(responseCode = "200", description = "Cover Photo Found.") })
-  public ResponseEntity<byte[]> getCoverPhotoById(@Parameter(description = "User Id.") @PathVariable String id) {
-    return getPhotoResponse(photoService.getPhotoByUserId(id, false));
-  }
-
-  private ResponseEntity<byte[]> getPhotoResponse(byte[] photoBytes) {
-    return ResponseEntity.ok()
-        .contentType(MediaType.IMAGE_JPEG)
-        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=photo.jpg")
-        .body(photoBytes);
+  public ResponseEntity<PhotoResponse> getCoverPhotoById(@Parameter(description = "User Id.") @PathVariable String id) {
+    var imageUrl = photoService.getPhotoByUserId(id, false);
+    return ResponseEntity.ok(new PhotoResponse(imageUrl));
   }
 }

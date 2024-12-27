@@ -21,7 +21,7 @@ public class BookListResponse {
   private String language;
   private String description;
   private String condition;
-  private byte[] coverPhoto;
+  private String coverPhotoUrl;
 
   public BookListResponse(Book entity) {
     this.id = entity.getId();
@@ -31,6 +31,6 @@ public class BookListResponse {
     this.language = entity.getLanguage().name();
     this.description = entity.getDescription();
     this.condition = entity.getCondition().name();
-    this.coverPhoto = entity.getCoverPhoto() != null ? entity.getCoverPhoto().getFileBytes() : null;
+    this.coverPhotoUrl = entity.getCoverPhoto() != null ? entity.getCoverPhoto() : null;
   }
 }
