@@ -38,11 +38,14 @@ import com.kirjaswappi.backend.common.utils.JwtUtil;
 @Component
 @Profile("cloud")
 public class FilterApiRequest extends OncePerRequestFilter {
+  private static final Logger logger = LoggerFactory.getLogger(FilterApiRequest.class);
+
   @Autowired
   private AdminUserService adminUserService;
   @Autowired
   private ErrorUtils errorUtils;
-  private static final Logger logger = LoggerFactory.getLogger(ErrorUtils.class);
+  @Autowired
+  private JwtUtil jwtUtil;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -80,9 +83,9 @@ public class FilterApiRequest extends OncePerRequestFilter {
 
   private void validateTokenAndUser(HttpServletRequest request, String jwt) {
     try {
-      String username = JwtUtil.extractUsername(jwt);
+      String username = jwtUtil.extractUsername(jwt);
       AdminUser userDetails = adminUserService.getAdminUserInfo(username);
-      if (JwtUtil.validateJwtToken(jwt, userDetails))
+      if (jwtUtil.validateJwtToken(jwt, userDetails))
         setAuthentication(request, jwt, userDetails);
     } catch (MalformedJwtException | ExpiredJwtException | AuthenticationException e) {
       logger.warn(e.getMessage());
@@ -98,7 +101,7 @@ public class FilterApiRequest extends OncePerRequestFilter {
 
   private UsernamePasswordAuthenticationToken createAuthenticationToken(String jwt, AdminUser userDetails,
       HttpServletRequest request) {
-    String role = JwtUtil.extractRole(jwt);
+    String role = jwtUtil.extractRole(jwt);
     List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
         userDetails, null, authorities);

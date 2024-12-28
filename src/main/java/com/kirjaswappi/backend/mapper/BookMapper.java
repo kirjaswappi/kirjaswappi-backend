@@ -24,8 +24,8 @@ public class BookMapper {
     book.setTitle(dao.getTitle());
     book.setAuthor(dao.getAuthor());
     book.setDescription(dao.getDescription());
-    book.setLanguage(Language.fromString(dao.getLanguage()));
-    book.setCondition(Condition.fromString(dao.getCondition()));
+    book.setLanguage(Language.fromCode(dao.getLanguage()));
+    book.setCondition(Condition.fromCode(dao.getCondition()));
     book.setGenres(dao.getGenres().stream().map(GenreDao::getName).toList());
     if (dao.getCoverPhoto() != null) {
       book.setCoverPhoto(dao.getCoverPhoto());
@@ -39,8 +39,8 @@ public class BookMapper {
     book.setTitle(dao.getTitle());
     book.setAuthor(dao.getAuthor());
     book.setDescription(dao.getDescription());
-    book.setLanguage(Language.fromString(dao.getLanguage()));
-    book.setCondition(Condition.fromString(dao.getCondition()));
+    book.setLanguage(Language.fromCode(dao.getLanguage()));
+    book.setCondition(Condition.fromCode(dao.getCondition()));
     book.setGenres(dao.getGenres().stream().map(GenreDao::getName).toList());
     book.setCoverPhoto(imageUrl);
     return book;

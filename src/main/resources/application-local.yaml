@@ -16,3 +16,7 @@ s3:
   bucket: kirjaswappi
   accessKey: test
   secretKey: test
+
+jwt:
+  secret: abcdefghijklmnopqrstuvwxyz1234567890
+  expiration: 300000

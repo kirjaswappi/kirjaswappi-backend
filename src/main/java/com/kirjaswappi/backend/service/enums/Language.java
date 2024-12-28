@@ -4,83 +4,50 @@
  */
 package com.kirjaswappi.backend.service.enums;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import lombok.Getter;
+
 import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 
+@Getter
 public enum Language {
-  ENGLISH,
-  FINNISH,
-  SWEDISH,
-  GERMAN,
-  FRENCH,
-  SPANISH,
-  ITALIAN,
-  RUSSIAN,
-  CHINESE,
-  JAPANESE,
-  KOREAN,
-  HINDI,
-  BENGALI,
-  PUNJABI,
-  URDU,
-  TAMIL,
-  TELUGU,
-  MARATHI,
-  GUJARATI,
-  KANNADA,
-  MALAYALAM,
-  ORIYA,
-  ASSAMESE,
-  MAITHILI,
-  SANTALI,
-  KASHMIRI,
-  NEPALI,
-  SINDHI,
-  SANSKRIT,
-  ARABIC,
-  PERSIAN,
-  TURKISH,
-  GREEK,
-  HEBREW,
-  LATIN,
-  SWAHILI,
-  ZULU,
-  AFRIKAANS,
-  XHOSA,
-  SESOTHO,
-  TSONGA,
-  TSWANA,
-  VENDA,
-  AMHARIC,
-  OROMO,
-  SOMALI,
-  YORUBA,
-  IGBO,
-  HAUSA,
-  AKAN,
-  KIKUYU,
-  KINYARWANDA,
-  LUGANDA,
-  SHONA,
-  CHICHEWA,
-  KIRUNDI,
-  LINGALA,
-  MALAGASY,
-  SWAZI,
-  TIGRINYA,
-  WOLOF,
-  OTHER;
+  ENGLISH("English"),
+  FINNISH("Finnish"),
+  SWEDISH("Swedish"),
+  GERMAN("German"),
+  FRENCH("French"),
+  SPANISH("Spanish"),
+  ITALIAN("Italian"),
+  RUSSIAN("Russian"),
+  CHINESE("Chinese"),
+  JAPANESE("Japanese"),
+  KOREAN("Korean"),
+  HINDI("Hindi"),
+  BENGALI("Bengali"),
+  ARABIC("Arabic"),
+  PERSIAN("Persian"),
+  TURKISH("Turkish"),
+  GREEK("Greek"),
+  LATIN("Latin"),
+  OTHER("Other");
 
-  public static Language fromString(String language) {
-    for (Language l : Language.values()) {
-      if (l.name().equalsIgnoreCase(language)) {
-        return l;
-      }
-    }
-    throw new BadRequestException("invalidLanguage", language);
+  private final String code;
+
+  Language(String code) {
+    this.code = code;
+  }
+
+  public static Language fromCode(String code) {
+    Objects.requireNonNull(code);
+    return Arrays.stream(Language.values())
+        .filter(l -> l.getCode().equals(code))
+        .findFirst()
+        .orElseThrow(() -> new BadRequestException("invalidLanguage", code));
   }
 
   public static List<String> getSupportedLanguages() {
