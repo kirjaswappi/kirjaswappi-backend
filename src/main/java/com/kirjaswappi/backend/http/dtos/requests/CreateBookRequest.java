@@ -48,8 +48,8 @@ public class CreateBookRequest {
     book.setTitle(title);
     book.setAuthor(author);
     book.setDescription(description);
-    book.setLanguage(Language.fromString(language));
-    book.setCondition(Condition.fromString(condition));
+    book.setLanguage(Language.fromCode(language));
+    book.setCondition(Condition.fromCode(condition));
     book.setGenres(genres);
     book.setCoverPhotoFile(coverPhoto);
     var user = new User();

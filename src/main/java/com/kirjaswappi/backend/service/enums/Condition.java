@@ -4,29 +4,38 @@
  */
 package com.kirjaswappi.backend.service.enums;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
+
+import lombok.Getter;
 
 import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 
+@Getter
 public enum Condition {
-  NEW,
-  LIKE_NEW,
-  GOOD,
-  FAIR,
-  POOR,
-  UNREADABLE;
+  NEW("New"),
+  LIKE_NEW("Like New"),
+  GOOD("Good"),
+  FAIR("Fair"),
+  POOR("Poor");
 
-  public static Condition fromString(String condition) {
-    for (Condition c : Condition.values()) {
-      if (c.name().equalsIgnoreCase(condition)) {
-        return c;
-      }
-    }
-    throw new BadRequestException("invalidCondition", condition);
+  private final String code;
+
+  Condition(String code) {
+    this.code = code;
+  }
+
+  public static Condition fromCode(String code) {
+    Objects.requireNonNull(code);
+    return Arrays.stream(Condition.values())
+        .filter(c -> c.getCode().equalsIgnoreCase(code))
+        .findFirst()
+        .orElseThrow(() -> new BadRequestException("invalidCondition", code));
   }
 
   public static List<String> getSupportedConditions() {
-    return Stream.of(Condition.values()).map(Enum::name).toList();
+    return Stream.of(Condition.values()).map(Condition::getCode).toList();
   }
 }

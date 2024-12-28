@@ -17,7 +17,7 @@ public class GetAllBooksFilter {
       "English", "Bengali", "Hindi", "Spanish", "French", "German", "Russian", "Arabic", "Chinese", "Japanese" })
   String language;
   @Schema(description = "Filter parameter for the condition of the book.", example = "New", allowableValues = {
-      "New", "Like New", "Very Good", "Good", "Acceptable" })
+      "New", "Like New", "Good", "Fair", "Poor" })
   String condition;
   @Schema(description = "Filter parameter for the genre of the book.", example = "Fantasy", allowableValues = {
       "Fantasy", "Science Fiction", "Mystery", "Horror", "Romance", "Thriller", "Historical Fiction", "Non-Fiction" })

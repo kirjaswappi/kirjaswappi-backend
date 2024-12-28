@@ -16,6 +16,8 @@ import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 @Transactional
 public class AuthService {
   @Autowired
+  private JwtUtil jwtUtil;
+  @Autowired
   private AdminUserService adminUserService;
 
   public AdminUser verifyLogin(AdminUser user) {
@@ -24,18 +26,18 @@ public class AuthService {
   }
 
   public String generateJwtToken(AdminUser adminUser) {
-    return JwtUtil.generateJwtToken(adminUser);
+    return jwtUtil.generateJwtToken(adminUser);
   }
 
   public String generateRefreshToken(AdminUser adminUser) {
-    return JwtUtil.generateRefreshToken(adminUser);
+    return jwtUtil.generateRefreshToken(adminUser);
   }
 
   public String verifyRefreshToken(String refreshToken) {
-    String username = JwtUtil.extractUsername(refreshToken);
+    String username = jwtUtil.extractUsername(refreshToken);
     AdminUser userDetails = adminUserService.getAdminUserInfo(username);
-    if (JwtUtil.validateRefreshToken(refreshToken, userDetails)) {
-      return JwtUtil.generateJwtToken(userDetails);
+    if (jwtUtil.validateRefreshToken(refreshToken, userDetails)) {
+      return jwtUtil.generateJwtToken(userDetails);
     }
     throw new BadRequestException("invalidRefreshToken", refreshToken);
   }
