@@ -36,6 +36,6 @@ public enum Condition {
   }
 
   public static List<String> getSupportedConditions() {
-    return Stream.of(Condition.values()).map(Enum::name).toList();
+    return Stream.of(Condition.values()).map(Condition::getCode).toList();
   }
 }

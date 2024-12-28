@@ -52,7 +52,7 @@ public enum Language {
 
   public static List<String> getSupportedLanguages() {
     return Stream.of(Language.values())
-        .map(Enum::name)
+        .map(Language::getCode)
         .sorted()
         .collect(Collectors.toList());
   }
