@@ -30,9 +30,9 @@ public class BookResponse {
     this.title = entity.getTitle();
     this.author = entity.getAuthor();
     this.genres = entity.getGenres();
-    this.language = entity.getLanguage().name();
+    this.language = entity.getLanguage().getCode();
     this.description = entity.getDescription();
-    this.condition = entity.getCondition().name();
+    this.condition = entity.getCondition().getCode();
     this.coverPhotoUrl = entity.getCoverPhoto() == null ? null : entity.getCoverPhoto();
     this.owner = new OwnerResponse(entity.getOwner());
   }

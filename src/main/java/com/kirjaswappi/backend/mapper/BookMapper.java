@@ -60,8 +60,8 @@ public class BookMapper {
     dao.setTitle(entity.getTitle());
     dao.setAuthor(entity.getAuthor());
     dao.setDescription(entity.getDescription());
-    dao.setLanguage(entity.getLanguage().name());
-    dao.setCondition(entity.getCondition().name());
+    dao.setLanguage(entity.getLanguage().getCode());
+    dao.setCondition(entity.getCondition().getCode());
     return dao;
   }
 }
