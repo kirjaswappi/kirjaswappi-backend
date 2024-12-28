@@ -15,6 +15,8 @@ import io.minio.http.Method;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,6 +51,7 @@ public class ImageService {
 
   }
 
+  @Cacheable(value = "imageUrls", key = "#uniqueId")
   public String getDownloadUrl(String uniqueId) {
     if (uniqueId == null) {
       throw new ResourceNotFoundException("photoNotFound");
@@ -59,13 +62,14 @@ public class ImageService {
               .bucket(bucketName)
               .object(uniqueId)
               .method(Method.GET)
-              .expiry(1, TimeUnit.HOURS)
+              .expiry(7, TimeUnit.DAYS)
               .build());
     } catch (Exception e) {
       throw new ImageUrlFetchFailureException("Failed to fetch image URL.");
     }
   }
 
+  @CacheEvict(value = "imageUrls", key = "#uniqueId")
   public void deleteImage(String uniqueId) {
     if (uniqueId == null) {
       throw new ResourceNotFoundException("photoNotFound");
