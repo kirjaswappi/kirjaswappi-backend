@@ -103,7 +103,7 @@ public class UserService {
     // update user details:
     updateUserDetails(user, dao);
 
-    return UserMapper.toEntity(userRepository.save(dao));
+    return getUser(user.getId());
   }
 
   private void updateUserDetails(User user, UserDao dao) {
@@ -122,6 +122,7 @@ public class UserService {
             .orElseThrow(() -> new BadRequestException("genreNotFound", genre)))
         .toList();
     dao.setFavGenres(favGenres);
+    userRepository.save(dao);
   }
 
   public User verifyLogin(User user) {
@@ -138,8 +139,10 @@ public class UserService {
     String password = Util.hashPassword(user.getPassword(), dao.getSalt());
 
     // validate email and password and return user:
-    return UserMapper.toEntity(userRepository.findByEmailAndPassword(dao.getEmail(), password)
-        .orElseThrow(() -> new InvalidCredentials(dao.getEmail(), password)));
+    var verifiedUser = userRepository.findByEmailAndPassword(dao.getEmail(), password)
+        .orElseThrow(() -> new InvalidCredentials(dao.getEmail(), password));
+
+    return getUser(verifiedUser.getId());
   }
 
   public void verifyCurrentPassword(User user) {
