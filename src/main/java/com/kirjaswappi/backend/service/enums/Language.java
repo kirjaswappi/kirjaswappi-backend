@@ -45,7 +45,7 @@ public enum Language {
   public static Language fromCode(String code) {
     Objects.requireNonNull(code);
     return Arrays.stream(Language.values())
-        .filter(l -> l.getCode().equals(code))
+        .filter(l -> l.getCode().equalsIgnoreCase(code))
         .findFirst()
         .orElseThrow(() -> new BadRequestException("invalidLanguage", code));
   }

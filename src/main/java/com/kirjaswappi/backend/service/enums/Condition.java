@@ -30,7 +30,7 @@ public enum Condition {
   public static Condition fromCode(String code) {
     Objects.requireNonNull(code);
     return Arrays.stream(Condition.values())
-        .filter(c -> c.getCode().equals(code))
+        .filter(c -> c.getCode().equalsIgnoreCase(code))
         .findFirst()
         .orElseThrow(() -> new BadRequestException("invalidCondition", code));
   }
