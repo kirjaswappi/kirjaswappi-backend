@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -56,7 +55,8 @@ public class BookService {
   }
 
   public Book updateBook(Book book) {
-    var dao = bookRepository.findById(book.getId()).orElseThrow(() -> new BookNotFoundException(book.getId()));
+    var dao = bookRepository.findById(book.getId())
+        .orElseThrow(() -> new BookNotFoundException(book.getId()));
     updateDaoWithNewProperties(book, dao);
     var updatedBookDao = bookRepository.save(dao);
     updatedBookDao = addCoverPhotoToBook(book, updatedBookDao);
@@ -64,7 +64,8 @@ public class BookService {
   }
 
   public Book getBookById(String id) {
-    var bookDao = bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException(id));
+    var bookDao = bookRepository.findById(id)
+        .orElseThrow(() -> new BookNotFoundException(id));
     return mapToBookWithImageUrl(bookDao);
   }
 
@@ -99,7 +100,7 @@ public class BookService {
     dao.setGenres(book.getGenres().stream()
         .map(genreName -> genreRepository.findByName(genreName)
             .orElseThrow(() -> new GenreNotFoundException(genreName)))
-        .collect(Collectors.toList()));
+        .toList());
   }
 
   private void setOwnerToBook(Book book, BookDao bookDao) {
@@ -132,7 +133,9 @@ public class BookService {
     var owner = userRepository.findById(dao.getOwner().getId())
         .orElseThrow(() -> new UserNotFoundException(dao.getOwner().getId()));
     if (owner.getBooks() != null) {
-      owner.setBooks(owner.getBooks().stream().filter(book -> !book.getId().equals(dao.getId())).toList());
+      owner.setBooks(owner.getBooks().stream()
+          .filter(book -> !book.getId().equals(dao.getId()))
+          .toList());
       userRepository.save(owner);
     }
   }
