@@ -20,6 +20,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -83,9 +86,12 @@ public class BookController {
   @GetMapping
   @Operation(summary = "Search for books with (optional) filter properties.", responses = {
       @ApiResponse(responseCode = "200", description = "List of Books.") })
-  public ResponseEntity<List<BookListResponse>> getAllBooks(@Valid @ParameterObject GetAllBooksFilter filter) {
-    List<Book> books = (filter == null) ? bookService.getAllBooks() : bookService.getAllBooksByFilter(filter);
-    return ResponseEntity.status(HttpStatus.OK).body(books.stream().map(BookListResponse::new).toList());
+  public ResponseEntity<Page<BookListResponse>> getAllBooks(@Valid @ParameterObject GetAllBooksFilter filter,
+      @PageableDefault(size = 10) Pageable pageable) {
+    Page<Book> books = (filter == null) ? bookService.getAllBooks(pageable)
+        : bookService.getAllBooksByFilter(filter, pageable);
+    Page<BookListResponse> response = books.map(BookListResponse::new);
+    return ResponseEntity.status(HttpStatus.OK).body(response);
   }
 
   @PutMapping(ID)
