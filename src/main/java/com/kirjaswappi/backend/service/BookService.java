@@ -5,10 +5,17 @@
 package com.kirjaswappi.backend.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,27 +42,48 @@ public class BookService {
   @Autowired
   private PhotoService photoService;
 
+  private static final List<String> ALLOWED_SORT_FIELDS = Arrays.asList("title", "author", "language", "condition",
+      "genres.name");
+
   public Book createBook(Book book) {
     var bookDao = BookMapper.toDao(book);
-    this.addGenresToBook(book, bookDao);
-    this.setOwnerToBook(book, bookDao);
+    addGenresToBook(book, bookDao);
+    setOwnerToBook(book, bookDao);
     var savedDao = bookRepository.save(bookDao);
-    savedDao = this.addCoverPhotoToBook(book, savedDao);
-    this.addBookToOwner(savedDao);
-    var imageUrl = photoService.getBookCoverPhoto(savedDao.getCoverPhoto());
-    var newBook = BookMapper.toEntity(bookDao, imageUrl);
-    return BookMapper.setOwner(bookDao.getOwner(), newBook);
+    savedDao = addCoverPhotoToBook(book, savedDao);
+    addBookToOwner(savedDao);
+    return mapToBookWithImageUrl(savedDao);
   }
 
   public Book updateBook(Book book) {
-    var dao = bookRepository.findById(book.getId())
-        .orElseThrow(() -> new BookNotFoundException(book.getId()));
-    this.updateDaoWithNewProperties(book, dao);
+    var dao = bookRepository.findById(book.getId()).orElseThrow(() -> new BookNotFoundException(book.getId()));
+    updateDaoWithNewProperties(book, dao);
     var updatedBookDao = bookRepository.save(dao);
-    updatedBookDao = this.addCoverPhotoToBook(book, updatedBookDao);
-    var imageUrl = photoService.getBookCoverPhoto(updatedBookDao.getCoverPhoto());
-    var updatedBook = BookMapper.toEntity(updatedBookDao, imageUrl);
-    return BookMapper.setOwner(updatedBookDao.getOwner(), updatedBook);
+    updatedBookDao = addCoverPhotoToBook(book, updatedBookDao);
+    return mapToBookWithImageUrl(updatedBookDao);
+  }
+
+  public Book getBookById(String id) {
+    var bookDao = bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException(id));
+    return mapToBookWithImageUrl(bookDao);
+  }
+
+  public Page<Book> getAllBooks(Pageable pageable) {
+    var bookDaos = bookRepository.findAll(getPageableWithValidSortingCriteria(pageable));
+    return mapToBookPage(bookDaos, pageable);
+  }
+
+  public Page<Book> getAllBooksByFilter(GetAllBooksFilter filter, Pageable pageable) {
+    var bookDaos = bookRepository.findAllBooksByFilter(filter.buildQuery(),
+        getPageableWithValidSortingCriteria(pageable));
+    return mapToBookPage(bookDaos, pageable);
+  }
+
+  public void deleteBook(String id) {
+    var dao = bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException(id));
+    deleteExistingCoverPhoto(dao);
+    removeBookFromOwner(dao);
+    bookRepository.deleteById(id);
   }
 
   private void updateDaoWithNewProperties(Book book, BookDao dao) {
@@ -67,43 +95,11 @@ public class BookService {
     addGenresToBook(book, dao);
   }
 
-  public Book getBookById(String id) {
-    var bookDao = bookRepository.findById(id)
-        .orElseThrow(() -> new BookNotFoundException(id));
-    var imageUrl = photoService.getBookCoverPhoto(bookDao.getCoverPhoto());
-    var book = BookMapper.toEntity(bookDao, imageUrl);
-    return BookMapper.setOwner(bookDao.getOwner(), book);
-  }
-
-  public List<Book> getAllBooks() {
-    return bookRepository.findAll().stream()
-        .map(bookDao -> {
-          var imageUrl = photoService.getBookCoverPhoto(bookDao.getCoverPhoto());
-          return BookMapper.toEntity(bookDao, imageUrl);
-        }).toList();
-  }
-
-  public List<Book> getAllBooksByFilter(GetAllBooksFilter filter) {
-    return bookRepository.findAllBooksByFilter(filter).stream()
-        .map(bookDao -> {
-          var imageUrl = photoService.getBookCoverPhoto(bookDao.getCoverPhoto());
-          return BookMapper.toEntity(bookDao, imageUrl);
-        }).toList();
-  }
-
-  public void deleteBook(String id) {
-    var dao = bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException(id));
-    deleteExistingCoverPhoto(dao);
-    removeBookFromOwner(dao);
-    bookRepository.deleteById(id);
-  }
-
-  private void addBookToOwner(BookDao dao) {
-    var owner = userRepository.findById(dao.getOwner().getId())
-        .orElseThrow(() -> new UserNotFoundException(dao.getOwner().getId()));
-    owner.setBooks(Optional.ofNullable(owner.getBooks()).orElseGet(ArrayList::new));
-    owner.getBooks().add(dao);
-    userRepository.save(owner);
+  private void addGenresToBook(Book book, BookDao dao) {
+    dao.setGenres(book.getGenres().stream()
+        .map(genreName -> genreRepository.findByName(genreName)
+            .orElseThrow(() -> new GenreNotFoundException(genreName)))
+        .collect(Collectors.toList()));
   }
 
   private void setOwnerToBook(Book book, BookDao bookDao) {
@@ -112,17 +108,18 @@ public class BookService {
     bookDao.setOwner(owner);
   }
 
-  private void addGenresToBook(Book book, BookDao dao) {
-    dao.setGenres(book.getGenres().stream()
-        .map(genreName -> genreRepository.findByName(genreName)
-            .orElseThrow(() -> new GenreNotFoundException(genreName)))
-        .toList());
-  }
-
   private BookDao addCoverPhotoToBook(Book book, BookDao dao) {
     String uniqueId = photoService.addBookCoverPhoto(book.getCoverPhotoFile(), dao.getId());
     dao.setCoverPhoto(uniqueId);
     return bookRepository.save(dao);
+  }
+
+  private void addBookToOwner(BookDao dao) {
+    var owner = userRepository.findById(dao.getOwner().getId())
+        .orElseThrow(() -> new UserNotFoundException(dao.getOwner().getId()));
+    owner.setBooks(Optional.ofNullable(owner.getBooks()).orElseGet(ArrayList::new));
+    owner.getBooks().add(dao);
+    userRepository.save(owner);
   }
 
   private void deleteExistingCoverPhoto(BookDao dao) {
@@ -135,10 +132,31 @@ public class BookService {
     var owner = userRepository.findById(dao.getOwner().getId())
         .orElseThrow(() -> new UserNotFoundException(dao.getOwner().getId()));
     if (owner.getBooks() != null) {
-      owner.setBooks(owner.getBooks().stream()
-          .filter(book -> !book.getId().equals(dao.getId()))
-          .toList());
+      owner.setBooks(owner.getBooks().stream().filter(book -> !book.getId().equals(dao.getId())).toList());
       userRepository.save(owner);
     }
+  }
+
+  private Pageable getPageableWithValidSortingCriteria(Pageable pageable) {
+    if (pageable.getSort().isSorted()) {
+      List<Sort.Order> allowedOrders = pageable.getSort().stream()
+          .filter(order -> ALLOWED_SORT_FIELDS.contains(order.getProperty()))
+          .toList();
+      if (!allowedOrders.isEmpty()) {
+        return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(allowedOrders));
+      }
+    }
+    return pageable;
+  }
+
+  private Book mapToBookWithImageUrl(BookDao bookDao) {
+    var imageUrl = photoService.getBookCoverPhoto(bookDao.getCoverPhoto());
+    var book = BookMapper.toEntity(bookDao, imageUrl);
+    return BookMapper.setOwner(bookDao.getOwner(), book);
+  }
+
+  private Page<Book> mapToBookPage(Page<BookDao> bookDaos, Pageable pageable) {
+    var books = bookDaos.stream().map(this::mapToBookWithImageUrl).toList();
+    return new PageImpl<>(books, pageable, bookDaos.getTotalElements());
   }
 }
