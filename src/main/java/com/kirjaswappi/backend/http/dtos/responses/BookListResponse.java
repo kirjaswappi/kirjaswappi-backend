@@ -9,10 +9,13 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
+import org.springframework.hateoas.server.core.Relation;
+
 import com.kirjaswappi.backend.service.entities.Book;
 
 @Getter
 @Setter
+@Relation(collectionRelation = "books")
 public class BookListResponse {
   private final String id;
   private final String title;
