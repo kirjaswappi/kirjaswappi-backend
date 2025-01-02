@@ -4,12 +4,14 @@
  */
 package com.kirjaswappi.backend.service.filters;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 
 @Getter
 @Setter
@@ -26,12 +28,12 @@ public class GetAllBooksFilter {
       "Fantasy", "Science Fiction", "Mystery", "Horror", "Romance", "Thriller", "Historical Fiction", "Non-Fiction" })
   String genre;
 
-  public Query buildQuery() {
-    Query query = new Query();
+  public Criteria buildSearchAndFilterCriteria() {
+    List<Criteria> combinedCriteria = new ArrayList<>();
 
     // Add search criteria:
     if (search != null && !search.isEmpty()) {
-      query.addCriteria(new Criteria().orOperator(
+      combinedCriteria.add(new Criteria().orOperator(
           Criteria.where("title").regex(search, "i"),
           Criteria.where("author").regex(search, "i"),
           Criteria.where("description").regex(search, "i")));
@@ -39,17 +41,21 @@ public class GetAllBooksFilter {
 
     // Add filter criteria:
     if (language != null && !language.isEmpty()) {
-      query.addCriteria(Criteria.where("language").is(language));
+      combinedCriteria.add(Criteria.where("language").is(language));
     }
 
     if (condition != null && !condition.isEmpty()) {
-      query.addCriteria(Criteria.where("condition").is(condition));
+      combinedCriteria.add(Criteria.where("condition").is(condition));
     }
 
     if (genre != null && !genre.isEmpty()) {
-      query.addCriteria(Criteria.where("genres.name").is(genre));
+      combinedCriteria.add(Criteria.where("genres.name").is(genre));
     }
 
-    return query;
+    var criteria = new Criteria();
+    if (combinedCriteria.isEmpty()) {
+      return criteria;
+    }
+    return criteria.andOperator(combinedCriteria.toArray(new Criteria[0]));
   }
 }

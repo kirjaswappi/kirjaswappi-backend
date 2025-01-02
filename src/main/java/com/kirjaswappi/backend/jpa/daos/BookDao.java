@@ -44,11 +44,11 @@ public class BookDao {
   private String condition;
 
   @NotNull
-  @DBRef
-  private List<GenreDao> genres;
+  private String coverPhoto;
 
   @NotNull
-  private String coverPhoto;
+  @DBRef
+  private List<GenreDao> genres;
 
   @NotNull
   @DBRef

@@ -118,6 +118,11 @@
 			<artifactId>minio</artifactId>
 			<version>8.5.14</version>
 		</dependency>
+		<!-- Spring Hateoas -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-hateoas</artifactId>
+		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
