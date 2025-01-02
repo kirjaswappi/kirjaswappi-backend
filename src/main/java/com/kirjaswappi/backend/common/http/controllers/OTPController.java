@@ -32,7 +32,7 @@ public class OTPController {
   private OTPService otpService;
 
   @PostMapping(SEND_OTP)
-  @Operation(summary = "Send OTP to a user.", description = "Send OTP to a user using email.", responses = {
+  @Operation(summary = "Send OTP to a user.", description = "Send OTP to a user email.", responses = {
       @ApiResponse(responseCode = "200", description = "OTP sent.") })
   public ResponseEntity<SendOtpResponse> sendOTP(@RequestBody SendOtpRequest request) throws IOException {
     String userEmail = otpService.saveAndSendOTP(request.toEntity());
@@ -40,8 +40,8 @@ public class OTPController {
   }
 
   @PostMapping(VERIFY_OTP)
-  @Operation(summary = "Send OTP to a user.", description = "Send OTP to a user using email.", responses = {
-      @ApiResponse(responseCode = "200", description = "OTP sent.") })
+  @Operation(summary = "Verify OTP.", description = "Verify OTP of a user.", responses = {
+      @ApiResponse(responseCode = "200", description = "OTP Verified.") })
   public ResponseEntity<VerifyOtpResponse> verifyOTP(@RequestBody VerifyOtpRequest request) {
     String email = otpService.verifyOTPByEmail(request.toEntity());
     return ResponseEntity.status(HttpStatus.OK).body(new VerifyOtpResponse(email));
