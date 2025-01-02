@@ -6,10 +6,10 @@ package com.kirjaswappi.backend.jpa.repositories;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Criteria;
 
 import com.kirjaswappi.backend.jpa.daos.BookDao;
 
 public interface CustomBookRepository {
-  Page<BookDao> findAllBooksByFilter(Query query, Pageable pageable);
+  Page<BookDao> findAllBooksByFilter(Criteria criteria, Pageable pageable);
 }

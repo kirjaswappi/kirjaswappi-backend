@@ -69,14 +69,10 @@ public class BookService {
     return mapToBookWithImageUrl(bookDao);
   }
 
-  public Page<Book> getAllBooks(Pageable pageable) {
-    var bookDaos = bookRepository.findAll(getPageableWithValidSortingCriteria(pageable));
-    return mapToBookPage(bookDaos, pageable);
-  }
-
   public Page<Book> getAllBooksByFilter(GetAllBooksFilter filter, Pageable pageable) {
-    var bookDaos = bookRepository.findAllBooksByFilter(filter.buildQuery(),
-        getPageableWithValidSortingCriteria(pageable));
+    var criteria = filter.buildSearchAndFilterCriteria();
+    pageable = getPageableWithValidSortingCriteria(pageable);
+    var bookDaos = bookRepository.findAllBooksByFilter(criteria, pageable);
     return mapToBookPage(bookDaos, pageable);
   }
 
@@ -141,15 +137,20 @@ public class BookService {
   }
 
   private Pageable getPageableWithValidSortingCriteria(Pageable pageable) {
-    if (pageable.getSort().isSorted()) {
-      List<Sort.Order> allowedOrders = pageable.getSort().stream()
-          .filter(order -> ALLOWED_SORT_FIELDS.contains(order.getProperty()))
-          .toList();
-      if (!allowedOrders.isEmpty()) {
-        return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(allowedOrders));
-      }
+    if (!pageable.getSort().isSorted()) {
+      return pageable;
     }
-    return pageable;
+
+    List<Sort.Order> allowedOrders = pageable.getSort().stream()
+        .filter(order -> ALLOWED_SORT_FIELDS.contains(order.getProperty()))
+        .toList();
+
+    if (allowedOrders.isEmpty()) {
+      // remove sorting if no valid sorting criteria is found
+      return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
+    }
+
+    return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(allowedOrders));
   }
 
   private Book mapToBookWithImageUrl(BookDao bookDao) {

@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kirjaswappi.backend.common.utils.LinkBuilder;
 import com.kirjaswappi.backend.http.dtos.requests.CreateBookRequest;
 import com.kirjaswappi.backend.http.dtos.requests.UpdateBookRequest;
 import com.kirjaswappi.backend.http.dtos.responses.BookListResponse;
@@ -86,12 +88,11 @@ public class BookController {
   @GetMapping
   @Operation(summary = "Search for books with (optional) filter properties.", responses = {
       @ApiResponse(responseCode = "200", description = "List of Books.") })
-  public ResponseEntity<Page<BookListResponse>> getAllBooks(@Valid @ParameterObject GetAllBooksFilter filter,
+  public ResponseEntity<PagedModel<BookListResponse>> getAllBooks(@Valid @ParameterObject GetAllBooksFilter filter,
       @PageableDefault(size = 10) Pageable pageable) {
-    Page<Book> books = (filter == null) ? bookService.getAllBooks(pageable)
-        : bookService.getAllBooksByFilter(filter, pageable);
+    Page<Book> books = bookService.getAllBooksByFilter(filter, pageable);
     Page<BookListResponse> response = books.map(BookListResponse::new);
-    return ResponseEntity.status(HttpStatus.OK).body(response);
+    return ResponseEntity.status(HttpStatus.OK).body(LinkBuilder.forPage(response, API_BASE + BOOKS));
   }
 
   @PutMapping(ID)
