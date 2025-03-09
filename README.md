@@ -30,8 +30,6 @@ mvn spring-boot:run -Dspring-boot.run.profiles=local,local-h2-file
 
 The H2 local database file has the advantage to be used in IDE's (like IntelliJ Ultimate) directly.
 
-To run this application with the `cloud` profile similar to as it would run Cloud Foundry, please see [this document](https://github.tools.sap/dcm/dcm-docs/blob/main/development-guide/working-with-postgres.md#run-your-application-locally-with-postgres).
-
 To format the source code, you can run
 
 ```console
