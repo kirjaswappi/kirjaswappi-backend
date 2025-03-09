@@ -1,0 +1,13 @@
+version: 2
+updates:
+  # Enable version updates for Maven package
+  - package-ecosystem: "maven"
+    directory: "/" # Location of package manifests
+    schedule:
+      interval: "weekly"
+  
+  # Enable version updates for Docker
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
