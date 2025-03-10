@@ -95,11 +95,11 @@ public class UserControllerTest {
     when(otpService.saveAndSendOTP(any(String.class))).thenReturn(user.getEmail());
 
     mockMvc.perform(post(API_BASE + "/signup")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(createUserRequest))
-                    .header("Authorization ", "Bearer a.b.c"))
-            .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.email").value(user.getEmail()));
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(objectMapper.writeValueAsString(createUserRequest))
+        .header("Authorization ", "Bearer a.b.c"))
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.email").value(user.getEmail()));
   }
 
   @Test
@@ -142,9 +142,9 @@ public class UserControllerTest {
     when(userService.getUser("1")).thenReturn(user);
 
     mockMvc.perform(get(API_BASE + "/1")
-                    .header("Authorization ", "Bearer a.b.c"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.email").value(user.getEmail()));
+        .header("Authorization ", "Bearer a.b.c"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.email").value(user.getEmail()));
   }
 
   @Test
@@ -153,9 +153,9 @@ public class UserControllerTest {
     when(userService.getUsers()).thenReturn(List.of(user));
 
     mockMvc.perform(get(API_BASE)
-                    .header("Authorization ", "Bearer a.b.c"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].email").value(user.getEmail()));
+        .header("Authorization ", "Bearer a.b.c"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].email").value(user.getEmail()));
   }
 
   @Test
