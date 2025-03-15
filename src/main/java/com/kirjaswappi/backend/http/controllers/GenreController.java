@@ -52,7 +52,7 @@ public class GenreController {
   }
 
   @PostMapping
-  @Operation(summary = "Create a genre.", responses = {
+  @Operation(summary = "Create genre.", responses = {
       @ApiResponse(responseCode = "201", description = "Genre created.") })
   public ResponseEntity<GenreResponse> createGenre(@Valid @RequestBody CreateGenreRequest request) {
     Genre savedGenre = genreService.addGenre(request.toEntity());
@@ -60,7 +60,7 @@ public class GenreController {
   }
 
   @PutMapping(ID)
-  @Operation(summary = "Update a genre.", responses = {
+  @Operation(summary = "Update genre.", responses = {
       @ApiResponse(responseCode = "200", description = "Genre updated.") })
   public ResponseEntity<GenreResponse> updateGenre(@Parameter(description = "Genre Id.") @PathVariable String id,
       @Valid @RequestBody UpdateGenreRequest request) {
@@ -73,7 +73,7 @@ public class GenreController {
   }
 
   @DeleteMapping(ID)
-  @Operation(summary = "Delete a genre.", responses = {
+  @Operation(summary = "Delete genre.", responses = {
       @ApiResponse(responseCode = "204", description = "Genre deleted.") })
   public ResponseEntity<Void> deleteGenre(@Parameter(description = "Genre Id.") @PathVariable String id) {
     genreService.deleteGenre(id);

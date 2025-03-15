@@ -19,8 +19,10 @@ import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 public class ChangePasswordRequest {
   @Schema(description = "The current password of the user.", example = "password", requiredMode = REQUIRED)
   private String currentPassword;
+
   @Schema(description = "The new password of the user.", example = "newPassword", requiredMode = REQUIRED)
   private String newPassword;
+
   @Schema(description = "The confirm password of the user.", example = "newPassword", requiredMode = REQUIRED)
   private String confirmPassword;
 
