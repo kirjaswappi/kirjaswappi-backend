@@ -18,23 +18,22 @@ public class ExchangeCondition {
   private List<Genre> exchangeableGenres;
   private List<ExchangeableBook> exchangeableBooks;
 
-  public ExchangeCondition(Boolean openForOffers,
+  public ExchangeCondition(boolean openForOffers,
       List<Genre> exchangeableGenres,
       List<ExchangeableBook> exchangeableBooks) {
     checkIfOnlyOneOfTheExchangeConditionIsProvided(openForOffers, exchangeableGenres, exchangeableBooks);
-    this.openForOffers = openForOffers != null ? openForOffers : false;
+    this.openForOffers = openForOffers;
     this.exchangeableGenres = exchangeableGenres != null ? exchangeableGenres : List.of();
     this.exchangeableBooks = exchangeableBooks != null ? exchangeableBooks : List.of();
   }
 
-  private static void checkIfOnlyOneOfTheExchangeConditionIsProvided(Boolean openForOffers,
+  private static void checkIfOnlyOneOfTheExchangeConditionIsProvided(boolean openForOffers,
       List<Genre> exchangeableGenres, List<ExchangeableBook> exchangeableBooks) {
-    boolean isOpenForOffersSet = openForOffers != null && openForOffers;
     boolean isGenresSet = exchangeableGenres != null && !exchangeableGenres.isEmpty();
     boolean isBooksSet = exchangeableBooks != null && !exchangeableBooks.isEmpty();
 
-    if ((isOpenForOffersSet && (isGenresSet || isBooksSet)) ||
-        (!isOpenForOffersSet && !isGenresSet && !isBooksSet)) {
+    if ((openForOffers && (isGenresSet || isBooksSet)) ||
+        (!openForOffers && !isGenresSet && !isBooksSet)) {
       throw new IllegalArgumentException("Exactly one of the exchange conditions must be set");
     }
   }

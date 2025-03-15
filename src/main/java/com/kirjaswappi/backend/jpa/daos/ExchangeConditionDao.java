@@ -13,26 +13,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
-import org.springframework.data.mongodb.core.mapping.Document;
-
-@Document(collection = "exchange_conditions")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class ExchangeConditionDao {
-  @Id
-  private String bookId;
-
+  @NotNull
   private boolean openForOffers;
 
   @NotNull
-  @DBRef
   private List<GenreDao> exchangeableGenres;
 
   @NotNull
-  @DBRef
   private List<ExchangeableBookDao> exchangeableBooks;
 }

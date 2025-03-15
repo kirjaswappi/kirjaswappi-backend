@@ -26,6 +26,7 @@ import com.kirjaswappi.backend.jpa.repositories.UserRepository;
 import com.kirjaswappi.backend.mapper.BookMapper;
 import com.kirjaswappi.backend.mapper.ExchangeConditionMapper;
 import com.kirjaswappi.backend.mapper.ExchangeableBookMapper;
+import com.kirjaswappi.backend.mapper.GenreMapper;
 import com.kirjaswappi.backend.service.entities.Book;
 import com.kirjaswappi.backend.service.entities.ExchangeableBook;
 import com.kirjaswappi.backend.service.exceptions.BookNotFoundException;
@@ -54,6 +55,7 @@ public class BookService {
   public Book createBook(Book book) {
     var bookDao = BookMapper.toDao(book);
     addGenresToBook(book, bookDao);
+    setValidExchangeableGenresIfExists(book);
     setOwnerToBook(book, bookDao);
     var savedDao = bookRepository.save(bookDao);
     savedDao = addCoverPhotoToBook(book, savedDao);
@@ -108,8 +110,23 @@ public class BookService {
     dao.setDescription(book.getDescription());
     dao.setLanguage(book.getLanguage().name());
     dao.setCondition(book.getCondition().name());
-    dao.setExchangeCondition(ExchangeConditionMapper.toDao(book.getExchangeCondition()));
     addGenresToBook(book, dao);
+    setValidExchangeableGenresIfExists(book);
+    dao.setExchangeCondition(ExchangeConditionMapper.toDao(book.getExchangeCondition()));
+  }
+
+  private void setValidExchangeableGenresIfExists(Book book) {
+    var exchangeCondition = book.getExchangeCondition();
+    if (exchangeCondition != null) {
+      var exchangeableGenres = exchangeCondition.getExchangeableGenres();
+      if (exchangeableGenres != null && !exchangeableGenres.isEmpty()) {
+        var validGenres = exchangeableGenres.stream()
+            .map(genre -> genreRepository.findByName(genre.getName())
+                .orElseThrow(() -> new GenreNotFoundException(genre.getName())))
+            .toList();
+        exchangeCondition.setExchangeableGenres(validGenres.stream().map(GenreMapper::toEntity).toList());
+      }
+    }
   }
 
   private void addGenresToBook(Book book, BookDao dao) {
