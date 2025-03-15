@@ -222,13 +222,13 @@ public class UpdateBookRequest {
   @Getter
   @Setter
   private static class BookRequest {
-    @Schema(description = "The title of the book.", example = "The Alchemist", requiredMode = NOT_REQUIRED)
+    @Schema(description = "The title of the book.", example = "The Alchemist", requiredMode = REQUIRED)
     private String title;
 
-    @Schema(description = "The author of the book.", example = "Paulo Coelho", requiredMode = NOT_REQUIRED)
+    @Schema(description = "The author of the book.", example = "Paulo Coelho", requiredMode = REQUIRED)
     private String author;
 
-    @Schema(description = "The cover photo of the book.", requiredMode = NOT_REQUIRED)
+    @Schema(description = "The cover photo of the book.", requiredMode = REQUIRED)
     private MultipartFile coverPhoto;
 
     public ExchangeableBook toEntity() {
