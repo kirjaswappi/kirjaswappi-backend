@@ -56,7 +56,7 @@ public class BookController {
   private BookService bookService;
 
   @PostMapping
-  @Operation(summary = "Adds a book to a user.", responses = {
+  @Operation(summary = "Add book to a user.", responses = {
       @ApiResponse(responseCode = "201", description = "Book created.") })
   public ResponseEntity<BookResponse> createBook(@Valid @ModelAttribute CreateBookRequest book) {
     Book savedBook = bookService.createBook(book.toEntity());
@@ -64,7 +64,7 @@ public class BookController {
   }
 
   @GetMapping(ID)
-  @Operation(summary = "Get a book by Book Id.", responses = {
+  @Operation(summary = "Get book by Book Id.", responses = {
       @ApiResponse(responseCode = "200", description = "Book found.") })
   public ResponseEntity<BookResponse> getBookById(@Parameter(description = "Book Id.") @PathVariable String id) {
     Book book = bookService.getBookById(id);
@@ -72,14 +72,14 @@ public class BookController {
   }
 
   @GetMapping(SUPPORTED_LANGUAGES)
-  @Operation(summary = "Get a list of supported languages.", responses = {
+  @Operation(summary = "Get list of supported languages.", responses = {
       @ApiResponse(responseCode = "200", description = "List of supported languages.") })
   public ResponseEntity<List<String>> getAllSupportedLanguages() {
     return ResponseEntity.status(HttpStatus.OK).body(Language.getSupportedLanguages());
   }
 
   @GetMapping(SUPPORTED_CONDITIONS)
-  @Operation(summary = "Get a list of supported book conditions.", responses = {
+  @Operation(summary = "Get list of supported book conditions.", responses = {
       @ApiResponse(responseCode = "200", description = "List of supported conditions.") })
   public ResponseEntity<List<String>> getAllSupportedConditions() {
     return ResponseEntity.status(HttpStatus.OK).body(Condition.getSupportedConditions());
@@ -96,7 +96,7 @@ public class BookController {
   }
 
   @PutMapping(ID)
-  @Operation(summary = "Updates a book by Book Id.", responses = {
+  @Operation(summary = "Update book by Book Id.", responses = {
       @ApiResponse(responseCode = "200", description = "Book updated.") })
   public ResponseEntity<BookResponse> updateBook(@Parameter(description = "Book Id.") @PathVariable String id,
       @Valid @ModelAttribute UpdateBookRequest request) {
@@ -109,7 +109,7 @@ public class BookController {
   }
 
   @DeleteMapping(ID)
-  @Operation(summary = "Deletes a book by Book Id.", responses = {
+  @Operation(summary = "Delete book by Book Id.", responses = {
       @ApiResponse(responseCode = "204", description = "Book deleted.") })
   public ResponseEntity<Void> deleteBook(@Parameter(description = "Book Id.") @PathVariable String id) {
     bookService.deleteBook(id);

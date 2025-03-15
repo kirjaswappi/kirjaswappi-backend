@@ -21,6 +21,7 @@ import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 public class AuthenticateUserRequest implements Serializable {
   @Schema(description = "The email address of the user.", example = "abc@xyz.com", requiredMode = REQUIRED)
   private String email;
+
   @Schema(description = "The password of the user.", example = "password", requiredMode = REQUIRED)
   private String password;
 

@@ -12,6 +12,7 @@ import lombok.Setter;
 import org.springframework.hateoas.server.core.Relation;
 
 import com.kirjaswappi.backend.service.entities.Book;
+import com.kirjaswappi.backend.service.entities.Genre;
 
 @Getter
 @Setter
@@ -30,7 +31,7 @@ public class BookListResponse {
     this.id = entity.getId();
     this.title = entity.getTitle();
     this.author = entity.getAuthor();
-    this.genres = entity.getGenres();
+    this.genres = entity.getGenres().stream().map(Genre::getName).toList();
     this.language = entity.getLanguage().getCode();
     this.description = entity.getDescription();
     this.condition = entity.getCondition().getCode();
