@@ -20,6 +20,7 @@ import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 public class CreatePhotoRequest {
   @Schema(description = "The user ID of the photo owner.", example = "123456", requiredMode = REQUIRED)
   private String userId;
+
   @Schema(description = "The image file of the photo.", requiredMode = REQUIRED)
   private MultipartFile image;
 

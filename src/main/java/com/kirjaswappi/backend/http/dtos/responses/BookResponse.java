@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import com.kirjaswappi.backend.service.entities.Book;
+import com.kirjaswappi.backend.service.entities.ExchangeCondition;
+import com.kirjaswappi.backend.service.entities.Genre;
 import com.kirjaswappi.backend.service.entities.User;
 
 @Getter
@@ -24,17 +26,19 @@ public class BookResponse {
   private String condition;
   private String coverPhotoUrl;
   private OwnerResponse owner;
+  private ExchangeCondition exchangeCondition;
 
   public BookResponse(Book entity) {
     this.id = entity.getId();
     this.title = entity.getTitle();
     this.author = entity.getAuthor();
-    this.genres = entity.getGenres();
+    this.genres = entity.getGenres().stream().map(Genre::getName).toList();
     this.language = entity.getLanguage().getCode();
     this.description = entity.getDescription();
     this.condition = entity.getCondition().getCode();
     this.coverPhotoUrl = entity.getCoverPhoto() == null ? null : entity.getCoverPhoto();
     this.owner = new OwnerResponse(entity.getOwner());
+    this.exchangeCondition = entity.getExchangeCondition();
   }
 
   @Setter

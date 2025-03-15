@@ -21,6 +21,7 @@ import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 public class VerifyEmailRequest {
   @Schema(description = "The email address of the user.", example = "abc@xyz.com", requiredMode = REQUIRED)
   private String email;
+
   @Schema(description = "The OTP sent to the email address.", example = "123456", requiredMode = REQUIRED)
   private String otp;
 
