@@ -17,6 +17,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.kirjaswappi.backend.http.validations.ValidationUtil;
 import com.kirjaswappi.backend.service.entities.Book;
+import com.kirjaswappi.backend.service.entities.ExchangeCondition;
+import com.kirjaswappi.backend.service.entities.ExchangeableBook;
+import com.kirjaswappi.backend.service.entities.Genre;
 import com.kirjaswappi.backend.service.entities.User;
 import com.kirjaswappi.backend.service.enums.Condition;
 import com.kirjaswappi.backend.service.enums.Language;
@@ -27,20 +30,30 @@ import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 public class CreateBookRequest {
   @Schema(description = "The title of the book.", example = "The Alchemist", requiredMode = REQUIRED)
   private String title;
+
   @Schema(description = "The author of the book.", example = "Paulo Coelho", requiredMode = REQUIRED)
   private String author;
+
   @Schema(description = "The description of the book.", example = "A novel by Paulo Coelho", requiredMode = NOT_REQUIRED)
   private String description;
+
   @Schema(description = "The language of the book.", example = "English", requiredMode = REQUIRED)
   private String language;
+
   @Schema(description = "The condition of the book.", example = "New", requiredMode = REQUIRED)
   private String condition;
+
   @Schema(description = "The genres of the book.", example = "[\"Fiction\"]", requiredMode = REQUIRED)
   private List<String> genres;
+
   @Schema(description = "The cover photo of the book.", requiredMode = REQUIRED)
   private MultipartFile coverPhoto;
+
   @Schema(description = "The user ID of the book owner.", example = "123456", requiredMode = REQUIRED)
   private String ownerId;
+
+  @Schema(description = "The exchange condition of the book.", requiredMode = REQUIRED)
+  private ExchangeConditionRequest exchangeCondition;
 
   public Book toEntity() {
     this.validateProperties();
@@ -50,11 +63,12 @@ public class CreateBookRequest {
     book.setDescription(description);
     book.setLanguage(Language.fromCode(language));
     book.setCondition(Condition.fromCode(condition));
-    book.setGenres(genres);
+    book.setGenres(this.genres.stream().map(Genre::new).toList());
     book.setCoverPhotoFile(coverPhoto);
     var user = new User();
     user.setId(ownerId);
     book.setOwner(user);
+    book.setExchangeCondition(exchangeCondition.toEntity());
     return book;
   }
 
@@ -81,6 +95,46 @@ public class CreateBookRequest {
 
     if (!ValidationUtil.validateNotBlank(this.ownerId)) {
       throw new BadRequestException("ownerIdCannotBeBlank", this.ownerId);
+    }
+  }
+
+  @Getter
+  @Setter
+  private static class ExchangeConditionRequest {
+    @Schema(description = "The open for offers status of the exchange condition.", example = "true", requiredMode = REQUIRED)
+    private Boolean openForOffers;
+
+    @Schema(description = "The genres of the exchange condition.", example = "[\"Fiction\"]", requiredMode = REQUIRED)
+    private List<String> genres;
+
+    @Schema(description = "The books of the exchange condition.", example = "[\"123456\"]", requiredMode = REQUIRED)
+    private List<BookRequest> books;
+
+    public ExchangeCondition toEntity() {
+      List<Genre> exchangeableGenres = this.genres.stream().map(Genre::new).toList();
+      List<ExchangeableBook> exchangeableBooks = this.books.stream().map(BookRequest::toEntity).toList();
+      return new ExchangeCondition(openForOffers, exchangeableGenres, exchangeableBooks);
+    }
+  }
+
+  @Getter
+  @Setter
+  private static class BookRequest {
+    @Schema(description = "The title of the book.", example = "The Alchemist", requiredMode = REQUIRED)
+    private String title;
+
+    @Schema(description = "The author of the book.", example = "Paulo Coelho", requiredMode = REQUIRED)
+    private String author;
+
+    @Schema(description = "The cover photo of the book.", requiredMode = REQUIRED)
+    private MultipartFile coverPhoto;
+
+    public ExchangeableBook toEntity() {
+      var book = new ExchangeableBook();
+      book.setTitle(title);
+      book.setAuthor(author);
+      book.setCoverPhotoFile(coverPhoto);
+      return book;
     }
   }
 }
