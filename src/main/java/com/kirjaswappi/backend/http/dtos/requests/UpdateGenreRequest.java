@@ -19,6 +19,7 @@ import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 public class UpdateGenreRequest {
   @Schema(description = "The genre id.", example = "1", requiredMode = REQUIRED)
   private String id;
+
   @Schema(description = "The genre name.", example = "Fiction", requiredMode = REQUIRED)
   private String name;
 

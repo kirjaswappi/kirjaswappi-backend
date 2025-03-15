@@ -55,7 +55,7 @@ public class UserController {
   private OTPService otpService;
 
   @PostMapping(SIGNUP)
-  @Operation(summary = "Create a user.", responses = {
+  @Operation(summary = "Create user.", responses = {
       @ApiResponse(responseCode = "201", description = "User created.") })
   public ResponseEntity<CreateUserResponse> createUser(@Valid @RequestBody CreateUserRequest user) throws IOException {
     User savedUser = userService.addUser(user.toEntity());
@@ -73,7 +73,7 @@ public class UserController {
   }
 
   @PutMapping(ID)
-  @Operation(summary = "Update a user.", responses = {
+  @Operation(summary = "Update user.", responses = {
       @ApiResponse(responseCode = "200", description = "User updated.") })
   public ResponseEntity<UpdateUserResponse> updateUser(@Parameter(description = "User Id.") @PathVariable String id,
       @Valid @RequestBody UpdateUserRequest user) {
@@ -86,7 +86,7 @@ public class UserController {
   }
 
   @GetMapping(ID)
-  @Operation(summary = "Get a user by User Id.", responses = {
+  @Operation(summary = "Get user by User Id.", responses = {
       @ApiResponse(responseCode = "200", description = "User found.") })
   public ResponseEntity<UserResponse> getUser(@Parameter(description = "User Id.") @PathVariable String id) {
     User user = userService.getUser(id);
@@ -102,7 +102,7 @@ public class UserController {
   }
 
   @DeleteMapping(ID)
-  @Operation(summary = "Delete a user.", responses = {
+  @Operation(summary = "Delete user.", responses = {
       @ApiResponse(responseCode = "204", description = "User deleted.") })
   public ResponseEntity<Void> deleteUser(@Parameter(description = "User Id.") @PathVariable String id) {
     userService.deleteUser(id);
@@ -110,7 +110,7 @@ public class UserController {
   }
 
   @PostMapping(LOGIN)
-  @Operation(summary = "Login a user.", responses = {
+  @Operation(summary = "Login user.", responses = {
       @ApiResponse(responseCode = "200", description = "User logged in.") })
   public ResponseEntity<UserResponse> login(@Valid @RequestBody AuthenticateUserRequest authenticateUserRequest) {
     User user = userService.verifyLogin(authenticateUserRequest.toEntity());
