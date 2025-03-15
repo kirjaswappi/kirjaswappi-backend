@@ -169,9 +169,10 @@ public class CreateBookRequest {
 
   @Getter
   @Setter
+  @JsonDeserialize(using = ExchangeConditionRequest.ExchangeConditionRequestDeserializer.class)
   private static class ExchangeConditionRequest {
     @Schema(description = "The open for offers status of the exchange condition.", example = "true", requiredMode = REQUIRED)
-    private Boolean openForOffers;
+    private boolean openForOffers;
 
     @Schema(description = "The genres of the exchange condition.", example = "[\"Fiction\"]", requiredMode = REQUIRED)
     private List<String> genres;
@@ -180,12 +181,16 @@ public class CreateBookRequest {
     private List<BookRequest> books;
 
     public ExchangeCondition toEntity() {
+      if (this.genres == null)
+        genres = List.of();
+      if (this.books == null)
+        books = List.of();
       List<Genre> exchangeableGenres = this.genres.stream().map(Genre::new).toList();
       List<ExchangeableBook> exchangeableBooks = this.books.stream().map(BookRequest::toEntity).toList();
       return new ExchangeCondition(openForOffers, exchangeableGenres, exchangeableBooks);
     }
 
-    public static class ExchangeConditionRequestDeserializer extends JsonDeserializer<ExchangeConditionRequest> {
+    private static class ExchangeConditionRequestDeserializer extends JsonDeserializer<ExchangeConditionRequest> {
       @Override
       public ExchangeConditionRequest deserialize(JsonParser jsonParser, DeserializationContext context)
           throws IOException {

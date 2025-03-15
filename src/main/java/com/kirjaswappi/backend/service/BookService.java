@@ -53,9 +53,9 @@ public class BookService {
       "genres.name");
 
   public Book createBook(Book book) {
+    setValidExchangeableGenresIfExists(book);
     var bookDao = BookMapper.toDao(book);
     addGenresToBook(book, bookDao);
-    setValidExchangeableGenresIfExists(book);
     setOwnerToBook(book, bookDao);
     var savedDao = bookRepository.save(bookDao);
     savedDao = addCoverPhotoToBook(book, savedDao);

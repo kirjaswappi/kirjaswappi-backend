@@ -187,7 +187,7 @@ public class UpdateBookRequest {
       return new ExchangeCondition(openForOffers, exchangeableGenres, exchangeableBooks);
     }
 
-    public static class ExchangeConditionRequestDeserializer extends JsonDeserializer<ExchangeConditionRequest> {
+    private static class ExchangeConditionRequestDeserializer extends JsonDeserializer<ExchangeConditionRequest> {
       @Override
       public ExchangeConditionRequest deserialize(JsonParser jsonParser, DeserializationContext context)
           throws IOException {
