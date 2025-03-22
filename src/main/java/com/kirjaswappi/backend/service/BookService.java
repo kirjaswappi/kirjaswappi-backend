@@ -208,15 +208,15 @@ public class BookService {
   }
 
   private void fetchImageUrlForExchangeableBooks(BookDao bookDao) {
-    var exchangeCondition = bookDao.getExchangeCondition();
-    if (exchangeCondition != null) {
-      var exchangeableBooks = exchangeCondition.getExchangeableBooks();
-      if (exchangeableBooks != null && !exchangeableBooks.isEmpty()) {
-        var exchangeableBooksWithImageUrl = exchangeableBooks.stream()
+    var exchangeConditionDao = bookDao.getExchangeCondition();
+    if (exchangeConditionDao != null) {
+      var exchangeableBookDaos = exchangeConditionDao.getExchangeableBooks();
+      if (exchangeableBookDaos != null && !exchangeableBookDaos.isEmpty()) {
+        var exchangeableBooksWithImageUrl = exchangeableBookDaos.stream()
             .map(exchangeableBook -> ExchangeableBookMapper.toDao(exchangeableBook,
                 photoService.getBookCoverPhoto(exchangeableBook.getCoverPhoto())))
             .toList();
-        exchangeCondition.setExchangeableBooks(exchangeableBooksWithImageUrl);
+        bookDao.getExchangeCondition().setExchangeableBooks(exchangeableBooksWithImageUrl);
       }
     }
   }
