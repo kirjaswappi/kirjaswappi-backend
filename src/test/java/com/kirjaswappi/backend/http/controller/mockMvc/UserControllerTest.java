@@ -21,7 +21,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -35,7 +34,6 @@ import com.kirjaswappi.backend.http.dto.response.*;
 import com.kirjaswappi.backend.service.UserService;
 import com.kirjaswappi.backend.service.entity.User;
 
-@ActiveProfiles("local")
 @WebMvcTest(UserController.class)
 public class UserControllerTest {
   @Autowired
@@ -51,7 +49,6 @@ public class UserControllerTest {
 
   private User user;
   private CreateUserRequest createUserRequest;
-  private CreateUserResponse createUserResponse;
   private static final String API_BASE = "/api/v1/users";
 
   @TestConfiguration
@@ -85,7 +82,6 @@ public class UserControllerTest {
     createUserRequest.setEmail("test@example.com");
     createUserRequest.setPassword("password");
     createUserRequest.setConfirmPassword("password");
-    createUserResponse = new CreateUserResponse(user);
   }
 
   @Test
