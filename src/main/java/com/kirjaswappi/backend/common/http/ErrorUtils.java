@@ -4,7 +4,7 @@
  */
 package com.kirjaswappi.backend.common.http;
 
-import static com.kirjaswappi.backend.common.utils.PathProvider.getCurrentPath;
+import static com.kirjaswappi.backend.common.util.PathProvider.getCurrentPath;
 
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -20,7 +20,7 @@ import org.springframework.context.NoSuchMessageException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.WebRequest;
 
-import com.kirjaswappi.backend.common.exceptions.BusinessException;
+import com.kirjaswappi.backend.common.exception.BusinessException;
 
 @Component
 public class ErrorUtils {

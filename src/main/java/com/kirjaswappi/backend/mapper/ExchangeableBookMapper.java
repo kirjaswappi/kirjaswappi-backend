@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 
 import org.springframework.stereotype.Component;
 
-import com.kirjaswappi.backend.jpa.daos.ExchangeableBookDao;
-import com.kirjaswappi.backend.service.entities.ExchangeableBook;
+import com.kirjaswappi.backend.jpa.dao.ExchangeableBookDao;
+import com.kirjaswappi.backend.service.entity.ExchangeableBook;
 
 @Component
 @NoArgsConstructor

@@ -8,9 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.kirjaswappi.backend.common.service.entities.AdminUser;
-import com.kirjaswappi.backend.common.utils.JwtUtil;
-import com.kirjaswappi.backend.service.exceptions.BadRequestException;
+import com.kirjaswappi.backend.common.service.entity.AdminUser;
+import com.kirjaswappi.backend.common.util.JwtUtil;
+import com.kirjaswappi.backend.service.exception.BadRequestException;
 
 @Service
 @Transactional

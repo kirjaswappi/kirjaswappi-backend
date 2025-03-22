@@ -21,10 +21,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.kirjaswappi.backend.service.exceptions.ImageDeletionFailureException;
-import com.kirjaswappi.backend.service.exceptions.ImageUploadFailureException;
-import com.kirjaswappi.backend.service.exceptions.ImageUrlFetchFailureException;
-import com.kirjaswappi.backend.service.exceptions.ResourceNotFoundException;
+import com.kirjaswappi.backend.service.exception.ImageDeletionFailureException;
+import com.kirjaswappi.backend.service.exception.ImageUploadFailureException;
+import com.kirjaswappi.backend.service.exception.ImageUrlFetchFailureException;
+import com.kirjaswappi.backend.service.exception.ResourceNotFoundException;
 
 @Service
 @Transactional

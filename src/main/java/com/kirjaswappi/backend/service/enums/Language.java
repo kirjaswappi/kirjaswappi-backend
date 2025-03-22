@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 
 import lombok.Getter;
 
-import com.kirjaswappi.backend.service.exceptions.BadRequestException;
+import com.kirjaswappi.backend.service.exception.BadRequestException;
 
 @Getter
 public enum Language {
