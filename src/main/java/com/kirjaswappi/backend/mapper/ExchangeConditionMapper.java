@@ -21,8 +21,7 @@ public class ExchangeConditionMapper {
     var entity = new ExchangeCondition();
     entity.setOpenForOffers(dao.isOpenForOffers());
     entity.setExchangeableGenres(dao.getExchangeableGenres().stream().map(GenreMapper::toEntity).toList());
-    entity
-        .setExchangeableBooks(dao.getExchangeableBooks().stream().map(ExchangeableBookMapper::toEntity).toList());
+    entity.setExchangeableBooks(dao.getExchangeableBooks().stream().map(ExchangeableBookMapper::toEntity).toList());
     return entity;
   }
 

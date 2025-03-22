@@ -57,7 +57,7 @@ public class CreateBookRequest {
   @Schema(description = "The genres of the book.", example = "[\"Fiction\"]", requiredMode = REQUIRED)
   private List<String> genres;
 
-  @Schema(description = "The cover photo of the book.", requiredMode = REQUIRED)
+  @Schema(description = "The cover photo of the book.", example = "book-cover-photo.jpg", requiredMode = REQUIRED)
   private MultipartFile coverPhoto;
 
   @Schema(description = "The user ID of the book owner.", example = "123456", requiredMode = REQUIRED)
@@ -177,7 +177,7 @@ public class CreateBookRequest {
     @Schema(description = "The genres of the exchange condition.", example = "[\"Fiction\"]", requiredMode = REQUIRED)
     private List<String> genres;
 
-    @Schema(description = "The books of the exchange condition.", example = "[\"123456\"]", requiredMode = REQUIRED)
+    @Schema(description = "The books of the exchange condition.", example = "[{\"title\": \"The Alchemist\", \"author\": \"Paulo Coelho\", \"coverPhoto\": \"book-cover-photo.jpg\"}]", requiredMode = REQUIRED)
     private List<BookRequest> books;
 
     public ExchangeCondition toEntity() {

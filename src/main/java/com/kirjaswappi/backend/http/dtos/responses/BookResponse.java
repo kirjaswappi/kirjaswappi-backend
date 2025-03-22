@@ -11,6 +11,7 @@ import lombok.Setter;
 
 import com.kirjaswappi.backend.service.entities.Book;
 import com.kirjaswappi.backend.service.entities.ExchangeCondition;
+import com.kirjaswappi.backend.service.entities.ExchangeableBook;
 import com.kirjaswappi.backend.service.entities.Genre;
 import com.kirjaswappi.backend.service.entities.User;
 
@@ -26,7 +27,7 @@ public class BookResponse {
   private String condition;
   private String coverPhotoUrl;
   private OwnerResponse owner;
-  private ExchangeCondition exchangeCondition;
+  private ExchangeConditionResponse exchangeCondition;
 
   public BookResponse(Book entity) {
     this.id = entity.getId();
@@ -38,7 +39,7 @@ public class BookResponse {
     this.condition = entity.getCondition().getCode();
     this.coverPhotoUrl = entity.getCoverPhoto() == null ? null : entity.getCoverPhoto();
     this.owner = new OwnerResponse(entity.getOwner());
-    this.exchangeCondition = entity.getExchangeCondition();
+    this.exchangeCondition = new ExchangeConditionResponse(entity.getExchangeCondition());
   }
 
   @Setter
@@ -53,4 +54,36 @@ public class BookResponse {
     }
   }
 
+  @Setter
+  @Getter
+  static class ExchangeConditionResponse {
+    private boolean openForOffers;
+    private List<Genre> exchangeableGenres;
+    private List<ExchangeableBookResponse> exchangeableBooks;
+
+    public ExchangeConditionResponse(ExchangeCondition entity) {
+      this.openForOffers = entity.isOpenForOffers();
+      if (entity.getExchangeableGenres() != null) {
+        this.exchangeableGenres = entity.getExchangeableGenres();
+      }
+      if (entity.getExchangeableBooks() != null) {
+        this.exchangeableBooks = entity.getExchangeableBooks()
+            .stream().map(ExchangeableBookResponse::new).toList();
+      }
+    }
+  }
+
+  @Setter
+  @Getter
+  static class ExchangeableBookResponse {
+    private final String title;
+    private final String author;
+    private final String coverPhotoUrl;
+
+    public ExchangeableBookResponse(ExchangeableBook entity) {
+      this.title = entity.getTitle();
+      this.author = entity.getAuthor();
+      this.coverPhotoUrl = entity.getCoverPhoto();
+    }
+  }
 }
