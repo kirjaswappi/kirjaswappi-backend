@@ -27,7 +27,9 @@ import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kirjaswappi.backend.common.http.ErrorUtils;
+import com.kirjaswappi.backend.common.service.AdminUserService;
 import com.kirjaswappi.backend.common.service.OTPService;
+import com.kirjaswappi.backend.common.util.JwtUtil;
 import com.kirjaswappi.backend.http.controller.UserController;
 import com.kirjaswappi.backend.http.dto.request.*;
 import com.kirjaswappi.backend.http.dto.response.*;
@@ -44,8 +46,6 @@ public class UserControllerTest {
   private UserService userService;
   @MockBean
   private OTPService otpService;
-  @MockBean
-  private ErrorUtils errorUtils;
 
   private User user;
   private CreateUserRequest createUserRequest;
@@ -68,6 +68,13 @@ public class UserControllerTest {
           .defaultRequest(get("/").header("Host", "localhost:10000"))
           .build();
     }
+
+    @MockBean
+    private ErrorUtils errorUtils;
+    @MockBean
+    private AdminUserService adminUserService;
+    @MockBean
+    private JwtUtil jwtUtil;
   }
 
   @BeforeEach
