@@ -1,0 +1,87 @@
+/*
+ * Copyright (c) 2024 KirjaSwappi or KirjaSwappi affiliate company. All rights reserved.
+ * Author: Mahiuddin Al Kamal <mahiuddinalkamal>
+ */
+package com.kirjaswappi.backend.http.dto.request;
+
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED;
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
+import java.util.List;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+import lombok.Setter;
+
+import com.kirjaswappi.backend.http.validation.ValidationUtil;
+import com.kirjaswappi.backend.service.entity.User;
+import com.kirjaswappi.backend.service.exception.BadRequestException;
+
+@Getter
+@Setter
+public class UpdateUserRequest {
+  @Schema(description = "The id of the user.", example = "123456", requiredMode = REQUIRED)
+  private String id;
+
+  @Schema(description = "The first name of the user.", example = "Robert", requiredMode = REQUIRED)
+  private String firstName;
+
+  @Schema(description = "The last name of the user.", example = "Smith", requiredMode = REQUIRED)
+  private String lastName;
+
+  @Schema(description = "The street name of the user.", example = "Street 1", requiredMode = NOT_REQUIRED)
+  private String streetName;
+
+  @Schema(description = "The house number of the user.", example = "1", requiredMode = NOT_REQUIRED)
+  private String houseNumber;
+
+  @Schema(description = "The zip code of the user.", example = "12345", requiredMode = NOT_REQUIRED)
+  private Integer zipCode;
+
+  @Schema(description = "The city of the user.", example = "Dhaka", requiredMode = NOT_REQUIRED)
+  private String city;
+
+  @Schema(description = "The country of the user.", example = "Bangladesh", requiredMode = NOT_REQUIRED)
+  private String country;
+
+  @Schema(description = "The phone number of the user.", example = "1234567890", requiredMode = NOT_REQUIRED)
+  private String phoneNumber;
+
+  @Schema(description = "The about me of the user.", example = "I am a software engineer.", requiredMode = NOT_REQUIRED)
+  private String aboutMe;
+
+  @Schema(description = "The favorite genres of the user.", example = "[\"Fiction\", \"Non-fiction\"]", requiredMode = NOT_REQUIRED)
+  private List<String> favGenres;
+
+  public User toEntity() {
+    this.validateProperties();
+    var entity = new User();
+    entity.setId(this.id);
+    entity.setFirstName(this.firstName);
+    entity.setLastName(this.lastName);
+    entity.setStreetName(this.streetName);
+    entity.setHouseNumber(this.houseNumber);
+    entity.setZipCode(this.zipCode);
+    entity.setCity(this.city);
+    entity.setCountry(this.country);
+    entity.setPhoneNumber(this.phoneNumber);
+    entity.setAboutMe(this.aboutMe);
+    entity.setFavGenres(this.favGenres);
+    return entity;
+  }
+
+  private void validateProperties() {
+    // validate id:
+    if (!ValidationUtil.validateNotBlank(this.id)) {
+      throw new BadRequestException("idCannotBeBlank", this.id);
+    }
+    // validate first name:
+    if (!ValidationUtil.validateNotBlank(this.firstName)) {
+      throw new BadRequestException("firstNameCannotBeBlank", this.firstName);
+    }
+    // validate last name:
+    if (!ValidationUtil.validateNotBlank(this.lastName)) {
+      throw new BadRequestException("lastNameCannotBeBlank", this.lastName);
+    }
+  }
+}

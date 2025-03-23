@@ -8,9 +8,9 @@ import lombok.NoArgsConstructor;
 
 import org.springframework.stereotype.Component;
 
-import com.kirjaswappi.backend.jpa.daos.BookDao;
-import com.kirjaswappi.backend.jpa.daos.UserDao;
-import com.kirjaswappi.backend.service.entities.Book;
+import com.kirjaswappi.backend.jpa.dao.BookDao;
+import com.kirjaswappi.backend.jpa.dao.UserDao;
+import com.kirjaswappi.backend.service.entity.Book;
 import com.kirjaswappi.backend.service.enums.Condition;
 import com.kirjaswappi.backend.service.enums.Language;
 

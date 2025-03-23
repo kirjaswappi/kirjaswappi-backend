@@ -4,7 +4,7 @@
  */
 package com.kirjaswappi.backend.common.service;
 
-import static com.kirjaswappi.backend.common.utils.Constants.NUMERIC;
+import static com.kirjaswappi.backend.common.util.Constants.NUMERIC;
 
 import java.io.IOException;
 import java.security.SecureRandom;
@@ -13,13 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.kirjaswappi.backend.common.jpa.repositories.OTPRepository;
-import com.kirjaswappi.backend.common.service.entities.OTP;
-import com.kirjaswappi.backend.common.service.mappers.OTPMapper;
+import com.kirjaswappi.backend.common.jpa.repository.OTPRepository;
+import com.kirjaswappi.backend.common.service.entity.OTP;
+import com.kirjaswappi.backend.common.service.mapper.OTPMapper;
 import com.kirjaswappi.backend.service.UserService;
-import com.kirjaswappi.backend.service.exceptions.BadRequestException;
-import com.kirjaswappi.backend.service.exceptions.ResourceNotFoundException;
-import com.kirjaswappi.backend.service.exceptions.UserNotFoundException;
+import com.kirjaswappi.backend.service.exception.BadRequestException;
+import com.kirjaswappi.backend.service.exception.ResourceNotFoundException;
+import com.kirjaswappi.backend.service.exception.UserNotFoundException;
 
 @Service
 @Transactional

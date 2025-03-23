@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 
 import org.springframework.stereotype.Component;
 
-import com.kirjaswappi.backend.jpa.daos.GenreDao;
-import com.kirjaswappi.backend.service.entities.Genre;
+import com.kirjaswappi.backend.jpa.dao.GenreDao;
+import com.kirjaswappi.backend.service.entity.Genre;
 
 @Component
 @NoArgsConstructor

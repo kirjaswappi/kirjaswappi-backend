@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 
 import org.springframework.stereotype.Component;
 
-import com.kirjaswappi.backend.jpa.daos.ExchangeConditionDao;
-import com.kirjaswappi.backend.service.entities.ExchangeCondition;
+import com.kirjaswappi.backend.jpa.dao.ExchangeConditionDao;
+import com.kirjaswappi.backend.service.entity.ExchangeCondition;
 
 @Component
 @NoArgsConstructor

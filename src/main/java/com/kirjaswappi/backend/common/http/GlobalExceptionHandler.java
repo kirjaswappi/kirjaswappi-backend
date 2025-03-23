@@ -4,7 +4,7 @@
  */
 package com.kirjaswappi.backend.common.http;
 
-import static com.kirjaswappi.backend.common.utils.PathProvider.getCurrentPath;
+import static com.kirjaswappi.backend.common.util.PathProvider.getCurrentPath;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,11 +13,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import com.kirjaswappi.backend.common.exceptions.BusinessException;
-import com.kirjaswappi.backend.common.exceptions.SystemException;
-import com.kirjaswappi.backend.common.service.exceptions.InvalidCredentials;
-import com.kirjaswappi.backend.service.exceptions.ResourceNotFoundException;
-import com.kirjaswappi.backend.service.exceptions.UserNotFoundException;
+import com.kirjaswappi.backend.common.exception.BusinessException;
+import com.kirjaswappi.backend.common.exception.SystemException;
+import com.kirjaswappi.backend.common.service.exception.InvalidCredentials;
+import com.kirjaswappi.backend.service.exception.ResourceNotFoundException;
+import com.kirjaswappi.backend.service.exception.UserNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {

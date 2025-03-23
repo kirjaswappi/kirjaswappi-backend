@@ -10,8 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.kirjaswappi.backend.common.service.ImageService;
-import com.kirjaswappi.backend.jpa.repositories.UserRepository;
-import com.kirjaswappi.backend.service.exceptions.UserNotFoundException;
+import com.kirjaswappi.backend.jpa.repository.UserRepository;
+import com.kirjaswappi.backend.service.exception.UserNotFoundException;
 
 @Service
 @Transactional

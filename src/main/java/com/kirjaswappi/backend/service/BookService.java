@@ -19,20 +19,20 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.kirjaswappi.backend.jpa.daos.BookDao;
-import com.kirjaswappi.backend.jpa.repositories.BookRepository;
-import com.kirjaswappi.backend.jpa.repositories.GenreRepository;
-import com.kirjaswappi.backend.jpa.repositories.UserRepository;
+import com.kirjaswappi.backend.jpa.dao.BookDao;
+import com.kirjaswappi.backend.jpa.repository.BookRepository;
+import com.kirjaswappi.backend.jpa.repository.GenreRepository;
+import com.kirjaswappi.backend.jpa.repository.UserRepository;
 import com.kirjaswappi.backend.mapper.BookMapper;
 import com.kirjaswappi.backend.mapper.ExchangeConditionMapper;
 import com.kirjaswappi.backend.mapper.ExchangeableBookMapper;
 import com.kirjaswappi.backend.mapper.GenreMapper;
-import com.kirjaswappi.backend.service.entities.Book;
-import com.kirjaswappi.backend.service.entities.ExchangeableBook;
-import com.kirjaswappi.backend.service.exceptions.BookNotFoundException;
-import com.kirjaswappi.backend.service.exceptions.GenreNotFoundException;
-import com.kirjaswappi.backend.service.exceptions.UserNotFoundException;
-import com.kirjaswappi.backend.service.filters.GetAllBooksFilter;
+import com.kirjaswappi.backend.service.entity.Book;
+import com.kirjaswappi.backend.service.entity.ExchangeableBook;
+import com.kirjaswappi.backend.service.exception.BookNotFoundException;
+import com.kirjaswappi.backend.service.exception.GenreNotFoundException;
+import com.kirjaswappi.backend.service.exception.UserNotFoundException;
+import com.kirjaswappi.backend.service.filter.GetAllBooksFilter;
 
 @Service
 @Transactional

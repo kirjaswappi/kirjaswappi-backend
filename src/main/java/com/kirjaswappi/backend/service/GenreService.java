@@ -10,14 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.kirjaswappi.backend.jpa.daos.UserDao;
-import com.kirjaswappi.backend.jpa.repositories.GenreRepository;
-import com.kirjaswappi.backend.jpa.repositories.UserRepository;
+import com.kirjaswappi.backend.jpa.dao.UserDao;
+import com.kirjaswappi.backend.jpa.repository.GenreRepository;
+import com.kirjaswappi.backend.jpa.repository.UserRepository;
 import com.kirjaswappi.backend.mapper.GenreMapper;
-import com.kirjaswappi.backend.service.entities.Genre;
-import com.kirjaswappi.backend.service.exceptions.GenreAlreadyExistsException;
-import com.kirjaswappi.backend.service.exceptions.GenreCannotBeDeletedException;
-import com.kirjaswappi.backend.service.exceptions.GenreNotFoundException;
+import com.kirjaswappi.backend.service.entity.Genre;
+import com.kirjaswappi.backend.service.exception.GenreAlreadyExistsException;
+import com.kirjaswappi.backend.service.exception.GenreCannotBeDeletedException;
+import com.kirjaswappi.backend.service.exception.GenreNotFoundException;
 
 @Service
 @Transactional

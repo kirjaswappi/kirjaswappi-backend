@@ -10,14 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.kirjaswappi.backend.common.jpa.daos.AdminUserDao;
-import com.kirjaswappi.backend.common.jpa.repositories.AdminUserRepository;
-import com.kirjaswappi.backend.common.service.entities.AdminUser;
-import com.kirjaswappi.backend.common.service.exceptions.InvalidCredentials;
-import com.kirjaswappi.backend.common.service.mappers.AdminUserMapper;
-import com.kirjaswappi.backend.common.utils.JwtUtil;
-import com.kirjaswappi.backend.service.exceptions.UserAlreadyExistsException;
-import com.kirjaswappi.backend.service.exceptions.UserNotFoundException;
+import com.kirjaswappi.backend.common.jpa.dao.AdminUserDao;
+import com.kirjaswappi.backend.common.jpa.repository.AdminUserRepository;
+import com.kirjaswappi.backend.common.service.entity.AdminUser;
+import com.kirjaswappi.backend.common.service.exception.InvalidCredentials;
+import com.kirjaswappi.backend.common.service.mapper.AdminUserMapper;
+import com.kirjaswappi.backend.common.util.JwtUtil;
+import com.kirjaswappi.backend.service.exception.UserAlreadyExistsException;
+import com.kirjaswappi.backend.service.exception.UserNotFoundException;
 
 @Service
 @Transactional
