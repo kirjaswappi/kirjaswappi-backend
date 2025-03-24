@@ -5,6 +5,7 @@
 package com.kirjaswappi.backend.mapper;
 
 import java.util.Objects;
+import java.util.UUID;
 
 import lombok.NoArgsConstructor;
 
@@ -41,7 +42,8 @@ public class ExchangeableBookMapper {
     var dao = new ExchangeableBookDao();
     if (entity.getId() != null) {
       dao.setId(entity.getId());
-    }
+    } else
+      dao.setId(UUID.randomUUID().toString());
     dao.setTitle(entity.getTitle());
     dao.setAuthor(entity.getAuthor());
     if (entity.getCoverPhoto() != null) {
