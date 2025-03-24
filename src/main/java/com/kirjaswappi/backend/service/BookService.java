@@ -25,10 +25,8 @@ import com.kirjaswappi.backend.jpa.repositories.GenreRepository;
 import com.kirjaswappi.backend.jpa.repositories.UserRepository;
 import com.kirjaswappi.backend.mapper.BookMapper;
 import com.kirjaswappi.backend.mapper.ExchangeConditionMapper;
-import com.kirjaswappi.backend.mapper.ExchangeableBookMapper;
 import com.kirjaswappi.backend.mapper.GenreMapper;
 import com.kirjaswappi.backend.service.entities.Book;
-import com.kirjaswappi.backend.service.entities.ExchangeableBook;
 import com.kirjaswappi.backend.service.exceptions.BookNotFoundException;
 import com.kirjaswappi.backend.service.exceptions.GenreNotFoundException;
 import com.kirjaswappi.backend.service.exceptions.UserNotFoundException;
@@ -59,20 +57,23 @@ public class BookService {
     setOwnerToBook(book, bookDao);
     var savedDao = bookRepository.save(bookDao);
     savedDao = addCoverPhotoToBook(book, savedDao);
-    var exchangeBooks = book.getExchangeCondition().getExchangeableBooks();
-    addCoverPhotoToExchangeBooks(exchangeBooks, savedDao);
+    addCoverPhotoToExchangeableBooksIfExists(book, savedDao);
     addBookToOwner(savedDao);
     return bookWithImageUrlAndOwner(savedDao);
   }
 
-  private void addCoverPhotoToExchangeBooks(List<ExchangeableBook> exchangeableBooks, BookDao savedDao) {
-    for (int i = 0; i < exchangeableBooks.size(); i++) {
-      var exchangeableBook = exchangeableBooks.get(i);
-      var exchangeableBookId = savedDao.getExchangeCondition().getExchangeableBooks().get(i).getId();
-      String uniqueId = photoService.addBookCoverPhoto(exchangeableBook.getCoverPhotoFile(), exchangeableBookId);
-      savedDao.getExchangeCondition().getExchangeableBooks().get(i).setCoverPhoto(uniqueId);
+  private void addCoverPhotoToExchangeableBooksIfExists(Book parentBook, BookDao bookDao) {
+    var exchangeableBooks = parentBook.getExchangeCondition().getExchangeableBooks();
+    if (exchangeableBooks == null || exchangeableBooks.isEmpty()) {
+      return;
     }
-    bookRepository.save(savedDao);
+    for (int i = 0; i < exchangeableBooks.size(); i++) {
+      var coverPhoto = exchangeableBooks.get(i).getCoverPhotoFile();
+      var exchangeableBookId = bookDao.getExchangeCondition().getExchangeableBooks().get(i).getId();
+      String uniqueId = photoService.addBookCoverPhoto(coverPhoto, exchangeableBookId);
+      bookDao.getExchangeCondition().getExchangeableBooks().get(i).setCoverPhoto(uniqueId);
+    }
+    bookRepository.save(bookDao);
   }
 
   public Book updateBook(Book book) {
@@ -116,17 +117,15 @@ public class BookService {
   }
 
   private void setValidExchangeableGenresIfExists(Book book) {
-    var exchangeCondition = book.getExchangeCondition();
-    if (exchangeCondition != null) {
-      var exchangeableGenres = exchangeCondition.getExchangeableGenres();
-      if (exchangeableGenres != null && !exchangeableGenres.isEmpty()) {
-        var validGenres = exchangeableGenres.stream()
-            .map(genre -> genreRepository.findByName(genre.getName())
-                .orElseThrow(() -> new GenreNotFoundException(genre.getName())))
-            .toList();
-        exchangeCondition.setExchangeableGenres(validGenres.stream().map(GenreMapper::toEntity).toList());
-      }
+    var exchangeableGenres = book.getExchangeCondition().getExchangeableGenres();
+    if (exchangeableGenres == null || exchangeableGenres.isEmpty()) {
+      return;
     }
+    var validGenres = exchangeableGenres.stream()
+        .map(genre -> genreRepository.findByName(genre.getName())
+            .orElseThrow(() -> new GenreNotFoundException(genre.getName())))
+        .toList();
+    book.getExchangeCondition().setExchangeableGenres(validGenres.stream().map(GenreMapper::toEntity).toList());
   }
 
   private void addGenresToBook(Book book, BookDao dao) {
@@ -191,8 +190,8 @@ public class BookService {
   }
 
   private Book bookWithImageUrlAndOwner(BookDao bookDao) {
-    fetchImageUrlForExchangeableBooks(bookDao);
     var book = fetchImageUrlForBookCoverPhoto(bookDao);
+    fetchImageUrlForExchangeableBooksIfExists(book);
     return bookWithOwner(bookDao, book);
   }
 
@@ -207,22 +206,27 @@ public class BookService {
     return BookMapper.toEntity(bookDao, bookCoverPhotoImageUrl);
   }
 
-  private void fetchImageUrlForExchangeableBooks(BookDao bookDao) {
-    var exchangeConditionDao = bookDao.getExchangeCondition();
-    if (exchangeConditionDao != null) {
-      var exchangeableBookDaos = exchangeConditionDao.getExchangeableBooks();
-      if (exchangeableBookDaos != null && !exchangeableBookDaos.isEmpty()) {
-        var exchangeableBooksWithImageUrl = exchangeableBookDaos.stream()
-            .map(exchangeableBook -> ExchangeableBookMapper.toDao(exchangeableBook,
-                photoService.getBookCoverPhoto(exchangeableBook.getCoverPhoto())))
-            .toList();
-        bookDao.getExchangeCondition().setExchangeableBooks(exchangeableBooksWithImageUrl);
-      }
+  private void fetchImageUrlForExchangeableBooksIfExists(Book parentBook) {
+    var exchangeableBooks = parentBook.getExchangeCondition().getExchangeableBooks();
+    if (exchangeableBooks == null || exchangeableBooks.isEmpty()) {
+      return;
+    }
+    for (int i = 0; i < exchangeableBooks.size(); i++) {
+      var uniqueId = exchangeableBooks.get(i).getCoverPhoto();
+      String coverPhotoUrl = photoService.getBookCoverPhoto(uniqueId);
+      parentBook.getExchangeCondition().getExchangeableBooks().get(i).setCoverPhoto(coverPhotoUrl);
     }
   }
 
   private Page<Book> mapToBookPage(Page<BookDao> bookDaos, Pageable pageable) {
     var books = bookDaos.stream().map(this::bookWithImageUrlAndOwner).toList();
     return new PageImpl<>(books, pageable, bookDaos.getTotalElements());
+  }
+
+  public void deleteAllBooks() {
+    var bookDaos = bookRepository.findAll();
+    for (var bookDao : bookDaos) {
+      deleteBook(bookDao.getId());
+    }
   }
 }
