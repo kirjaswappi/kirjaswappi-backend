@@ -115,4 +115,12 @@ public class BookController {
     bookService.deleteBook(id);
     return ResponseEntity.noContent().build();
   }
+
+  @DeleteMapping
+  @Operation(summary = "Delete all books.", responses = {
+      @ApiResponse(responseCode = "204", description = "All books are deleted.") })
+  public ResponseEntity<Void> deleteAllBooks() {
+    bookService.deleteAllBooks();
+    return ResponseEntity.noContent().build();
+  }
 }
