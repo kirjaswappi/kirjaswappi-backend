@@ -34,7 +34,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.kirjaswappi.backend.common.utils.LinkBuilder;
 import com.kirjaswappi.backend.http.dtos.requests.CreateBookRequest;
@@ -55,10 +57,20 @@ public class BookController {
   @Autowired
   private BookService bookService;
 
-  @PostMapping
+  @PostMapping(consumes = "multipart/form-data")
   @Operation(summary = "Add book to a user.", responses = {
       @ApiResponse(responseCode = "201", description = "Book created.") })
-  public ResponseEntity<BookResponse> createBook(@Valid @ModelAttribute CreateBookRequest book) {
+  public ResponseEntity<BookResponse> createBook(@Valid @ModelAttribute CreateBookRequest book,
+      @RequestPart("coverPhoto") MultipartFile coverPhoto,
+      @RequestPart("exchangeCondition.books.coverPhoto") List<MultipartFile> bookCoverPhotos) {
+    // Set the cover photo
+    book.setCoverPhoto(coverPhoto);
+
+    // Set the cover photos for exchange condition books
+    for (int i = 0; i < book.getExchangeCondition().getBooks().size(); i++) {
+      book.getExchangeCondition().getBooks().get(i).setCoverPhoto(bookCoverPhotos.get(i));
+    }
+
     Book savedBook = bookService.createBook(book.toEntity());
     return ResponseEntity.status(HttpStatus.CREATED).body(new BookResponse(savedBook));
   }
