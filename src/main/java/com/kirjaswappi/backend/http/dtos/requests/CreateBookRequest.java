@@ -18,8 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.kirjaswappi.backend.http.validations.ValidationUtil;
 import com.kirjaswappi.backend.service.entities.Book;
-import com.kirjaswappi.backend.service.entities.ExchangeCondition;
-import com.kirjaswappi.backend.service.entities.ExchangeableBook;
 import com.kirjaswappi.backend.service.entities.Genre;
 import com.kirjaswappi.backend.service.entities.User;
 import com.kirjaswappi.backend.service.enums.Condition;
@@ -90,7 +88,7 @@ public class CreateBookRequest {
       throw new BadRequestException("atLeastOneGenreNeeded", this.genres);
     }
     if (this.coverPhoto == null) {
-      throw new BadRequestException("coverPhotoIsRequired", this.coverPhoto);
+      throw new BadRequestException("coverPhotoIsRequired");
     }
     ValidationUtil.validateMediaType(coverPhoto);
 
@@ -98,96 +96,14 @@ public class CreateBookRequest {
       throw new BadRequestException("ownerIdCannotBeBlank", this.ownerId);
     }
     if (Objects.isNull(this.exchangeCondition)) {
-      throw new BadRequestException("exchangeConditionIsRequired", this.exchangeCondition);
+      throw new BadRequestException("exchangeConditionIsRequired");
     }
 
-    if (this.exchangeCondition.openForOffers) {
-      validateOpenForOffers();
+    if (this.exchangeCondition.isOpenForOffers()) {
+      exchangeCondition.validateOpenForOffers();
     } else {
-      validateNotOpenForOffers();
+      exchangeCondition.validateNotOpenForOffers();
     }
   }
 
-  private void validateOpenForOffers() {
-    if (this.exchangeCondition.genres != null && !this.exchangeCondition.genres.isEmpty()) {
-      throw new BadRequestException("exchangeableGenreCannotBePresent", this.exchangeCondition.genres);
-    }
-    if (this.exchangeCondition.books != null && !this.exchangeCondition.books.isEmpty()) {
-      throw new BadRequestException("exchangeableBookCannotBePresent", this.exchangeCondition.books);
-    }
-  }
-
-  private void validateNotOpenForOffers() {
-    if ((this.exchangeCondition.genres == null || this.exchangeCondition.genres.isEmpty()) &&
-        (this.exchangeCondition.books == null || this.exchangeCondition.books.isEmpty())) {
-      throw new BadRequestException("atLeastOneExchangeConditionIsNeeded", this.exchangeCondition.genres);
-    }
-
-    if (this.exchangeCondition.genres != null && !this.exchangeCondition.genres.isEmpty()) {
-      this.exchangeCondition.genres.forEach(genre -> {
-        if (!ValidationUtil.validateNotBlank(genre)) {
-          throw new BadRequestException("genreCannotBeBlankForExchangeCondition", genre);
-        }
-      });
-    }
-
-    if (this.exchangeCondition.books != null && !this.exchangeCondition.books.isEmpty()) {
-      this.exchangeCondition.books.forEach(book -> {
-        if (!ValidationUtil.validateNotBlank(book.title)) {
-          throw new BadRequestException("bookTitleCannotBeBlankForExchangeableBook", book.title);
-        }
-        if (!ValidationUtil.validateNotBlank(book.author)) {
-          throw new BadRequestException("authorCannotBeBlankForExchangeableBook", book.author);
-        }
-        if (book.coverPhoto == null) {
-          throw new BadRequestException("coverPhotoIsRequiredForExchangeableBook", book.coverPhoto);
-        }
-        ValidationUtil.validateMediaType(book.coverPhoto);
-      });
-    }
-  }
-
-  @Getter
-  @Setter
-  public static class ExchangeConditionRequest {
-    @Schema(description = "The open for offers status of the exchange condition.", example = "true", requiredMode = REQUIRED)
-    private boolean openForOffers;
-
-    @Schema(description = "The genres of the exchange condition.", example = "[\"Fiction\"]", requiredMode = NOT_REQUIRED)
-    private List<String> genres;
-
-    @Schema(description = "The books of the exchange condition.", example = "[{\"title\": \"The Alchemist\", \"author\": \"Paulo Coelho\", \"coverPhoto\": \"book-cover-photo.jpg\"}]", requiredMode = NOT_REQUIRED)
-    private List<BookRequest> books;
-
-    public ExchangeCondition toEntity() {
-      if (this.genres == null)
-        genres = List.of();
-      if (this.books == null)
-        books = List.of();
-      List<Genre> exchangeableGenres = this.genres.stream().map(Genre::new).toList();
-      List<ExchangeableBook> exchangeableBooks = this.books.stream().map(BookRequest::toEntity).toList();
-      return new ExchangeCondition(openForOffers, exchangeableGenres, exchangeableBooks);
-    }
-  }
-
-  @Getter
-  @Setter
-  public static class BookRequest {
-    @Schema(description = "The title of the book.", example = "The Alchemist", requiredMode = NOT_REQUIRED)
-    private String title;
-
-    @Schema(description = "The author of the book.", example = "Paulo Coelho", requiredMode = NOT_REQUIRED)
-    private String author;
-
-    @Schema(description = "The cover photo of the book.", requiredMode = NOT_REQUIRED)
-    private MultipartFile coverPhoto;
-
-    public ExchangeableBook toEntity() {
-      var book = new ExchangeableBook();
-      book.setTitle(title);
-      book.setAuthor(author);
-      book.setCoverPhotoFile(coverPhoto);
-      return book;
-    }
-  }
 }
