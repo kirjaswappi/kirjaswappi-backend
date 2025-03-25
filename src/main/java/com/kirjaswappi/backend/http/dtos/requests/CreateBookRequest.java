@@ -54,18 +54,7 @@ public class CreateBookRequest {
   private String ownerId;
 
   @Schema(description = "The exchange condition of the book.", requiredMode = REQUIRED)
-  // @JsonDeserialize(using =
-  // ExchangeConditionRequest.ExchangeConditionRequestDeserializer.class)
   private ExchangeConditionRequest exchangeCondition;
-
-//  public void setExchangeCondition(String exchangeConditionJson) {
-//    ObjectMapper objectMapper = new ObjectMapper();
-//    try {
-//      this.exchangeCondition = objectMapper.readValue(exchangeConditionJson, ExchangeConditionRequest.class);
-//    } catch (Exception e) {
-//      throw new BadRequestException("Invalid exchange condition JSON", exchangeConditionJson);
-//    }
-//  }
 
   public Book toEntity() {
     this.validateProperties();
@@ -160,16 +149,14 @@ public class CreateBookRequest {
 
   @Getter
   @Setter
-  // @JsonDeserialize(using =
-  // ExchangeConditionRequest.ExchangeConditionRequestDeserializer.class)
   public static class ExchangeConditionRequest {
     @Schema(description = "The open for offers status of the exchange condition.", example = "true", requiredMode = REQUIRED)
     private boolean openForOffers;
 
-    @Schema(description = "The genres of the exchange condition.", example = "[\"Fiction\"]", requiredMode = REQUIRED)
+    @Schema(description = "The genres of the exchange condition.", example = "[\"Fiction\"]", requiredMode = NOT_REQUIRED)
     private List<String> genres;
 
-    @Schema(description = "The books of the exchange condition.", example = "[{\"title\": \"The Alchemist\", \"author\": \"Paulo Coelho\", \"coverPhoto\": \"book-cover-photo.jpg\"}]", requiredMode = REQUIRED)
+    @Schema(description = "The books of the exchange condition.", example = "[{\"title\": \"The Alchemist\", \"author\": \"Paulo Coelho\", \"coverPhoto\": \"book-cover-photo.jpg\"}]", requiredMode = NOT_REQUIRED)
     private List<BookRequest> books;
 
     public ExchangeCondition toEntity() {
@@ -181,37 +168,6 @@ public class CreateBookRequest {
       List<ExchangeableBook> exchangeableBooks = this.books.stream().map(BookRequest::toEntity).toList();
       return new ExchangeCondition(openForOffers, exchangeableGenres, exchangeableBooks);
     }
-
-//    private static class ExchangeConditionRequestDeserializer extends JsonDeserializer<ExchangeConditionRequest> {
-//      @Override
-//      public ExchangeConditionRequest deserialize(JsonParser jsonParser, DeserializationContext context)
-//              throws IOException {
-//        ObjectMapper mapper = (ObjectMapper) jsonParser.getCodec();
-//        JsonNode node = mapper.readTree(jsonParser);
-//        if (node.isTextual()) {
-//          node = mapper.readTree(node.asText());
-//        }
-//        ExchangeConditionRequest request = new ExchangeConditionRequest();
-//        request.setOpenForOffers(node.get("openForOffers").asBoolean());
-//        request.setGenres(node.get("genres").isNull() ? null : Arrays.asList(node.get("genres").asText().split(",")));
-//        if (node.get("books").isArray()) {
-//          List<BookRequest> books = new ArrayList<>();
-//          for (JsonNode bookNode : node.get("books")) {
-//            BookRequest bookRequest = new BookRequest();
-//            bookRequest.setTitle(bookNode.get("title").asText());
-//            bookRequest.setAuthor(bookNode.get("author").asText());
-//            String coverPhotoBase64 = bookNode.get("coverPhoto").asText();
-//            MultipartFile coverPhoto = Util.base64ToMultipartFile(coverPhotoBase64, "coverPhoto.jpg");
-//            bookRequest.setCoverPhoto(coverPhoto);
-//            books.add(bookRequest);
-//          }
-//          request.setBooks(books);
-//        } else {
-//          request.setBooks(null);
-//        }
-//        return request;
-//      }
-//    }
   }
 
   @Getter
