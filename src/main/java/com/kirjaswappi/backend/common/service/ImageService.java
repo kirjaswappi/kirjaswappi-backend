@@ -48,7 +48,6 @@ public class ImageService {
     } catch (Exception e) {
       throw new ImageUploadFailureException("Failed to upload image.");
     }
-
   }
 
   @Cacheable(value = "imageUrls", key = "#uniqueId")

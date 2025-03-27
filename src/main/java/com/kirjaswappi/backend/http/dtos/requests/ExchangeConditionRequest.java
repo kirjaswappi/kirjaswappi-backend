@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.kirjaswappi.backend.common.utils.Util;
 import com.kirjaswappi.backend.http.validations.ValidationUtil;
 import com.kirjaswappi.backend.service.entities.ExchangeCondition;
 import com.kirjaswappi.backend.service.entities.ExchangeableBook;
@@ -71,7 +72,26 @@ public class ExchangeConditionRequest {
           BookRequest bookRequest = new BookRequest();
           bookRequest.setTitle(bookNode.get("title").asText());
           bookRequest.setAuthor(bookNode.get("author").asText());
-          MultipartFile coverPhoto = (MultipartFile) bookNode.get("coverPhoto");
+          MultipartFile coverPhoto;
+          try {
+            coverPhoto = (MultipartFile) bookNode.get("coverPhoto");
+          } catch (Exception e) {
+            byte[] coverPhotoBytes = bookNode.get("coverPhoto").binaryValue(); // Extract binary data
+
+            if (coverPhotoBytes == null || coverPhotoBytes.length == 0) {
+              throw new BadRequestException("coverPhotoIsRequiredForExchangeableBook");
+            } else {
+              try {
+                // Convert byte array to Multipart File
+                coverPhoto = Util.convertByteArrayToMultipartFile(coverPhotoBytes, "cover.jpg", "image/jpeg");
+                if (coverPhoto == null) {
+                  throw new BadRequestException("coverPhotoIsInvalid");
+                }
+              } catch (IOException ioException) {
+                throw new RuntimeException("Error converting byte array to MultipartFile", ioException);
+              }
+            }
+          }
           bookRequest.setCoverPhoto(coverPhoto);
           books.add(bookRequest);
         }
