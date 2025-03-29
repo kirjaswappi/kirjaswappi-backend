@@ -15,18 +15,18 @@ import org.springframework.data.mongodb.core.query.Criteria;
 
 @Getter
 @Setter
-public class GetAllBooksFilter {
+public class FindAllBooksFilter {
   @Schema(description = "Search parameter to find specific books by name, author, or genre.", example = "Lord of the Rings")
   String search;
-  @Schema(description = "Filter parameter for the language of the book.", example = "English", allowableValues = {
-      "English", "Bengali", "Hindi", "Spanish", "French", "German", "Russian", "Arabic", "Chinese", "Japanese" })
-  String language;
-  @Schema(description = "Filter parameter for the condition of the book.", example = "New", allowableValues = {
+  @Schema(description = "Filter parameter for the language of the book.", example = "[\"English\"]", allowableValues = {
+      "English", "Finnish", "Bengali", "Spanish", "French", "German", "Russian", "Arabic", "Chinese", "Japanese" })
+  List<String> languages;
+  @Schema(description = "Filter parameter for the condition of the book.", example = "[\"New\"]", allowableValues = {
       "New", "Like New", "Good", "Fair", "Poor" })
-  String condition;
-  @Schema(description = "Filter parameter for the genre of the book.", example = "Fantasy", allowableValues = {
+  List<String> conditions;
+  @Schema(description = "Filter parameter for the genre of the book.", example = "[\"Fiction\"]", allowableValues = {
       "Fantasy", "Science Fiction", "Mystery", "Horror", "Romance", "Thriller", "Historical Fiction", "Non-Fiction" })
-  String genre;
+  List<String> genres;
 
   public Criteria buildSearchAndFilterCriteria() {
     List<Criteria> combinedCriteria = new ArrayList<>();
@@ -40,22 +40,22 @@ public class GetAllBooksFilter {
     }
 
     // Add filter criteria:
-    if (language != null && !language.isEmpty()) {
-      combinedCriteria.add(Criteria.where("language").is(language));
+    if (languages != null && !languages.isEmpty()) {
+      languages.forEach(language -> combinedCriteria.add(Criteria.where("language").is(language)));
     }
 
-    if (condition != null && !condition.isEmpty()) {
-      combinedCriteria.add(Criteria.where("condition").is(condition));
+    if (conditions != null && !conditions.isEmpty()) {
+      conditions.forEach(condition -> combinedCriteria.add(Criteria.where("condition").is(condition)));
     }
 
-    if (genre != null && !genre.isEmpty()) {
-      combinedCriteria.add(Criteria.where("genres.name").is(genre));
+    if (genres != null && !genres.isEmpty()) {
+      genres.forEach(genre -> combinedCriteria.add(Criteria.where("genres.name").is(genre)));
     }
 
-    var criteria = new Criteria();
+    var finalCriteria = new Criteria();
     if (combinedCriteria.isEmpty()) {
-      return criteria;
+      return finalCriteria;
     }
-    return criteria.andOperator(combinedCriteria.toArray(new Criteria[0]));
+    return finalCriteria.andOperator(combinedCriteria.toArray(new Criteria[0]));
   }
 }
