@@ -22,10 +22,10 @@ public class BookResponse {
   private final String title;
   private final String author;
   private List<String> genres;
-  private String language;
-  private String description;
-  private String condition;
-  private String coverPhotoUrl;
+  private final String language;
+  private final String description;
+  private final String condition;
+  private final String coverPhotoUrl;
   private OwnerResponse owner;
   private ExchangeConditionResponse exchangeCondition;
 
