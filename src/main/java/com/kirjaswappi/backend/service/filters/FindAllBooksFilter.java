@@ -41,15 +41,30 @@ public class FindAllBooksFilter {
 
     // Add filter criteria:
     if (languages != null && !languages.isEmpty()) {
-      languages.forEach(language -> combinedCriteria.add(Criteria.where("language").is(language)));
+      if (languages.size() == 1) {
+        combinedCriteria.add(Criteria.where("language").is(languages.get(0)));
+      } else {
+        combinedCriteria.add(new Criteria().orOperator(
+            languages.stream().map(lang -> Criteria.where("language").is(lang)).toArray(Criteria[]::new)));
+      }
     }
 
     if (conditions != null && !conditions.isEmpty()) {
-      conditions.forEach(condition -> combinedCriteria.add(Criteria.where("condition").is(condition)));
+      if (conditions.size() == 1) {
+        combinedCriteria.add(Criteria.where("condition").is(conditions.get(0)));
+      } else {
+        combinedCriteria.add(new Criteria().orOperator(
+            conditions.stream().map(cond -> Criteria.where("condition").is(cond)).toArray(Criteria[]::new)));
+      }
     }
 
     if (genres != null && !genres.isEmpty()) {
-      genres.forEach(genre -> combinedCriteria.add(Criteria.where("genres.name").is(genre)));
+      if (genres.size() == 1) {
+        combinedCriteria.add(Criteria.where("genres.name").is(genres.get(0)));
+      } else {
+        combinedCriteria.add(new Criteria().orOperator(
+            genres.stream().map(genre -> Criteria.where("genres.name").is(genre)).toArray(Criteria[]::new)));
+      }
     }
 
     var finalCriteria = new Criteria();
