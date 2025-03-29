@@ -44,9 +44,9 @@ public class GenreController {
   private GenreService genreService;
 
   @GetMapping
-  @Operation(summary = "Get all genres.", responses = {
+  @Operation(summary = "Find all genres.", responses = {
       @ApiResponse(responseCode = "200", description = "List of genres.") })
-  public ResponseEntity<List<GenreResponse>> getGenres() {
+  public ResponseEntity<List<GenreResponse>> findGenres() {
     var genreListResponses = genreService.getGenres().stream().map(GenreResponse::new).toList();
     return ResponseEntity.status(HttpStatus.OK).body(genreListResponses);
   }

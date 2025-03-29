@@ -30,7 +30,7 @@ import com.kirjaswappi.backend.service.entities.Book;
 import com.kirjaswappi.backend.service.exceptions.BookNotFoundException;
 import com.kirjaswappi.backend.service.exceptions.GenreNotFoundException;
 import com.kirjaswappi.backend.service.exceptions.UserNotFoundException;
-import com.kirjaswappi.backend.service.filters.GetAllBooksFilter;
+import com.kirjaswappi.backend.service.filters.FindAllBooksFilter;
 
 @Service
 @Transactional
@@ -91,7 +91,7 @@ public class BookService {
     return bookWithImageUrlAndOwner(bookDao);
   }
 
-  public Page<Book> getAllBooksByFilter(GetAllBooksFilter filter, Pageable pageable) {
+  public Page<Book> getAllBooksByFilter(FindAllBooksFilter filter, Pageable pageable) {
     var criteria = filter.buildSearchAndFilterCriteria();
     pageable = getPageableWithValidSortingCriteria(pageable);
     var bookDaos = bookRepository.findAllBooksByFilter(criteria, pageable);

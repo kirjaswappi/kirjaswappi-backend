@@ -46,7 +46,7 @@ import com.kirjaswappi.backend.service.entities.Book;
 import com.kirjaswappi.backend.service.enums.Condition;
 import com.kirjaswappi.backend.service.enums.Language;
 import com.kirjaswappi.backend.service.exceptions.BadRequestException;
-import com.kirjaswappi.backend.service.filters.GetAllBooksFilter;
+import com.kirjaswappi.backend.service.filters.FindAllBooksFilter;
 
 @RestController
 @RequestMapping(API_BASE + BOOKS)
@@ -64,31 +64,31 @@ public class BookController {
   }
 
   @GetMapping(ID)
-  @Operation(summary = "Get book by Book Id.", responses = {
+  @Operation(summary = "Find book by Book Id.", responses = {
       @ApiResponse(responseCode = "200", description = "Book found.") })
-  public ResponseEntity<BookResponse> getBookById(@Parameter(description = "Book Id.") @PathVariable String id) {
+  public ResponseEntity<BookResponse> findBookById(@Parameter(description = "Book Id.") @PathVariable String id) {
     Book book = bookService.getBookById(id);
     return ResponseEntity.status(HttpStatus.OK).body(new BookResponse(book));
   }
 
   @GetMapping(SUPPORTED_LANGUAGES)
-  @Operation(summary = "Get list of supported languages.", responses = {
+  @Operation(summary = "Find list of supported languages.", responses = {
       @ApiResponse(responseCode = "200", description = "List of supported languages.") })
-  public ResponseEntity<List<String>> getAllSupportedLanguages() {
+  public ResponseEntity<List<String>> findAllSupportedLanguages() {
     return ResponseEntity.status(HttpStatus.OK).body(Language.getSupportedLanguages());
   }
 
   @GetMapping(SUPPORTED_CONDITIONS)
-  @Operation(summary = "Get list of supported book conditions.", responses = {
+  @Operation(summary = "Find list of supported book conditions.", responses = {
       @ApiResponse(responseCode = "200", description = "List of supported conditions.") })
-  public ResponseEntity<List<String>> getAllSupportedConditions() {
+  public ResponseEntity<List<String>> findAllSupportedConditions() {
     return ResponseEntity.status(HttpStatus.OK).body(Condition.getSupportedConditions());
   }
 
   @GetMapping
   @Operation(summary = "Search for books with (optional) filter properties.", responses = {
       @ApiResponse(responseCode = "200", description = "List of Books.") })
-  public ResponseEntity<PagedModel<BookListResponse>> getAllBooks(@Valid @ParameterObject GetAllBooksFilter filter,
+  public ResponseEntity<PagedModel<BookListResponse>> findAllBooks(@Valid @ParameterObject FindAllBooksFilter filter,
       @PageableDefault(size = 10) Pageable pageable) {
     Page<Book> books = bookService.getAllBooksByFilter(filter, pageable);
     Page<BookListResponse> response = books.map(BookListResponse::new);
