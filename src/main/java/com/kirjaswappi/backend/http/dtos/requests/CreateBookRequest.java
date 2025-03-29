@@ -16,6 +16,8 @@ import lombok.Setter;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.kirjaswappi.backend.http.validations.ValidationUtil;
 import com.kirjaswappi.backend.service.entities.Book;
 import com.kirjaswappi.backend.service.entities.Genre;
@@ -52,7 +54,17 @@ public class CreateBookRequest {
   private String ownerId;
 
   @Schema(description = "The exchange condition of the book.", requiredMode = REQUIRED)
+  @JsonDeserialize(using = ExchangeConditionRequest.ExchangeConditionRequestDeserializer.class)
   private ExchangeConditionRequest exchangeCondition;
+
+  public void setExchangeCondition(String exchangeConditionJson) {
+    ObjectMapper objectMapper = new ObjectMapper();
+    try {
+      this.exchangeCondition = objectMapper.readValue(exchangeConditionJson, ExchangeConditionRequest.class);
+    } catch (Exception e) {
+      throw new BadRequestException("Invalid exchange condition JSON", exchangeConditionJson);
+    }
+  }
 
   public Book toEntity() {
     this.validateProperties();
