@@ -64,22 +64,22 @@ public class BookController {
   }
 
   @GetMapping(ID)
-  @Operation(summary = "Find book by Book Id.", responses = {
+  @Operation(summary = "Find book by Book ID.", responses = {
       @ApiResponse(responseCode = "200", description = "Book found.") })
-  public ResponseEntity<BookResponse> findBookById(@Parameter(description = "Book Id.") @PathVariable String id) {
+  public ResponseEntity<BookResponse> findBookById(@Parameter(description = "Book ID.") @PathVariable String id) {
     Book book = bookService.getBookById(id);
     return ResponseEntity.status(HttpStatus.OK).body(new BookResponse(book));
   }
 
   @GetMapping(SUPPORTED_LANGUAGES)
-  @Operation(summary = "Find list of supported languages.", responses = {
+  @Operation(summary = "Find supported book languages.", responses = {
       @ApiResponse(responseCode = "200", description = "List of supported languages.") })
   public ResponseEntity<List<String>> findAllSupportedLanguages() {
     return ResponseEntity.status(HttpStatus.OK).body(Language.getSupportedLanguages());
   }
 
   @GetMapping(SUPPORTED_CONDITIONS)
-  @Operation(summary = "Find list of supported book conditions.", responses = {
+  @Operation(summary = "Find supported book conditions.", responses = {
       @ApiResponse(responseCode = "200", description = "List of supported conditions.") })
   public ResponseEntity<List<String>> findAllSupportedConditions() {
     return ResponseEntity.status(HttpStatus.OK).body(Condition.getSupportedConditions());
@@ -96,9 +96,9 @@ public class BookController {
   }
 
   @PutMapping(value = ID, consumes = "multipart/form-data")
-  @Operation(summary = "Update book by Book Id.", responses = {
+  @Operation(summary = "Update book by Book ID.", responses = {
       @ApiResponse(responseCode = "200", description = "Book updated.") })
-  public ResponseEntity<BookResponse> updateBook(@Parameter(description = "Book Id.") @PathVariable String id,
+  public ResponseEntity<BookResponse> updateBook(@Parameter(description = "Book ID.") @PathVariable String id,
       @Valid @ModelAttribute UpdateBookRequest request) {
     // validate id:
     if (!id.equals(request.getId())) {
@@ -109,9 +109,9 @@ public class BookController {
   }
 
   @DeleteMapping(ID)
-  @Operation(summary = "Delete book by Book Id.", responses = {
+  @Operation(summary = "Delete book by Book ID.", responses = {
       @ApiResponse(responseCode = "204", description = "Book deleted.") })
-  public ResponseEntity<Void> deleteBook(@Parameter(description = "Book Id.") @PathVariable String id) {
+  public ResponseEntity<Void> deleteBook(@Parameter(description = "Book ID.") @PathVariable String id) {
     bookService.deleteBook(id);
     return ResponseEntity.noContent().build();
   }

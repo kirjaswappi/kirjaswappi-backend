@@ -75,7 +75,7 @@ public class UserController {
   @PutMapping(ID)
   @Operation(summary = "Update user.", responses = {
       @ApiResponse(responseCode = "200", description = "User updated.") })
-  public ResponseEntity<UpdateUserResponse> updateUser(@Parameter(description = "User Id.") @PathVariable String id,
+  public ResponseEntity<UpdateUserResponse> updateUser(@Parameter(description = "User ID.") @PathVariable String id,
       @Valid @RequestBody UpdateUserRequest user) {
     // validate id:
     if (!id.equals(user.getId())) {
@@ -86,15 +86,15 @@ public class UserController {
   }
 
   @GetMapping(ID)
-  @Operation(summary = "Get user by User Id.", responses = {
+  @Operation(summary = "Find user by User ID.", responses = {
       @ApiResponse(responseCode = "200", description = "User found.") })
-  public ResponseEntity<UserResponse> getUser(@Parameter(description = "User Id.") @PathVariable String id) {
+  public ResponseEntity<UserResponse> getUser(@Parameter(description = "User ID.") @PathVariable String id) {
     User user = userService.getUser(id);
     return ResponseEntity.status(HttpStatus.OK).body(new UserResponse(user));
   }
 
   @GetMapping
-  @Operation(summary = "Get all users.", responses = {
+  @Operation(summary = "Find all users.", responses = {
       @ApiResponse(responseCode = "200", description = "List of users.") })
   public ResponseEntity<List<UserResponse>> getUsers() {
     var userResponses = userService.getUsers().stream().map(UserResponse::new).toList();
@@ -104,7 +104,7 @@ public class UserController {
   @DeleteMapping(ID)
   @Operation(summary = "Delete user.", responses = {
       @ApiResponse(responseCode = "204", description = "User deleted.") })
-  public ResponseEntity<Void> deleteUser(@Parameter(description = "User Id.") @PathVariable String id) {
+  public ResponseEntity<Void> deleteUser(@Parameter(description = "User ID.") @PathVariable String id) {
     userService.deleteUser(id);
     return ResponseEntity.noContent().build();
   }
@@ -121,7 +121,7 @@ public class UserController {
   @Operation(summary = "Change password.", responses = {
       @ApiResponse(responseCode = "200", description = "Password changed.") })
   public ResponseEntity<ChangePasswordResponse> changePassword(
-      @Parameter(description = "User Email.") @PathVariable String email,
+      @Parameter(description = "User email.") @PathVariable String email,
       @Valid @RequestBody ChangePasswordRequest request) {
     userService.verifyCurrentPassword(request.toVerifyPasswordEntity(email));
     String userEmail = userService.changePassword(request.toChangePasswordEntity(email));
@@ -130,9 +130,9 @@ public class UserController {
 
   @PostMapping(RESET_PASSWORD + EMAIL)
   @Operation(summary = "Reset password.", responses = {
-      @ApiResponse(responseCode = "200", description = "Password reset.") })
+      @ApiResponse(responseCode = "200", description = "Password reset successfully.") })
   public ResponseEntity<ResetPasswordResponse> resetPassword(
-      @Parameter(description = "User Email.") @PathVariable String email,
+      @Parameter(description = "User email.") @PathVariable String email,
       @Valid @RequestBody ResetPasswordRequest request) {
     String userEmail = userService.changePassword(request.toUserEntity(email));
     return ResponseEntity.status(HttpStatus.OK).body(new ResetPasswordResponse(userEmail));

@@ -62,7 +62,7 @@ public class GenreController {
   @PutMapping(ID)
   @Operation(summary = "Update genre.", responses = {
       @ApiResponse(responseCode = "200", description = "Genre updated.") })
-  public ResponseEntity<GenreResponse> updateGenre(@Parameter(description = "Genre Id.") @PathVariable String id,
+  public ResponseEntity<GenreResponse> updateGenre(@Parameter(description = "Genre ID.") @PathVariable String id,
       @Valid @RequestBody UpdateGenreRequest request) {
     // validate id:
     if (!id.equals(request.getId())) {
@@ -75,7 +75,7 @@ public class GenreController {
   @DeleteMapping(ID)
   @Operation(summary = "Delete genre.", responses = {
       @ApiResponse(responseCode = "204", description = "Genre deleted.") })
-  public ResponseEntity<Void> deleteGenre(@Parameter(description = "Genre Id.") @PathVariable String id) {
+  public ResponseEntity<Void> deleteGenre(@Parameter(description = "Genre ID.") @PathVariable String id) {
     genreService.deleteGenre(id);
     return ResponseEntity.noContent().build();
   }
