@@ -60,46 +60,71 @@ public class ExchangeConditionRequest {
         throws IOException {
       ObjectMapper mapper = (ObjectMapper) jsonParser.getCodec();
       JsonNode node = mapper.readTree(jsonParser);
+
       if (node.isTextual()) {
         node = mapper.readTree(node.asText());
       }
+
       ExchangeConditionRequest request = new ExchangeConditionRequest();
       request.setOpenForOffers(node.get("openForOffers").asBoolean());
-      request.setGenres(node.get("genres").isNull() ? null : Arrays.asList(node.get("genres").asText().split(",")));
-      if (node.get("books").isArray()) {
-        List<BookRequest> books = new ArrayList<>();
-        for (JsonNode bookNode : node.get("books")) {
-          BookRequest bookRequest = new BookRequest();
-          bookRequest.setTitle(bookNode.get("title").asText());
-          bookRequest.setAuthor(bookNode.get("author").asText());
-          MultipartFile coverPhoto;
-          try {
-            coverPhoto = (MultipartFile) bookNode.get("coverPhoto");
-          } catch (Exception e) {
-            byte[] coverPhotoBytes = bookNode.get("coverPhoto").binaryValue(); // Extract binary data
+      request.setGenres(node.hasNonNull("genres") ? Arrays.asList(node.get("genres").asText().split(",")) : null);
 
-            if (coverPhotoBytes == null || coverPhotoBytes.length == 0) {
-              throw new BadRequestException("coverPhotoIsRequiredForExchangeableBook");
-            } else {
-              try {
-                // Convert byte array to Multipart File
-                coverPhoto = Util.convertByteArrayToMultipartFile(coverPhotoBytes, "cover.jpg", "image/jpeg");
-                if (coverPhoto == null) {
-                  throw new BadRequestException("coverPhotoIsInvalid");
-                }
-              } catch (IOException ioException) {
-                throw new RuntimeException("Error converting byte array to MultipartFile", ioException);
-              }
-            }
+      if (node.has("books") && node.get("books").isArray()) {
+        JsonNode booksNode = node.get("books");
+        List<BookRequest> books = new ArrayList<>(booksNode.size()); // Preallocate list
+
+        for (JsonNode bookNode : booksNode) {
+          BookRequest bookRequest = new BookRequest();
+          bookRequest.setTitle(getJsonNodeAsText(bookNode, "title"));
+          bookRequest.setAuthor(getJsonNodeAsText(bookNode, "author"));
+
+          // Extract cover photo
+          String coverPhotoData = getJsonNodeAsText(bookNode, "coverPhoto");
+          if (coverPhotoData == null || !coverPhotoData.contains(",")) {
+            throw new BadRequestException("coverPhotoIsRequiredForExchangeableBook");
           }
-          bookRequest.setCoverPhoto(coverPhoto);
+
+          // Extract MIME type and base64-encoded image
+          String[] imageParts = coverPhotoData.split(",", 2); // Split once
+          String imageInfo = imageParts[0];
+          String base64Image = imageParts[1];
+
+          String contentType = extractContentType(imageInfo);
+
+          try {
+            MultipartFile coverPhoto = Util.convertBase64ImageToMultipartFile(
+                base64Image, "Exchangeable-Book-Cover-Photo.jpg", contentType);
+            if (coverPhoto == null) {
+              throw new BadRequestException("invalidExchangeableCoverPhoto");
+            }
+            bookRequest.setCoverPhoto(coverPhoto);
+          } catch (IOException ioException) {
+            throw new RuntimeException("Error converting base64 to MultipartFile", ioException);
+          }
+
           books.add(bookRequest);
         }
         request.setBooks(books);
       } else {
         request.setBooks(null);
       }
+
       return request;
+    }
+
+    /**
+     * Helper method to safely get text from a JSON node.
+     */
+    private String getJsonNodeAsText(JsonNode node, String fieldName) {
+      return node.hasNonNull(fieldName) ? node.get(fieldName).asText() : null;
+    }
+
+    /**
+     * Extracts MIME type from a base64 data URI.
+     */
+    private String extractContentType(String imageInfo) {
+      String[] parts = imageInfo.split("[,:;]");
+      return (parts.length > 1) ? parts[1] : "";
     }
   }
 

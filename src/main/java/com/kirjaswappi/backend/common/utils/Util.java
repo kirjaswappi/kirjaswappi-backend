@@ -6,6 +6,7 @@ package com.kirjaswappi.backend.common.utils;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Base64;
 
 import lombok.NoArgsConstructor;
 
@@ -24,15 +25,16 @@ public class Util {
     return BCrypt.hashpw(password, salt);
   }
 
-  public static MultipartFile convertByteArrayToMultipartFile(byte[] byteArray, String fileName, String contentType)
+  public static MultipartFile convertBase64ImageToMultipartFile(String base64Image, String fileName, String contentType)
       throws IOException {
-    if (byteArray == null || byteArray.length == 0) {
+    byte[] decodedBytes = Base64.getDecoder().decode(base64Image);
+    if (decodedBytes == null || decodedBytes.length == 0) {
       return null;
     }
 
-    FileItem fileItem = new DiskFileItem("file", contentType, true, fileName, byteArray.length, null);
+    FileItem fileItem = new DiskFileItem("file", contentType, true, fileName, decodedBytes.length, null);
     try (OutputStream outputStream = fileItem.getOutputStream()) {
-      outputStream.write(byteArray);
+      outputStream.write(decodedBytes);
     }
     return new FileItemMultipartFile(fileItem);
   }
