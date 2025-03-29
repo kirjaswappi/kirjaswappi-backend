@@ -17,27 +17,20 @@ import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 
 @Getter
 @Setter
-public class CreatePhotoRequest {
-  @Schema(description = "The user ID of the photo owner.", example = "123456", requiredMode = REQUIRED)
-  private String userId;
-
+public class CreateSupportedCoverPhotoRequest {
   @Schema(description = "The image file of the photo.", requiredMode = REQUIRED)
-  private MultipartFile image;
+  private MultipartFile coverPhoto;
 
-  public CreatePhotoRequest(String userId, MultipartFile image) {
-    this.userId = userId;
-    this.image = image;
+  public CreateSupportedCoverPhotoRequest(MultipartFile coverPhoto) {
+    this.coverPhoto = coverPhoto;
     this.validateProperties();
   }
 
   private void validateProperties() {
-    if (!ValidationUtil.validateNotBlank(this.userId)) {
-      throw new BadRequestException("userIdCannotBeBlank", this.userId);
-    }
     // validate image:
-    if (this.image == null) {
+    if (this.coverPhoto == null) {
       throw new BadRequestException("imageCannotBeNull");
     }
-    ValidationUtil.validateMediaType(this.image);
+    ValidationUtil.validateMediaType(this.coverPhoto);
   }
 }

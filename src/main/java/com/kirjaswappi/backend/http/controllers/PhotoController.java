@@ -4,14 +4,9 @@
  */
 package com.kirjaswappi.backend.http.controllers;
 
-import static com.kirjaswappi.backend.common.utils.Constants.API_BASE;
-import static com.kirjaswappi.backend.common.utils.Constants.BY_EMAIL;
-import static com.kirjaswappi.backend.common.utils.Constants.BY_ID;
-import static com.kirjaswappi.backend.common.utils.Constants.COVER_PHOTO;
-import static com.kirjaswappi.backend.common.utils.Constants.EMAIL;
-import static com.kirjaswappi.backend.common.utils.Constants.ID;
-import static com.kirjaswappi.backend.common.utils.Constants.PHOTOS;
-import static com.kirjaswappi.backend.common.utils.Constants.PROFILE_PHOTO;
+import static com.kirjaswappi.backend.common.utils.Constants.*;
+
+import java.util.List;
 
 import jakarta.validation.Valid;
 
@@ -31,7 +26,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kirjaswappi.backend.http.dtos.requests.CreatePhotoRequest;
+import com.kirjaswappi.backend.http.dtos.requests.CreateSupportedCoverPhotoRequest;
 import com.kirjaswappi.backend.http.dtos.responses.PhotoResponse;
+import com.kirjaswappi.backend.http.dtos.responses.SupportedCoverPhotoListResponse;
 import com.kirjaswappi.backend.service.PhotoService;
 
 @RestController
@@ -106,5 +103,31 @@ public class PhotoController {
   public ResponseEntity<PhotoResponse> getCoverPhotoById(@Parameter(description = "User ID.") @PathVariable String id) {
     var imageUrl = photoService.getPhotoByUserId(id, false);
     return ResponseEntity.ok(new PhotoResponse(imageUrl));
+  }
+
+  @PostMapping(SUPPORTED_COVER_PHOTOS)
+  @Operation(summary = "Add supported cover photo.", description = "Add supported cover photo.", responses = {
+      @ApiResponse(responseCode = "200", description = "Supported cover photo added.") })
+  public ResponseEntity<PhotoResponse> addSupportedCoverPhoto(
+      @Valid @ModelAttribute CreateSupportedCoverPhotoRequest request) {
+    var imageUrl = photoService.addSupportedCoverPhoto(request.getCoverPhoto());
+    return ResponseEntity.ok(new PhotoResponse(imageUrl));
+  }
+
+  @GetMapping(SUPPORTED_COVER_PHOTOS)
+  @Operation(summary = "Find all supported cover photos.", description = "Find all supported cover photos.", responses = {
+      @ApiResponse(responseCode = "200", description = "List of all supported cover photos.") })
+  public ResponseEntity<List<SupportedCoverPhotoListResponse>> findSupportedCoverPhotos() {
+    var supportedCoverPhotos = photoService.findSupportedCoverPhoto();
+    return ResponseEntity.ok(supportedCoverPhotos.stream().map(SupportedCoverPhotoListResponse::new).toList());
+  }
+
+  @DeleteMapping(SUPPORTED_COVER_PHOTOS + ID)
+  @Operation(summary = "Delete a supported cover photo.", description = "Delete a supported cover photo.", responses = {
+      @ApiResponse(responseCode = "204", description = "Cover photo deleted.") })
+  public ResponseEntity<Void> deleteSupportedCoverPhoto(
+      @Parameter(description = "Supported cover photo ID.") @PathVariable String id) {
+    photoService.deleteSupportedCoverPhoto(id);
+    return ResponseEntity.noContent().build();
   }
 }
