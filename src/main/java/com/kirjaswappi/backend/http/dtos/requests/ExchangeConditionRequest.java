@@ -101,7 +101,6 @@ public class ExchangeConditionRequest {
           } catch (IOException ioException) {
             throw new RuntimeException("Error converting base64 to MultipartFile", ioException);
           }
-
           books.add(bookRequest);
         }
         request.setBooks(books);
