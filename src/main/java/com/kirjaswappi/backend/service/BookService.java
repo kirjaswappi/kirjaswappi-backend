@@ -82,6 +82,7 @@ public class BookService {
     updateDaoWithNewProperties(book, dao);
     var updatedBookDao = bookRepository.save(dao);
     updatedBookDao = addCoverPhotoToBook(book, updatedBookDao);
+    addCoverPhotoToExchangeableBooksIfExists(book, updatedBookDao);
     return bookWithImageUrlAndOwner(updatedBookDao);
   }
 
