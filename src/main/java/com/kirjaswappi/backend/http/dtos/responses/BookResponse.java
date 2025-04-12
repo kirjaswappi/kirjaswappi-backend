@@ -10,9 +10,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 import com.kirjaswappi.backend.service.entities.Book;
-import com.kirjaswappi.backend.service.entities.ExchangeCondition;
-import com.kirjaswappi.backend.service.entities.ExchangeableBook;
 import com.kirjaswappi.backend.service.entities.Genre;
+import com.kirjaswappi.backend.service.entities.SwapCondition;
+import com.kirjaswappi.backend.service.entities.SwappableBook;
 import com.kirjaswappi.backend.service.entities.User;
 
 @Getter
@@ -27,7 +27,7 @@ public class BookResponse {
   private final String condition;
   private final String coverPhotoUrl;
   private OwnerResponse owner;
-  private ExchangeConditionResponse exchangeCondition;
+  private SwapConditionResponse swapCondition;
 
   public BookResponse(Book entity) {
     this.id = entity.getId();
@@ -39,7 +39,7 @@ public class BookResponse {
     this.condition = entity.getCondition().getCode();
     this.coverPhotoUrl = entity.getCoverPhoto() == null ? null : entity.getCoverPhoto();
     this.owner = new OwnerResponse(entity.getOwner());
-    this.exchangeCondition = new ExchangeConditionResponse(entity.getExchangeCondition());
+    this.swapCondition = new SwapConditionResponse(entity.getSwapCondition());
   }
 
   @Setter
@@ -56,31 +56,35 @@ public class BookResponse {
 
   @Setter
   @Getter
-  static class ExchangeConditionResponse {
+  static class SwapConditionResponse {
+    private String conditionType;
+    private boolean giveAway;
     private boolean openForOffers;
-    private List<Genre> exchangeableGenres;
-    private List<ExchangeableBookResponse> exchangeableBooks;
+    private List<Genre> swappableGenres;
+    private List<SwappableBookResponse> swappableBooks;
 
-    public ExchangeConditionResponse(ExchangeCondition entity) {
+    public SwapConditionResponse(SwapCondition entity) {
+      this.conditionType = entity.getConditionType().getCode();
+      this.giveAway = entity.isGiveAway();
       this.openForOffers = entity.isOpenForOffers();
-      if (entity.getExchangeableGenres() != null) {
-        this.exchangeableGenres = entity.getExchangeableGenres();
+      if (entity.getSwappableGenres() != null) {
+        this.swappableGenres = entity.getSwappableGenres();
       }
-      if (entity.getExchangeableBooks() != null) {
-        this.exchangeableBooks = entity.getExchangeableBooks()
-            .stream().map(ExchangeableBookResponse::new).toList();
+      if (entity.getSwappableBooks() != null) {
+        this.swappableBooks = entity.getSwappableBooks()
+            .stream().map(SwappableBookResponse::new).toList();
       }
     }
   }
 
   @Setter
   @Getter
-  static class ExchangeableBookResponse {
+  static class SwappableBookResponse {
     private final String title;
     private final String author;
     private final String coverPhotoUrl;
 
-    public ExchangeableBookResponse(ExchangeableBook entity) {
+    public SwappableBookResponse(SwappableBook entity) {
       this.title = entity.getTitle();
       this.author = entity.getAuthor();
       this.coverPhotoUrl = entity.getCoverPhoto();

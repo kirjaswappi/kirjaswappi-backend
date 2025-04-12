@@ -36,8 +36,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kirjaswappi.backend.common.utils.LinkBuilder;
 import com.kirjaswappi.backend.http.dtos.requests.CreateBookRequest;
+import com.kirjaswappi.backend.http.dtos.requests.SwapConditionRequest;
 import com.kirjaswappi.backend.http.dtos.requests.UpdateBookRequest;
 import com.kirjaswappi.backend.http.dtos.responses.BookListResponse;
 import com.kirjaswappi.backend.http.dtos.responses.BookResponse;
@@ -59,7 +61,9 @@ public class BookController {
   @Operation(summary = "Add book to a user.", responses = {
       @ApiResponse(responseCode = "201", description = "Book created.") })
   public ResponseEntity<BookResponse> createBook(@Valid @ModelAttribute CreateBookRequest book) {
-    Book savedBook = bookService.createBook(book.toEntity());
+    Book entity = book.toEntity();
+    this.parseBookSwapCondition(book.getSwapCondition(), entity);
+    Book savedBook = bookService.createBook(entity);
     return ResponseEntity.status(HttpStatus.CREATED).body(new BookResponse(savedBook));
   }
 
@@ -104,7 +108,9 @@ public class BookController {
     if (!id.equals(request.getId())) {
       throw new BadRequestException("idMismatch", id, request.getId());
     }
-    Book updatedBook = bookService.updateBook(request.toEntity());
+    Book entity = request.toEntity();
+    this.parseBookSwapCondition(request.getSwapCondition(), entity);
+    Book updatedBook = bookService.updateBook(entity);
     return ResponseEntity.status(HttpStatus.OK).body(new BookResponse(updatedBook));
   }
 
@@ -122,5 +128,14 @@ public class BookController {
   public ResponseEntity<Void> deleteAllBooks() {
     bookService.deleteAllBooks();
     return ResponseEntity.noContent().build();
+  }
+
+  private void parseBookSwapCondition(String swapConditionJson, Book book) {
+    ObjectMapper objectMapper = new ObjectMapper();
+    try {
+      book.setSwapCondition(objectMapper.readValue(swapConditionJson, SwapConditionRequest.class).toEntity());
+    } catch (Exception e) {
+      throw new BadRequestException("invalidSwapConditionRequest", swapConditionJson);
+    }
   }
 }

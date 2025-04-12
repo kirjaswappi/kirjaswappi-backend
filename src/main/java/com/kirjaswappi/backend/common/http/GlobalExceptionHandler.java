@@ -6,7 +6,11 @@ package com.kirjaswappi.backend.common.http;
 
 import static com.kirjaswappi.backend.common.utils.PathProvider.getCurrentPath;
 
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -65,5 +69,12 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ErrorResponse handleGenericBusinessException(BusinessException exception, WebRequest webRequest) {
     return errorUtils.buildErrorResponse(exception, webRequest);
+  }
+
+  @ExceptionHandler(HttpMessageNotReadableException.class)
+  public ResponseEntity<?> handleJsonParseError(HttpMessageNotReadableException ex) {
+    return ResponseEntity
+        .badRequest()
+        .body(Map.of("error", "Invalid JSON payload", "details", ex.getMessage()));
   }
 }
