@@ -27,6 +27,7 @@ public class SwapCondition {
       boolean openForOffers,
       List<Genre> swappableGenres,
       List<SwappableBook> swappableBooks) {
+    this.conditionType = conditionType;
     this.giveAway = giveAway;
     this.openForOffers = openForOffers;
     this.swappableGenres = swappableGenres != null ? swappableGenres : List.of();
