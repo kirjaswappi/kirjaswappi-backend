@@ -66,8 +66,8 @@ public class GenreService {
   private boolean isGenreInBooks(UserDao user, String id) {
     return user.getBooks() != null && user.getBooks().stream()
         .anyMatch(book -> book.getGenres().stream().anyMatch(genre -> genre.getId().equals(id)) &&
-            book.getExchangeCondition() != null &&
-            book.getExchangeCondition().getExchangeableGenres().stream().anyMatch(g -> g.getId().equals(id)));
+            book.getSwapCondition() != null &&
+            book.getSwapCondition().getSwappableGenres().stream().anyMatch(g -> g.getId().equals(id)));
   }
 
   public Genre updateGenre(Genre entity) {

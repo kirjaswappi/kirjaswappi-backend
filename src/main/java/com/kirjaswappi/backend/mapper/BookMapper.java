@@ -29,7 +29,7 @@ public class BookMapper {
     if (dao.getCoverPhoto() != null) {
       entity.setCoverPhoto(dao.getCoverPhoto());
     }
-    entity.setExchangeCondition(ExchangeConditionMapper.toEntity(dao.getExchangeCondition()));
+    entity.setSwapCondition(SwapConditionMapper.toEntity(dao.getSwapCondition()));
     return entity;
   }
 
@@ -43,7 +43,7 @@ public class BookMapper {
     entity.setCondition(Condition.fromCode(dao.getCondition()));
     entity.setGenres(dao.getGenres().stream().map(GenreMapper::toEntity).toList());
     entity.setCoverPhoto(imageUrl);
-    entity.setExchangeCondition(ExchangeConditionMapper.toEntity(dao.getExchangeCondition()));
+    entity.setSwapCondition(SwapConditionMapper.toEntity(dao.getSwapCondition()));
     return entity;
   }
 
@@ -63,7 +63,7 @@ public class BookMapper {
     dao.setDescription(entity.getDescription());
     dao.setLanguage(entity.getLanguage().getCode());
     dao.setCondition(entity.getCondition().getCode());
-    dao.setExchangeCondition(ExchangeConditionMapper.toDao(entity.getExchangeCondition()));
+    dao.setSwapCondition(SwapConditionMapper.toDao(entity.getSwapCondition()));
     return dao;
   }
 }

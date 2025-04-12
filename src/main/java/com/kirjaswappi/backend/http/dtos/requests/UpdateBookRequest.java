@@ -4,11 +4,9 @@
  */
 package com.kirjaswappi.backend.http.dtos.requests;
 
-import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED;
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
 import java.util.List;
-import java.util.Objects;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -16,8 +14,6 @@ import lombok.Setter;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.kirjaswappi.backend.http.validations.ValidationUtil;
 import com.kirjaswappi.backend.service.entities.Book;
 import com.kirjaswappi.backend.service.entities.Genre;
@@ -37,7 +33,7 @@ public class UpdateBookRequest {
   @Schema(description = "The author of the book.", example = "Paulo Coelho", requiredMode = REQUIRED)
   private String author;
 
-  @Schema(description = "The description of the book.", example = "A novel by Paulo Coelho", requiredMode = NOT_REQUIRED)
+  @Schema(description = "The description of the book.", example = "A novel by Paulo Coelho")
   private String description;
 
   @Schema(description = "The language of the book.", example = "English", requiredMode = REQUIRED)
@@ -52,18 +48,20 @@ public class UpdateBookRequest {
   @Schema(description = "The cover photo of the book.", example = "book-cover-photo.jpg", requiredMode = REQUIRED)
   private MultipartFile coverPhoto;
 
-  @Schema(description = "The exchange condition of the book.", requiredMode = REQUIRED)
-  @JsonDeserialize(using = ExchangeConditionRequest.ExchangeConditionRequestDeserializer.class)
-  private ExchangeConditionRequest exchangeCondition;
-
-  public void setExchangeCondition(String exchangeConditionJson) {
-    ObjectMapper objectMapper = new ObjectMapper();
-    try {
-      this.exchangeCondition = objectMapper.readValue(exchangeConditionJson, ExchangeConditionRequest.class);
-    } catch (Exception e) {
-      throw new BadRequestException("Invalid exchange condition JSON", exchangeConditionJson);
-    }
-  }
+  @Schema(description = "Swap condition of the book in JSON format.", requiredMode = REQUIRED, example = "{\n" +
+      "  \"conditionType\": \"ByBooks\",\n" +
+      "  \"giveAway\": false,\n" +
+      "  \"openForOffers\": false,\n" +
+      "  \"genres\": [],\n" +
+      "  \"books\": [\n" +
+      "    {\n" +
+      "      \"title\": \"The Alchemist\",\n" +
+      "      \"author\": \"Paulo Coelho\",\n" +
+      "      \"coverPhoto\": \"swappable-book-cover-photo.jpg\"\n" +
+      "    }\n" +
+      "  ]\n" +
+      "}")
+  private String swapCondition;
 
   public Book toEntity() {
     this.validateProperties();
@@ -76,11 +74,11 @@ public class UpdateBookRequest {
     book.setCondition(Condition.fromCode(condition));
     book.setGenres(this.genres.stream().map(Genre::new).toList());
     book.setCoverPhotoFile(coverPhoto);
-    book.setExchangeCondition(exchangeCondition.toEntity());
     return book;
   }
 
   private void validateProperties() {
+    ValidationUtil.validateMediaType(coverPhoto);
     if (!ValidationUtil.validateNotBlank(this.id)) {
       throw new BadRequestException("bookIdCannotBeBlank", this.id);
     }
@@ -102,16 +100,8 @@ public class UpdateBookRequest {
     if (this.coverPhoto == null) {
       throw new BadRequestException("coverPhotoIsRequired");
     }
-    ValidationUtil.validateMediaType(coverPhoto);
-
-    if (Objects.isNull(this.exchangeCondition)) {
-      throw new BadRequestException("exchangeConditionIsRequired");
-    }
-
-    if (this.exchangeCondition.isOpenForOffers()) {
-      exchangeCondition.validateOpenForOffers();
-    } else {
-      exchangeCondition.validateNotOpenForOffers();
+    if (!ValidationUtil.validateNotBlank(this.swapCondition)) {
+      throw new BadRequestException("swapConditionIsRequired");
     }
   }
 }

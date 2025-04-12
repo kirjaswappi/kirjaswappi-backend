@@ -31,5 +31,5 @@ public class Book {
   private String coverPhoto;
   private MultipartFile coverPhotoFile;
   private User owner;
-  private ExchangeCondition exchangeCondition;
+  private SwapCondition swapCondition;
 }

@@ -55,5 +55,5 @@ public class BookDao {
   private UserDao owner;
 
   @NotNull
-  private ExchangeConditionDao exchangeCondition;
+  private SwapConditionDao swapCondition;
 }

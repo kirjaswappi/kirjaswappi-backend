@@ -17,13 +17,19 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ExchangeConditionDao {
+public class SwapConditionDao {
+  @NotNull
+  private String conditionType;
+
+  @NotNull
+  private boolean giveAway;
+
   @NotNull
   private boolean openForOffers;
 
   @NotNull
-  private List<GenreDao> exchangeableGenres;
+  private List<GenreDao> swappableGenres;
 
   @NotNull
-  private List<ExchangeableBookDao> exchangeableBooks;
+  private List<SwappableBookDao> swappableBooks;
 }
