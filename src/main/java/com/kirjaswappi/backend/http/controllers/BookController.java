@@ -4,11 +4,7 @@
  */
 package com.kirjaswappi.backend.http.controllers;
 
-import static com.kirjaswappi.backend.common.utils.Constants.API_BASE;
-import static com.kirjaswappi.backend.common.utils.Constants.BOOKS;
-import static com.kirjaswappi.backend.common.utils.Constants.ID;
-import static com.kirjaswappi.backend.common.utils.Constants.SUPPORTED_CONDITIONS;
-import static com.kirjaswappi.backend.common.utils.Constants.SUPPORTED_LANGUAGES;
+import static com.kirjaswappi.backend.common.utils.Constants.*;
 
 import java.util.List;
 
@@ -47,6 +43,7 @@ import com.kirjaswappi.backend.service.BookService;
 import com.kirjaswappi.backend.service.entities.Book;
 import com.kirjaswappi.backend.service.enums.Condition;
 import com.kirjaswappi.backend.service.enums.Language;
+import com.kirjaswappi.backend.service.enums.SwapConditionType;
 import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 import com.kirjaswappi.backend.service.filters.FindAllBooksFilter;
 
@@ -87,6 +84,13 @@ public class BookController {
       @ApiResponse(responseCode = "200", description = "List of supported conditions.") })
   public ResponseEntity<List<String>> findAllSupportedConditions() {
     return ResponseEntity.status(HttpStatus.OK).body(Condition.getSupportedConditions());
+  }
+
+  @GetMapping(SUPPORTED_SWAP_CONDITIONS)
+  @Operation(summary = "Find supported book conditions.", responses = {
+      @ApiResponse(responseCode = "200", description = "List of supported conditions.") })
+  public ResponseEntity<List<String>> findAllSupportedSwapConditions() {
+    return ResponseEntity.status(HttpStatus.OK).body(SwapConditionType.getSupportedSwapConditionTypes());
   }
 
   @GetMapping
