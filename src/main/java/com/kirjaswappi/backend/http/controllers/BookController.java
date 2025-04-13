@@ -88,7 +88,7 @@ public class BookController {
 
   @GetMapping(SUPPORTED_SWAP_CONDITIONS)
   @Operation(summary = "Find supported book conditions.", responses = {
-      @ApiResponse(responseCode = "200", description = "List of supported conditions.") })
+      @ApiResponse(responseCode = "200", description = "List of supported swap conditions.") })
   public ResponseEntity<List<String>> findAllSupportedSwapConditions() {
     return ResponseEntity.status(HttpStatus.OK).body(SwapConditionType.getSupportedSwapConditionTypes());
   }
