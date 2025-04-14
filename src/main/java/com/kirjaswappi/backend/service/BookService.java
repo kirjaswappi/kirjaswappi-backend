@@ -62,28 +62,22 @@ public class BookService {
     return bookWithImageUrlAndOwner(savedDao);
   }
 
-  private void addCoverPhotoToSwappableBooksIfExists(Book parentBook, BookDao bookDao) {
-    var swappableBooks = parentBook.getSwapCondition().getSwappableBooks();
-    if (swappableBooks == null || swappableBooks.isEmpty()) {
-      return;
-    }
-    for (int i = 0; i < swappableBooks.size(); i++) {
-      var coverPhoto = swappableBooks.get(i).getCoverPhotoFile();
-      var swappableBookId = bookDao.getSwapCondition().getSwappableBooks().get(i).getId();
-      String uniqueId = photoService.addBookCoverPhoto(coverPhoto, swappableBookId);
-      bookDao.getSwapCondition().getSwappableBooks().get(i).setCoverPhoto(uniqueId);
-    }
-    bookRepository.save(bookDao);
+  public Book updateBook(Book updatedBook) {
+    var existingBookDao = bookRepository.findById(updatedBook.getId())
+        .orElseThrow(() -> new BookNotFoundException(updatedBook.getId()));
+    deleteExistingSwappableBooksCoverPhotoIfExists(existingBookDao);
+    updateExistingDaoWithNewProperties(updatedBook, existingBookDao);
+    var updatedBookDao = bookRepository.save(existingBookDao);
+    updatedBookDao = updateBookCoverPhoto(updatedBook, updatedBookDao);
+    addCoverPhotoToSwappableBooksIfExists(updatedBook, updatedBookDao);
+    return bookWithImageUrlAndOwner(updatedBookDao);
   }
 
-  public Book updateBook(Book book) {
-    var dao = bookRepository.findById(book.getId())
-        .orElseThrow(() -> new BookNotFoundException(book.getId()));
-    updateDaoWithNewProperties(book, dao);
-    var updatedBookDao = bookRepository.save(dao);
-    updatedBookDao = updateBookCoverPhoto(book, updatedBookDao);
-    addCoverPhotoToSwappableBooksIfExists(book, updatedBookDao);
-    return bookWithImageUrlAndOwner(updatedBookDao);
+  private void deleteExistingSwappableBooksCoverPhotoIfExists(BookDao existingBookDao) {
+    if (existingBookDao.getSwapCondition().getSwappableBooks() != null) {
+      existingBookDao.getSwapCondition().getSwappableBooks().forEach(
+          book -> photoService.deleteBookCoverPhoto(book.getCoverPhoto()));
+    }
   }
 
   public Book getBookById(String id) {
@@ -106,15 +100,36 @@ public class BookService {
     bookRepository.deleteById(id);
   }
 
-  private void updateDaoWithNewProperties(Book book, BookDao dao) {
-    dao.setTitle(book.getTitle());
-    dao.setAuthor(book.getAuthor());
-    dao.setDescription(book.getDescription());
-    dao.setLanguage(book.getLanguage().getCode());
-    dao.setCondition(book.getCondition().getCode());
-    addGenresToBook(book, dao);
-    setValidSwappableGenresIfExists(book);
-    dao.setSwapCondition(SwapConditionMapper.toDao(book.getSwapCondition()));
+  public void deleteAllBooks() {
+    var bookDaos = bookRepository.findAll();
+    for (var bookDao : bookDaos) {
+      deleteBook(bookDao.getId());
+    }
+  }
+
+  private void addCoverPhotoToSwappableBooksIfExists(Book parentBook, BookDao bookDao) {
+    var swappableBooks = parentBook.getSwapCondition().getSwappableBooks();
+    if (swappableBooks == null || swappableBooks.isEmpty()) {
+      return;
+    }
+    for (int i = 0; i < swappableBooks.size(); i++) {
+      var coverPhoto = swappableBooks.get(i).getCoverPhotoFile();
+      var swappableBookId = bookDao.getSwapCondition().getSwappableBooks().get(i).getId();
+      String uniqueId = photoService.addBookCoverPhoto(coverPhoto, swappableBookId);
+      bookDao.getSwapCondition().getSwappableBooks().get(i).setCoverPhoto(uniqueId);
+    }
+    bookRepository.save(bookDao);
+  }
+
+  private void updateExistingDaoWithNewProperties(Book updatedBook, BookDao existingBookDao) {
+    existingBookDao.setTitle(updatedBook.getTitle());
+    existingBookDao.setAuthor(updatedBook.getAuthor());
+    existingBookDao.setDescription(updatedBook.getDescription());
+    existingBookDao.setLanguage(updatedBook.getLanguage().getCode());
+    existingBookDao.setCondition(updatedBook.getCondition().getCode());
+    addGenresToBook(updatedBook, existingBookDao);
+    setValidSwappableGenresIfExists(updatedBook);
+    existingBookDao.setSwapCondition(SwapConditionMapper.toDao(updatedBook.getSwapCondition()));
   }
 
   private void setValidSwappableGenresIfExists(Book book) {
@@ -164,10 +179,6 @@ public class BookService {
   private void deleteExistingCoverPhoto(BookDao dao) {
     if (dao.getCoverPhoto() != null) {
       photoService.deleteBookCoverPhoto(dao.getCoverPhoto());
-    }
-    if (dao.getSwapCondition().getSwappableBooks() != null) {
-      dao.getSwapCondition().getSwappableBooks().forEach(
-          book -> photoService.deleteBookCoverPhoto(book.getCoverPhoto()));
     }
   }
 
@@ -231,12 +242,5 @@ public class BookService {
   private Page<Book> mapToBookPage(Page<BookDao> bookDaos, Pageable pageable) {
     var books = bookDaos.stream().map(this::bookWithImageUrlAndOwner).toList();
     return new PageImpl<>(books, pageable, bookDaos.getTotalElements());
-  }
-
-  public void deleteAllBooks() {
-    var bookDaos = bookRepository.findAll();
-    for (var bookDao : bookDaos) {
-      deleteBook(bookDao.getId());
-    }
   }
 }

@@ -53,6 +53,7 @@ public class SwappableBookMapper {
   }
 
   public static SwappableBookDao toDao(SwappableBookDao dao, String imageUrl) {
+    Objects.requireNonNull(dao.getId());
     Objects.requireNonNull(imageUrl);
     dao.setCoverPhoto(imageUrl);
     return dao;
