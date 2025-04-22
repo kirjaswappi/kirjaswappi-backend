@@ -16,7 +16,6 @@ import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.LookupOperation;
 import org.springframework.data.mongodb.core.aggregation.MatchOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
 import com.kirjaswappi.backend.common.exceptions.GlobalSystemException;
@@ -55,9 +54,12 @@ public class CustomBookRepositoryImpl implements CustomBookRepository {
       List<BookDao> bookDaos = mongoTemplate.aggregate(aggregation, "books", BookDao.class).getMappedResults();
 
       // Separate count query to get total matching documents
-      long total = mongoTemplate.count(Query.query(criteria), BookDao.class);
-
-      return new PageImpl<>(bookDaos, pageable, total);
+      var aggregationWithoutLimit = Aggregation.newAggregation(
+          lookupOperation,
+          matchOperation);
+      long totalBooks = mongoTemplate.aggregate(aggregationWithoutLimit, "books", BookDao.class).getMappedResults()
+          .size();
+      return new PageImpl<>(bookDaos, pageable, totalBooks);
     } catch (Exception e) {
       logger.error("Error occurred while fetching books: " + e.getMessage());
       throw new GlobalSystemException("Error occurred while fetching books, please try again later");
