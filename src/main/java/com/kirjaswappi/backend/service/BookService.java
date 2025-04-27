@@ -63,7 +63,7 @@ public class BookService {
   }
 
   public Book updateBook(Book updatedBook) {
-    var existingBookDao = bookRepository.findById(updatedBook.getId())
+    var existingBookDao = bookRepository.findByIdAndIsDeletedFalse(updatedBook.getId())
         .orElseThrow(() -> new BookNotFoundException(updatedBook.getId()));
     deleteExistingSwappableBooksCoverPhotoIfExists(existingBookDao);
     updateExistingDaoWithNewProperties(updatedBook, existingBookDao);
@@ -81,7 +81,7 @@ public class BookService {
   }
 
   public Book getBookById(String id) {
-    var bookDao = bookRepository.findById(id)
+    var bookDao = bookRepository.findByIdAndIsDeletedFalse(id)
         .orElseThrow(() -> new BookNotFoundException(id));
     return bookWithImageUrlAndOwner(bookDao);
   }
@@ -94,14 +94,14 @@ public class BookService {
   }
 
   public void deleteBook(String id) {
-    var dao = bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException(id));
-    deleteExistingCoverPhoto(dao);
-    removeBookFromOwner(dao);
-    bookRepository.deleteById(id);
+    var bookDao = bookRepository.findByIdAndIsDeletedFalse(id).orElseThrow(() -> new BookNotFoundException(id));
+    deleteExistingCoverPhoto(bookDao);
+    removeBookFromOwner(bookDao);
+    bookRepository.deleteLogically(id);
   }
 
   public void deleteAllBooks() {
-    var bookDaos = bookRepository.findAll();
+    var bookDaos = bookRepository.findAllByIsDeletedFalse();
     for (var bookDao : bookDaos) {
       deleteBook(bookDao.getId());
     }

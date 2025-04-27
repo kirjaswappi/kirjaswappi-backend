@@ -56,4 +56,7 @@ public class BookDao {
 
   @NotNull
   private SwapConditionDao swapCondition;
+
+  @NotNull
+  private boolean isDeleted = false;
 }
