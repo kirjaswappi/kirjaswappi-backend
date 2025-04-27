@@ -39,6 +39,8 @@ public class User {
   private String coverPhoto;
   @Nullable
   private List<Book> books;
+  @Nullable
+  private List<Book> favBooks;
 
   public void setPassword(String password, String salt) {
     this.password = hashPassword(password, salt);
