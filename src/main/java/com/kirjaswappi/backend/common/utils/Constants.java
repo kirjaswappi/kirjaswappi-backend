@@ -26,6 +26,7 @@ public class Constants {
   public static final String CHANGE_PASSWORD = "/change-password";
   public static final String RESET_PASSWORD = "/reset-password";
   public static final String ID = "/{id}";
+  public static final String MORE_BOOKS = "/more-books";
   public static final String USERNAME = "/{username}";
   public static final String EMAIL = "/{email}";
   public static final String SEND_OTP = "/send-otp";

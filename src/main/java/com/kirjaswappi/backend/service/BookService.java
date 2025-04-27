@@ -243,4 +243,14 @@ public class BookService {
     var books = bookDaos.stream().map(this::bookWithImageUrlAndOwner).toList();
     return new PageImpl<>(books, pageable, bookDaos.getTotalElements());
   }
+
+  public List<Book> getMoreBooksFromThisUser(String bookId) {
+    var bookDao = bookRepository.findByIdAndIsDeletedFalse(bookId)
+        .orElseThrow(() -> new BookNotFoundException(bookId));
+    var owner = bookDao.getOwner();
+    assert owner.getBooks() != null;
+    return owner.getBooks().stream()
+        .filter(book -> !book.getId().equals(bookId)) // Exclude the current book
+        .map(this::bookWithImageUrlAndOwner).toList();
+  }
 }
