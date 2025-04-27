@@ -206,6 +206,16 @@ public class UserService {
     var bookId = user.getFavBooks().get(0).getId();
     var favBookDao = bookRepository.findByIdAndIsDeletedFalse(bookId)
         .orElseThrow(() -> new BookNotFoundException(bookId));
+
+    // validations:
+    if (favBookDao.getOwner().getId().equals(user.getId())) {
+      throw new BadRequestException("ownBookCannotBeAddedAsFavBook");
+    }
+    if (userDao.getFavBooks() != null && userDao.getFavBooks().stream()
+        .anyMatch(book -> book.getId().equals(favBookDao.getId()))) {
+      throw new BadRequestException("bookAlreadyExistsAsFavBook", bookId);
+    }
+
     if (userDao.getFavBooks() != null)
       userDao.getFavBooks().add(favBookDao);
     else

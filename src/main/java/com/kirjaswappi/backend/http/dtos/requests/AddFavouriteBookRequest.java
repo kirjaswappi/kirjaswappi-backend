@@ -20,7 +20,7 @@ import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 @Getter
 @Setter
 public class AddFavouriteBookRequest {
-  @Schema(description = "The ID of the favourite book.", example = "The Alchemist", requiredMode = REQUIRED)
+  @Schema(description = "The ID of the favourite book.", example = "123456", requiredMode = REQUIRED)
   private String bookId;
 
   @Schema(description = "The user ID.", example = "123456", requiredMode = REQUIRED)

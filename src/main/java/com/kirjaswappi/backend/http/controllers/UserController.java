@@ -65,7 +65,7 @@ public class UserController {
   @PostMapping(FAVOURITE_BOOKS)
   @Operation(summary = "Add a favourite book to a user.", responses = {
       @ApiResponse(responseCode = "200", description = "Book added.") })
-  public ResponseEntity<UserResponse> addFavouriteBook(@Valid AddFavouriteBookRequest request) {
+  public ResponseEntity<UserResponse> addFavouriteBook(@Valid @RequestBody AddFavouriteBookRequest request) {
     User entity = request.toEntity();
     User updatedUser = userService.addFavouriteBook(entity);
     return ResponseEntity.status(HttpStatus.OK).body(new UserResponse(updatedUser));
