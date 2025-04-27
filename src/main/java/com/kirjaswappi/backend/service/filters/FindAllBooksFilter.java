@@ -40,6 +40,7 @@ public class FindAllBooksFilter {
     }
 
     // Add filter criteria:
+    combinedCriteria.add(Criteria.where("isDeleted").is(false));
     if (languages != null && !languages.isEmpty()) {
       if (languages.size() == 1) {
         combinedCriteria.add(Criteria.where("language").is(languages.get(0)));
@@ -68,9 +69,6 @@ public class FindAllBooksFilter {
     }
 
     var finalCriteria = new Criteria();
-    if (combinedCriteria.isEmpty()) {
-      return finalCriteria;
-    }
     return finalCriteria.andOperator(combinedCriteria.toArray(new Criteria[0]));
   }
 }
