@@ -244,7 +244,7 @@ public class BookService {
     return new PageImpl<>(books, pageable, bookDaos.getTotalElements());
   }
 
-  public List<Book> getMoreBooksFromThisUser(String bookId) {
+  public List<Book> getMoreBooksOfTheUser(String bookId) {
     var bookDao = bookRepository.findByIdAndIsDeletedFalse(bookId)
         .orElseThrow(() -> new BookNotFoundException(bookId));
     var owner = bookDao.getOwner();

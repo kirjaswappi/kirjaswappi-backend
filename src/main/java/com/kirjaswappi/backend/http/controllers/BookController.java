@@ -75,9 +75,9 @@ public class BookController {
   @GetMapping(ID + MORE_BOOKS)
   @Operation(summary = "Find more books of the user by Book ID.", responses = {
       @ApiResponse(responseCode = "200", description = "Books found.") })
-  public ResponseEntity<List<BookResponse>> findMoreBooksFromThisUse(
+  public ResponseEntity<List<BookResponse>> findMoreBooksOfTheUser(
       @Parameter(description = "Book ID.") @PathVariable String id) {
-    List<Book> moreBooks = bookService.getMoreBooksFromThisUser(id);
+    List<Book> moreBooks = bookService.getMoreBooksOfTheUser(id);
     return ResponseEntity.status(HttpStatus.OK).body(moreBooks.stream().map(BookResponse::new).toList());
   }
 
