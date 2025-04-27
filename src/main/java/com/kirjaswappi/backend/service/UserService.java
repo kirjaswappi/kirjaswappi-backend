@@ -13,11 +13,13 @@ import org.springframework.transaction.annotation.Transactional;
 import com.kirjaswappi.backend.common.service.exceptions.InvalidCredentials;
 import com.kirjaswappi.backend.common.utils.Util;
 import com.kirjaswappi.backend.jpa.daos.UserDao;
+import com.kirjaswappi.backend.jpa.repositories.BookRepository;
 import com.kirjaswappi.backend.jpa.repositories.GenreRepository;
 import com.kirjaswappi.backend.jpa.repositories.UserRepository;
 import com.kirjaswappi.backend.mapper.UserMapper;
 import com.kirjaswappi.backend.service.entities.User;
 import com.kirjaswappi.backend.service.exceptions.BadRequestException;
+import com.kirjaswappi.backend.service.exceptions.BookNotFoundException;
 import com.kirjaswappi.backend.service.exceptions.UserAlreadyExistsException;
 import com.kirjaswappi.backend.service.exceptions.UserNotFoundException;
 
@@ -30,6 +32,8 @@ public class UserService {
   GenreRepository genreRepository;
   @Autowired
   PhotoService photoService;
+  @Autowired
+  private BookRepository bookRepository;
 
   public User addUser(User user) {
     this.checkUserExistButNotVerified(user);
@@ -193,5 +197,31 @@ public class UserService {
     userRepository.save(dao);
 
     return dao.getEmail();
+  }
+
+  public User addFavouriteBook(User user) {
+    var userDao = userRepository.findById(user.getId()).orElseThrow(() -> new UserNotFoundException(user.getEmail()));
+
+    assert user.getFavBooks() != null;
+    var bookId = user.getFavBooks().get(0).getId();
+    var favBookDao = bookRepository.findByIdAndIsDeletedFalse(bookId)
+        .orElseThrow(() -> new BookNotFoundException(bookId));
+
+    // validations:
+    if (favBookDao.getOwner().getId().equals(user.getId())) {
+      throw new BadRequestException("ownBookCannotBeAddedAsFavBook");
+    }
+    if (userDao.getFavBooks() != null && userDao.getFavBooks().stream()
+        .anyMatch(book -> book.getId().equals(favBookDao.getId()))) {
+      throw new BadRequestException("bookAlreadyExistsAsFavBook", bookId);
+    }
+
+    if (userDao.getFavBooks() != null)
+      userDao.getFavBooks().add(favBookDao);
+    else
+      userDao.setFavBooks(List.of(favBookDao));
+
+    userRepository.save(userDao);
+    return getUser(user.getId());
   }
 }

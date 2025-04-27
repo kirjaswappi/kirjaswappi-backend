@@ -29,18 +29,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kirjaswappi.backend.common.service.OTPService;
-import com.kirjaswappi.backend.http.dtos.requests.AuthenticateUserRequest;
-import com.kirjaswappi.backend.http.dtos.requests.ChangePasswordRequest;
-import com.kirjaswappi.backend.http.dtos.requests.CreateUserRequest;
-import com.kirjaswappi.backend.http.dtos.requests.ResetPasswordRequest;
-import com.kirjaswappi.backend.http.dtos.requests.UpdateUserRequest;
-import com.kirjaswappi.backend.http.dtos.requests.VerifyEmailRequest;
-import com.kirjaswappi.backend.http.dtos.responses.ChangePasswordResponse;
-import com.kirjaswappi.backend.http.dtos.responses.CreateUserResponse;
-import com.kirjaswappi.backend.http.dtos.responses.ResetPasswordResponse;
-import com.kirjaswappi.backend.http.dtos.responses.UpdateUserResponse;
-import com.kirjaswappi.backend.http.dtos.responses.UserResponse;
-import com.kirjaswappi.backend.http.dtos.responses.VerifyEmailResponse;
+import com.kirjaswappi.backend.http.dtos.requests.*;
+import com.kirjaswappi.backend.http.dtos.responses.*;
 import com.kirjaswappi.backend.service.UserService;
 import com.kirjaswappi.backend.service.entities.User;
 import com.kirjaswappi.backend.service.exceptions.BadRequestException;
@@ -70,6 +60,15 @@ public class UserController {
     String email = otpService.verifyOTPByEmail(request.toEntity());
     String verifiedEmail = userService.verifyEmail(email);
     return ResponseEntity.status(HttpStatus.OK).body(new VerifyEmailResponse(verifiedEmail));
+  }
+
+  @PostMapping(FAVOURITE_BOOKS)
+  @Operation(summary = "Add a favourite book to a user.", responses = {
+      @ApiResponse(responseCode = "200", description = "Book added.") })
+  public ResponseEntity<UserResponse> addFavouriteBook(@Valid @RequestBody AddFavouriteBookRequest request) {
+    User entity = request.toEntity();
+    User updatedUser = userService.addFavouriteBook(entity);
+    return ResponseEntity.status(HttpStatus.OK).body(new UserResponse(updatedUser));
   }
 
   @PutMapping(ID)
