@@ -14,7 +14,7 @@ import lombok.Getter;
 import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 
 @Getter
-public enum SwapConditionType {
+public enum SwapType {
   GIVE_AWAY("GiveAway"),
   OPEN_FOR_OFFERS("OpenForOffers"),
   BY_GENRES("ByGenres"),
@@ -22,19 +22,19 @@ public enum SwapConditionType {
 
   private final String code;
 
-  SwapConditionType(String code) {
+  SwapType(String code) {
     this.code = code;
   }
 
-  public static SwapConditionType fromCode(String code) {
+  public static SwapType fromCode(String code) {
     Objects.requireNonNull(code);
-    return Arrays.stream(SwapConditionType.values())
+    return Arrays.stream(SwapType.values())
         .filter(c -> c.getCode().equalsIgnoreCase(code))
         .findFirst()
-        .orElseThrow(() -> new BadRequestException("invalidSwapConditionType", code));
+        .orElseThrow(() -> new BadRequestException("invalidSwapType", code));
   }
 
-  public static List<String> getSupportedSwapConditionTypes() {
-    return Stream.of(SwapConditionType.values()).map(SwapConditionType::getCode).toList();
+  public static List<String> getSupportedSwapTypes() {
+    return Stream.of(SwapType.values()).map(SwapType::getCode).toList();
   }
 }

@@ -43,7 +43,7 @@ import com.kirjaswappi.backend.service.BookService;
 import com.kirjaswappi.backend.service.entities.Book;
 import com.kirjaswappi.backend.service.enums.Condition;
 import com.kirjaswappi.backend.service.enums.Language;
-import com.kirjaswappi.backend.service.enums.SwapConditionType;
+import com.kirjaswappi.backend.service.enums.SwapType;
 import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 import com.kirjaswappi.backend.service.filters.FindAllBooksFilter;
 
@@ -95,11 +95,11 @@ public class BookController {
     return ResponseEntity.status(HttpStatus.OK).body(Condition.getSupportedConditions());
   }
 
-  @GetMapping(SUPPORTED_SWAP_CONDITIONS)
-  @Operation(summary = "Find supported book swap conditions.", responses = {
-      @ApiResponse(responseCode = "200", description = "List of supported swap conditions.") })
+  @GetMapping(SUPPORTED_SWAP_TYPES)
+  @Operation(summary = "Find supported book swap types.", responses = {
+      @ApiResponse(responseCode = "200", description = "List of supported swap types.") })
   public ResponseEntity<List<String>> findAllSupportedSwapConditions() {
-    return ResponseEntity.status(HttpStatus.OK).body(SwapConditionType.getSupportedSwapConditionTypes());
+    return ResponseEntity.status(HttpStatus.OK).body(SwapType.getSupportedSwapTypes());
   }
 
   @GetMapping

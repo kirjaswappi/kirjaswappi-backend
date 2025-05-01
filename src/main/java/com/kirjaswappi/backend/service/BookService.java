@@ -20,13 +20,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.kirjaswappi.backend.jpa.daos.BookDao;
+import com.kirjaswappi.backend.jpa.daos.SwappableBookDao;
+import com.kirjaswappi.backend.jpa.daos.UserDao;
 import com.kirjaswappi.backend.jpa.repositories.BookRepository;
 import com.kirjaswappi.backend.jpa.repositories.GenreRepository;
 import com.kirjaswappi.backend.jpa.repositories.UserRepository;
-import com.kirjaswappi.backend.mapper.BookMapper;
-import com.kirjaswappi.backend.mapper.GenreMapper;
-import com.kirjaswappi.backend.mapper.SwapConditionMapper;
+import com.kirjaswappi.backend.mapper.*;
 import com.kirjaswappi.backend.service.entities.Book;
+import com.kirjaswappi.backend.service.entities.SwappableBook;
 import com.kirjaswappi.backend.service.exceptions.BookNotFoundException;
 import com.kirjaswappi.backend.service.exceptions.GenreNotFoundException;
 import com.kirjaswappi.backend.service.exceptions.UserNotFoundException;
@@ -86,6 +87,16 @@ public class BookService {
     return bookWithImageUrlAndOwner(bookDao);
   }
 
+  public SwappableBook getSwappableBookById(String swappableBookId) {
+    Optional<BookDao> bookDao = bookRepository.findBySwapConditionSwappableBooksId(swappableBookId);
+    var swappableBookDao = bookDao.flatMap(book -> book.getSwapCondition()
+        .getSwappableBooks()
+        .stream()
+        .filter(sb -> sb.getId().equals(swappableBookId) && !sb.isDeleted())
+        .findFirst()).orElseThrow(BookNotFoundException::new);
+    return swappableBookWithImageUrl(swappableBookDao);
+  }
+
   public Page<Book> getAllBooksByFilter(FindAllBooksFilter filter, Pageable pageable) {
     var criteria = filter.buildSearchAndFilterCriteria();
     pageable = getPageableWithValidSortingCriteria(pageable);
@@ -95,16 +106,13 @@ public class BookService {
 
   public void deleteBook(String id) {
     var bookDao = bookRepository.findByIdAndIsDeletedFalse(id).orElseThrow(() -> new BookNotFoundException(id));
-    deleteExistingCoverPhoto(bookDao);
+    // deleteExistingCoverPhoto(bookDao); keeping the photo for future references
     removeBookFromOwner(bookDao);
     bookRepository.deleteLogically(id);
   }
 
   public void deleteAllBooks() {
-    var bookDaos = bookRepository.findAllByIsDeletedFalse();
-    for (var bookDao : bookDaos) {
-      deleteBook(bookDao.getId());
-    }
+    bookRepository.findAllByIsDeletedFalse().forEach(bookDao -> deleteBook(bookDao.getId()));
   }
 
   private void addCoverPhotoToSwappableBooksIfExists(Book parentBook, BookDao bookDao) {
@@ -213,12 +221,17 @@ public class BookService {
   private Book bookWithImageUrlAndOwner(BookDao bookDao) {
     var book = fetchImageUrlForBookCoverPhoto(bookDao);
     fetchImageUrlForSwappableBooksIfExists(book);
-    return bookWithOwner(bookDao, book);
+    return bookWithOwner(bookDao.getOwner(), book);
+  }
+
+  private SwappableBook swappableBookWithImageUrl(SwappableBookDao bookDao) {
+    var coverPhotoImageUrl = photoService.getBookCoverPhoto(bookDao.getCoverPhoto());
+    return SwappableBookMapper.toEntity(bookDao, coverPhotoImageUrl);
   }
 
   @NotNull
-  private static Book bookWithOwner(BookDao bookDao, Book book) {
-    return BookMapper.setOwner(bookDao.getOwner(), book);
+  private static Book bookWithOwner(UserDao userDao, Book book) {
+    return BookMapper.setOwner(userDao, book);
   }
 
   @NotNull

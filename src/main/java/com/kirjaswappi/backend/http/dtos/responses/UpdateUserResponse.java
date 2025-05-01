@@ -9,6 +9,7 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
+import com.kirjaswappi.backend.service.entities.Genre;
 import com.kirjaswappi.backend.service.entities.User;
 
 @Getter
@@ -39,6 +40,6 @@ public class UpdateUserResponse {
     this.country = entity.getCountry();
     this.phoneNumber = entity.getPhoneNumber();
     this.aboutMe = entity.getAboutMe();
-    this.favGenres = entity.getFavGenres();
+    this.favGenres = entity.getFavGenres().stream().map(Genre::getName).toList();
   }
 }

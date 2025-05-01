@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 import com.kirjaswappi.backend.jpa.daos.SwapConditionDao;
 import com.kirjaswappi.backend.service.entities.SwapCondition;
-import com.kirjaswappi.backend.service.enums.SwapConditionType;
+import com.kirjaswappi.backend.service.enums.SwapType;
 
 @Component
 @NoArgsConstructor
@@ -20,7 +20,7 @@ public class SwapConditionMapper {
       return new SwapCondition();
     }
     var entity = new SwapCondition();
-    entity.setConditionType(SwapConditionType.fromCode(dao.getConditionType()));
+    entity.setConditionType(SwapType.fromCode(dao.getConditionType()));
     entity.setGiveAway(dao.isGiveAway());
     entity.setOpenForOffers(dao.isOpenForOffers());
     entity.setSwappableGenres(dao.getSwappableGenres().stream().map(GenreMapper::toEntity).toList());

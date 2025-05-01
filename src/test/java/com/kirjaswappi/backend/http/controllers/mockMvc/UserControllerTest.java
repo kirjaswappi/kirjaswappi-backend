@@ -33,6 +33,7 @@ import com.kirjaswappi.backend.http.controllers.UserController;
 import com.kirjaswappi.backend.http.dtos.requests.*;
 import com.kirjaswappi.backend.http.dtos.responses.*;
 import com.kirjaswappi.backend.service.UserService;
+import com.kirjaswappi.backend.service.entities.Genre;
 import com.kirjaswappi.backend.service.entities.User;
 
 @ActiveProfiles("local")
@@ -230,7 +231,8 @@ public class UserControllerTest {
     updatedUser.setCountry("UpdatedCountry");
     updatedUser.setPhoneNumber("UpdatedPhoneNumber");
     updatedUser.setAboutMe("UpdatedAboutMe");
-    updatedUser.setFavGenres(List.of("UpdatedGenre1", "UpdatedGenre2"));
+    updatedUser.setFavGenres(List.of(new Genre("GenreId1", "UpdatedGenre1"),
+        new Genre("GenreId2", "UpdatedGenre2")));
     return updatedUser;
   }
 

@@ -33,13 +33,14 @@ public class BookResponse {
     this.id = entity.getId();
     this.title = entity.getTitle();
     this.author = entity.getAuthor();
-    this.genres = entity.getGenres().stream().map(Genre::getName).toList();
-    this.language = entity.getLanguage().getCode();
-    this.description = entity.getDescription();
-    this.condition = entity.getCondition().getCode();
+    this.genres = entity.getGenres() == null ? null : entity.getGenres().stream().map(Genre::getName).toList();
+    this.language = entity.getLanguage() == null ? null : entity.getLanguage().getCode();
+    this.description = entity.getDescription() == null ? null : entity.getDescription();
+    this.condition = entity.getCondition() == null ? null : entity.getCondition().getCode();
     this.coverPhotoUrl = entity.getCoverPhoto() == null ? null : entity.getCoverPhoto();
-    this.owner = new OwnerResponse(entity.getOwner());
-    this.swapCondition = new SwapConditionResponse(entity.getSwapCondition());
+    this.owner = entity.getOwner() == null ? null : new OwnerResponse(entity.getOwner());
+    this.swapCondition = entity.getSwapCondition() == null ? null
+        : new SwapConditionResponse(entity.getSwapCondition());
   }
 
   @Setter
@@ -80,11 +81,13 @@ public class BookResponse {
   @Setter
   @Getter
   static class SwappableBookResponse {
+    private final String id;
     private final String title;
     private final String author;
     private final String coverPhotoUrl;
 
     public SwappableBookResponse(SwappableBook entity) {
+      this.id = entity.getId();
       this.title = entity.getTitle();
       this.author = entity.getAuthor();
       this.coverPhotoUrl = entity.getCoverPhoto();

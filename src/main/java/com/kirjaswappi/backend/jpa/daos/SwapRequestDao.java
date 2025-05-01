@@ -4,6 +4,8 @@
  */
 package com.kirjaswappi.backend.jpa.daos;
 
+import java.time.Instant;
+
 import jakarta.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
@@ -14,24 +16,44 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "swappable_books")
+import com.mongodb.lang.Nullable;
+
+@Document(collection = "swap_requests")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SwappableBookDao {
+public class SwapRequestDao {
   @Id
   private String id;
 
   @NotNull
-  private String title;
+  private UserDao sender;
 
   @NotNull
-  private String author;
+  private UserDao receiver;
 
   @NotNull
-  private String coverPhoto;
+  private BookDao bookToSwapWith;
 
   @NotNull
-  private boolean isDeleted = false;
+  private String swapType;
+
+  @Nullable // can be null for: GiveAway/OpenForOffers
+  private SwapOfferDao swapOfferDao;
+
+  @NotNull
+  private boolean askForGiveaway;
+
+  @NotNull
+  private String swapStatus;
+
+  @Nullable
+  private String note;
+
+  @NotNull
+  private Instant requestedAt;
+
+  @NotNull
+  private Instant updatedAt;
 }
