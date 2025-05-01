@@ -32,7 +32,7 @@ public class User {
   private String country;
   private String phoneNumber;
   private String aboutMe;
-  private List<String> favGenres;
+  private List<Genre> favGenres;
   @Nullable
   private String profilePhoto;
   @Nullable

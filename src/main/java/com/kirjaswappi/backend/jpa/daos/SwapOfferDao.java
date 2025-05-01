@@ -1,0 +1,24 @@
+/*
+ * Copyright (c) 2025 KirjaSwappi or KirjaSwappi affiliate company. All rights reserved.
+ * Author: Mahiuddin Al Kamal <mahiuddinalkamal>
+ */
+package com.kirjaswappi.backend.jpa.daos;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import com.mongodb.lang.Nullable;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class SwapOfferDao {
+  @Nullable
+  private SwappableBookDao offeredBook;
+
+  @Nullable
+  private GenreDao offeredGenre;
+}

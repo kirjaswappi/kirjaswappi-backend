@@ -33,7 +33,7 @@ public class GenreService {
   }
 
   public Genre addGenre(Genre genre) {
-    // check if genre already exists:
+    // check if the genre already exists:
     if (genreRepository.existsByName(genre.getName())) {
       throw new GenreAlreadyExistsException(genre.getName());
     }
@@ -75,5 +75,11 @@ public class GenreService {
         .orElseThrow(() -> new GenreNotFoundException(entity.getId()));
     dao.setName(entity.getName());
     return GenreMapper.toEntity(genreRepository.save(dao));
+  }
+
+  public Genre getGenreById(String genreId) {
+    var dao = genreRepository.findById(genreId)
+        .orElseThrow(() -> new GenreNotFoundException(genreId));
+    return GenreMapper.toEntity(dao);
   }
 }

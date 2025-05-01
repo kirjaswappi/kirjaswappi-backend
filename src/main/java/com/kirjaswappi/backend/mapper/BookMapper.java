@@ -52,7 +52,6 @@ public class BookMapper {
     return book;
   }
 
-  // This is without the genres, cover photo and owner
   public static BookDao toDao(Book entity) {
     var dao = new BookDao();
     if (entity.getId() != null) {
@@ -64,6 +63,9 @@ public class BookMapper {
     dao.setLanguage(entity.getLanguage().getCode());
     dao.setCondition(entity.getCondition().getCode());
     dao.setSwapCondition(SwapConditionMapper.toDao(entity.getSwapCondition()));
+    dao.setGenres(entity.getGenres() == null ? null : entity.getGenres().stream().map(GenreMapper::toDao).toList());
+    dao.setCoverPhoto(entity.getCoverPhoto() == null ? null : entity.getCoverPhoto());
+    dao.setOwner(entity.getOwner() == null ? null : UserMapper.toDao(entity.getOwner()));
     return dao;
   }
 }

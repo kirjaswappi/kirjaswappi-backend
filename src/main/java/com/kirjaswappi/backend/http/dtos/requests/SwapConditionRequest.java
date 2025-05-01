@@ -26,7 +26,7 @@ import com.kirjaswappi.backend.http.validations.ValidationUtil;
 import com.kirjaswappi.backend.service.entities.Genre;
 import com.kirjaswappi.backend.service.entities.SwapCondition;
 import com.kirjaswappi.backend.service.entities.SwappableBook;
-import com.kirjaswappi.backend.service.enums.SwapConditionType;
+import com.kirjaswappi.backend.service.enums.SwapType;
 import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 
 @Getter
@@ -49,7 +49,7 @@ public class SwapConditionRequest {
   private List<BookRequest> books;
 
   public SwapCondition toEntity() {
-    SwapConditionType conditionTypeCode = SwapConditionType.fromCode(conditionType);
+    SwapType conditionTypeCode = SwapType.fromCode(conditionType);
     if (this.genres == null)
       genres = List.of();
     if (this.books == null)
@@ -66,7 +66,7 @@ public class SwapConditionRequest {
         swappableGenres, swappableBooks);
   }
 
-  private static void checkIfOnlyOneOfTheSwapConditionIsProvided(SwapConditionType conditionType,
+  private static void checkIfOnlyOneOfTheSwapConditionIsProvided(SwapType conditionType,
       boolean giveAway,
       boolean openForOffers,
       List<Genre> swappableGenres,
@@ -125,7 +125,7 @@ public class SwapConditionRequest {
           bookRequest.setTitle(getJsonNodeAsText(bookNode, "title"));
           bookRequest.setAuthor(getJsonNodeAsText(bookNode, "author"));
 
-          // Extract cover photo
+          // Extract a cover photo
           String coverPhotoData = getJsonNodeAsText(bookNode, "coverPhoto");
           if (coverPhotoData == null || !coverPhotoData.contains(",")) {
             throw new BadRequestException("coverPhotoIsRequiredForSwappableBook");

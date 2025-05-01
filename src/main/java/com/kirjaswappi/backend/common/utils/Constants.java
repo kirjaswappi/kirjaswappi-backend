@@ -12,6 +12,7 @@ public class Constants {
   public static final String USERS = "/users";
   public static final String GENRES = "/genres";
   public static final String BOOKS = "/books";
+  public static final String SWAP_REQUESTS = "/swap-requests";
   public static final String FAVOURITE_BOOKS = "/favourite-books";
   public static final String ADMIN_USERS = "/admin-users";
   public static final String SIGNUP = "/signup";
@@ -39,6 +40,6 @@ public class Constants {
   public static final String BY_ID = "/by-id";
   public static final String SUPPORTED_LANGUAGES = "/supported-languages";
   public static final String SUPPORTED_CONDITIONS = "/supported-conditions";
-  public static final String SUPPORTED_SWAP_CONDITIONS = "/supported-swap-conditions";
+  public static final String SUPPORTED_SWAP_TYPES = "/supported-swap-types";
   public static final String SUPPORTED_COVER_PHOTOS = "/supported-cover-photos";
 }

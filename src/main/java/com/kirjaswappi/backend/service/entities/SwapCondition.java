@@ -10,19 +10,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import com.kirjaswappi.backend.service.enums.SwapConditionType;
+import com.kirjaswappi.backend.service.enums.SwapType;
 
 @Getter
 @Setter
 @NoArgsConstructor
 public class SwapCondition {
-  private SwapConditionType conditionType;
+  private SwapType conditionType;
   private boolean giveAway;
   private boolean openForOffers;
   private List<Genre> swappableGenres;
   private List<SwappableBook> swappableBooks;
 
-  public SwapCondition(SwapConditionType conditionType,
+  public SwapCondition(SwapType conditionType,
       boolean giveAway,
       boolean openForOffers,
       List<Genre> swappableGenres,

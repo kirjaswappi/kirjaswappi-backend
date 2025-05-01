@@ -15,4 +15,6 @@ public interface BookRepository extends MongoRepository<BookDao, String>, Custom
   Optional<BookDao> findByIdAndIsDeletedFalse(String id);
 
   List<BookDao> findAllByIsDeletedFalse();
+
+  Optional<BookDao> findBySwapConditionSwappableBooksId(String swappableBookId);
 }
