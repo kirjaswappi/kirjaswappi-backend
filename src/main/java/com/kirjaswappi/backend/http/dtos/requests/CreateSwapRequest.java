@@ -8,8 +8,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
+import com.kirjaswappi.backend.http.validations.ValidationUtil;
 import com.kirjaswappi.backend.service.entities.*;
 import com.kirjaswappi.backend.service.enums.SwapType;
+import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 
 @Getter
 @Setter
@@ -35,6 +37,7 @@ public class CreateSwapRequest {
   private String note;
 
   public SwapRequest toEntity() {
+    this.validateProperties();
     var entity = new SwapRequest();
     var sender = new User();
     sender.setId(this.senderId);
@@ -50,6 +53,33 @@ public class CreateSwapRequest {
     entity.setAskForGiveaway(this.askForGiveaway);
     entity.setNote(this.note);
     return entity;
+  }
+
+  private void validateProperties() {
+    if (!ValidationUtil.validateNotBlank(this.senderId)) {
+      throw new BadRequestException("senderIdCannotBeBlank");
+    }
+    if (!ValidationUtil.validateNotBlank(this.receiverId)) {
+      throw new BadRequestException("receiverIdCannotBeBlank");
+    }
+    if (!ValidationUtil.validateNotBlank(this.bookIdToSwapWith)) {
+      throw new BadRequestException("bookIdToSwapWithCannotBeBlank");
+    }
+    if (!ValidationUtil.validateNotBlank(this.swapType)) {
+      throw new BadRequestException("swapTypeCannotBeBlank");
+    }
+    if (swapOffer != null) {
+      boolean hasBook = swapOffer.getOfferedBook() != null;
+      boolean hasGenre = swapOffer.getOfferedGenre() != null;
+      if (hasBook == hasGenre) { // true == true or false == false
+        if (hasBook) {
+          throw new BadRequestException("onlyOneOfTheSwapOfferCanBePresent");
+        } else {
+          throw new BadRequestException("oneOfTheSwapOfferMustBePresent");
+        }
+      }
+    }
+
   }
 
   @Getter
