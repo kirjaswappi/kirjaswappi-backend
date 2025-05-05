@@ -168,7 +168,7 @@ public class BookService {
   }
 
   private void setOwnerToBook(Book book, BookDao bookDao) {
-    var owner = userRepository.findById(book.getOwner().getId())
+    var owner = userRepository.findByIdAndIsEmailVerifiedTrue(book.getOwner().getId())
         .orElseThrow(() -> new UserNotFoundException(book.getOwner().getId()));
     bookDao.setOwner(owner);
   }
@@ -192,7 +192,7 @@ public class BookService {
   }
 
   private void addBookToOwner(BookDao dao) {
-    var owner = userRepository.findById(dao.getOwner().getId())
+    var owner = userRepository.findByIdAndIsEmailVerifiedTrue(dao.getOwner().getId())
         .orElseThrow(() -> new UserNotFoundException(dao.getOwner().getId()));
     owner.setBooks(Optional.ofNullable(owner.getBooks()).orElseGet(ArrayList::new));
     owner.getBooks().add(dao);
@@ -208,7 +208,7 @@ public class BookService {
   }
 
   private void removeBookFromOwner(BookDao dao) {
-    var owner = userRepository.findById(dao.getOwner().getId())
+    var owner = userRepository.findByIdAndIsEmailVerifiedTrue(dao.getOwner().getId())
         .orElseThrow(() -> new UserNotFoundException(dao.getOwner().getId()));
     if (owner.getBooks() != null) {
       owner.setBooks(owner.getBooks().stream()

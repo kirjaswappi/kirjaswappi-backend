@@ -51,13 +51,13 @@ public class PhotoService {
   }
 
   public String getPhotoByUserEmail(String email, boolean isProfilePhoto) {
-    var user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+    var user = userRepository.findByEmailAndIsEmailVerified(email, true).orElseThrow(UserNotFoundException::new);
     var uniqueId = isProfilePhoto ? user.getProfilePhoto() : user.getCoverPhoto();
     return imageService.getDownloadUrl(uniqueId);
   }
 
   public String getPhotoByUserId(String userId, boolean isProfilePhoto) {
-    var user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+    var user = userRepository.findByIdAndIsEmailVerifiedTrue(userId).orElseThrow(UserNotFoundException::new);
     var uniqueId = isProfilePhoto ? user.getProfilePhoto() : user.getCoverPhoto();
     return imageService.getDownloadUrl(uniqueId);
   }
@@ -75,7 +75,7 @@ public class PhotoService {
   }
 
   private String addUserPhoto(String userId, MultipartFile file, boolean isProfilePhoto) {
-    var userDao = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+    var userDao = userRepository.findByIdAndIsEmailVerifiedTrue(userId).orElseThrow(UserNotFoundException::new);
     var uniqueId = userDao.getId() + "-" + (isProfilePhoto ? "ProfilePhoto" : "CoverPhoto");
     imageService.uploadImage(file, uniqueId);
     if (isProfilePhoto) {
@@ -88,7 +88,7 @@ public class PhotoService {
   }
 
   private void deleteUserPhoto(String userId, boolean isProfilePhoto) {
-    var userDao = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+    var userDao = userRepository.findByIdAndIsEmailVerifiedTrue(userId).orElseThrow(UserNotFoundException::new);
     var uniqueId = isProfilePhoto ? userDao.getProfilePhoto() : userDao.getCoverPhoto();
     imageService.deleteImage(uniqueId);
     if (isProfilePhoto) {
