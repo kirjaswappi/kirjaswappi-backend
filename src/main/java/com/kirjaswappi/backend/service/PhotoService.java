@@ -62,10 +62,10 @@ public class PhotoService {
     return imageService.getDownloadUrl(uniqueId);
   }
 
-  public String addBookCoverPhoto(MultipartFile file, String bookId) {
-    var uniqueId = bookId + "-" + "BookCoverPhoto";
+  public void addBookCoverPhoto(MultipartFile file, String uniqueId) {
+    // var uniqueId = bookId + "-" + "BookCoverPhoto";
     imageService.uploadImage(file, uniqueId);
-    return uniqueId;
+    // return uniqueId;
   }
 
   public void deleteBookCoverPhoto(String uniqueId) {

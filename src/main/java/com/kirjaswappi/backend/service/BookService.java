@@ -23,13 +23,12 @@ import com.kirjaswappi.backend.jpa.daos.BookDao;
 import com.kirjaswappi.backend.jpa.daos.SwappableBookDao;
 import com.kirjaswappi.backend.jpa.daos.UserDao;
 import com.kirjaswappi.backend.jpa.repositories.BookRepository;
-import com.kirjaswappi.backend.jpa.repositories.GenreRepository;
 import com.kirjaswappi.backend.jpa.repositories.UserRepository;
 import com.kirjaswappi.backend.mapper.*;
 import com.kirjaswappi.backend.service.entities.Book;
+import com.kirjaswappi.backend.service.entities.Genre;
 import com.kirjaswappi.backend.service.entities.SwappableBook;
 import com.kirjaswappi.backend.service.exceptions.BookNotFoundException;
-import com.kirjaswappi.backend.service.exceptions.GenreNotFoundException;
 import com.kirjaswappi.backend.service.exceptions.UserNotFoundException;
 import com.kirjaswappi.backend.service.filters.FindAllBooksFilter;
 
@@ -40,10 +39,10 @@ public class BookService {
   private BookRepository bookRepository;
 
   @Autowired
-  private GenreRepository genreRepository;
+  private UserRepository userRepository;
 
   @Autowired
-  private UserRepository userRepository;
+  private GenreService genreService;
 
   @Autowired
   private PhotoService photoService;
@@ -123,7 +122,8 @@ public class BookService {
     for (int i = 0; i < swappableBooks.size(); i++) {
       var coverPhoto = swappableBooks.get(i).getCoverPhotoFile();
       var swappableBookId = bookDao.getSwapCondition().getSwappableBooks().get(i).getId();
-      String uniqueId = photoService.addBookCoverPhoto(coverPhoto, swappableBookId);
+      var uniqueId = swappableBookId + "-" + "SwappableBookCoverPhoto";
+      photoService.addBookCoverPhoto(coverPhoto, uniqueId);
       bookDao.getSwapCondition().getSwappableBooks().get(i).setCoverPhoto(uniqueId);
     }
     bookRepository.save(bookDao);
@@ -145,17 +145,14 @@ public class BookService {
     if (swappableGenres == null || swappableGenres.isEmpty()) {
       return;
     }
-    var validGenres = swappableGenres.stream()
-        .map(genre -> genreRepository.findByName(genre.getName())
-            .orElseThrow(() -> new GenreNotFoundException(genre.getName())))
-        .toList();
-    book.getSwapCondition().setSwappableGenres(validGenres.stream().map(GenreMapper::toEntity).toList());
+    List<Genre> validGenres = swappableGenres.stream()
+        .map(genre -> genreService.getGenreByName(genre.getName())).toList();
+    book.getSwapCondition().setSwappableGenres(validGenres);
   }
 
   private void addGenresToBook(Book book, BookDao dao) {
     dao.setGenres(book.getGenres().stream()
-        .map(genre -> genreRepository.findByName(genre.getName())
-            .orElseThrow(() -> new GenreNotFoundException(genre.getName())))
+        .map(genre -> GenreMapper.toDao(genreService.getGenreByName(genre.getName())))
         .toList());
   }
 
@@ -171,8 +168,15 @@ public class BookService {
   }
 
   private BookDao addCoverPhotoToBook(Book book, BookDao dao) {
-    String uniqueId = photoService.addBookCoverPhoto(book.getCoverPhotoFile(), dao.getId());
-    dao.setCoverPhoto(uniqueId);
+    var coverPhotoIds = new ArrayList<String>();
+    var index = 1;
+    for (var coverPhotoFile : book.getCoverPhotoFiles()) {
+      var uniqueId = dao.getId() + "-" + "BookCoverPhoto" + "-" + index;
+      photoService.addBookCoverPhoto(coverPhotoFile, uniqueId);
+      coverPhotoIds.add(uniqueId);
+      index++;
+    }
+    dao.setCoverPhotos(coverPhotoIds);
     return bookRepository.save(dao);
   }
 
@@ -185,8 +189,10 @@ public class BookService {
   }
 
   private void deleteExistingCoverPhoto(BookDao dao) {
-    if (dao.getCoverPhoto() != null) {
-      photoService.deleteBookCoverPhoto(dao.getCoverPhoto());
+    if (dao.getCoverPhotos() != null) {
+      for (var coverPhoto : dao.getCoverPhotos()) {
+        photoService.deleteBookCoverPhoto(coverPhoto);
+      }
     }
   }
 
@@ -236,8 +242,12 @@ public class BookService {
 
   @NotNull
   private Book fetchImageUrlForBookCoverPhoto(BookDao bookDao) {
-    var bookCoverPhotoImageUrl = photoService.getBookCoverPhoto(bookDao.getCoverPhoto());
-    return BookMapper.toEntity(bookDao, bookCoverPhotoImageUrl);
+    var coverPhotoImageUrls = new ArrayList<String>();
+    for (var uniqueId : bookDao.getCoverPhotos()) {
+      var imageUrl = photoService.getBookCoverPhoto(uniqueId);
+      coverPhotoImageUrls.add(imageUrl);
+    }
+    return BookMapper.toEntity(bookDao, coverPhotoImageUrls);
   }
 
   private void fetchImageUrlForSwappableBooksIfExists(Book parentBook) {

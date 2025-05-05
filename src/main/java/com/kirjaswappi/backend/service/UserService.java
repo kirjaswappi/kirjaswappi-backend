@@ -4,6 +4,7 @@
  */
 package com.kirjaswappi.backend.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,8 +72,12 @@ public class UserService {
         .orElseThrow(() -> new UserNotFoundException(id));
     if (userDao.getBooks() != null) {
       userDao.getBooks().forEach(bookDao -> {
-        var imageUrl = photoService.getBookCoverPhoto(bookDao.getCoverPhoto());
-        bookDao.setCoverPhoto(imageUrl);
+        var imageUrls = new ArrayList<String>();
+        bookDao.getCoverPhotos().forEach(uniqueId -> {
+          var imageUrl = photoService.getBookCoverPhoto(uniqueId);
+          imageUrls.add(imageUrl);
+        });
+        bookDao.setCoverPhotos(imageUrls);
       });
     }
     return UserMapper.toEntity(userDao);
@@ -82,8 +87,12 @@ public class UserService {
     return userRepository.findAll().stream().map(userDao -> {
       if (userDao.getBooks() != null) {
         userDao.getBooks().forEach(bookDao -> {
-          var imageUrl = photoService.getBookCoverPhoto(bookDao.getCoverPhoto());
-          bookDao.setCoverPhoto(imageUrl);
+          var imageUrls = new ArrayList<String>();
+          bookDao.getCoverPhotos().forEach(uniqueId -> {
+            var imageUrl = photoService.getBookCoverPhoto(uniqueId);
+            imageUrls.add(imageUrl);
+          });
+          bookDao.setCoverPhotos(imageUrls);
         });
       }
       return UserMapper.toEntity(userDao);

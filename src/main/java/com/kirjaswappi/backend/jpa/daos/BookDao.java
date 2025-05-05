@@ -44,7 +44,7 @@ public class BookDao {
   private String condition;
 
   @NotNull
-  private String coverPhoto;
+  private List<String> coverPhotos;
 
   @NotNull
   @DBRef

@@ -45,8 +45,8 @@ public class UpdateBookRequest {
   @Schema(description = "The genres of the book.", example = "[\"Fiction\"]", requiredMode = REQUIRED)
   private List<String> genres;
 
-  @Schema(description = "The cover photo of the book.", example = "book-cover-photo.jpg", requiredMode = REQUIRED)
-  private MultipartFile coverPhoto;
+  @Schema(description = "The cover photos of the book.", example = "book-cover-photo.jpg", requiredMode = REQUIRED)
+  private List<MultipartFile> coverPhotos;
 
   @Schema(description = "Swap condition of the book in JSON format.", requiredMode = REQUIRED, example = "{\n" +
       "  \"conditionType\": \"ByBooks\",\n" +
@@ -66,19 +66,18 @@ public class UpdateBookRequest {
   public Book toEntity() {
     this.validateProperties();
     var book = new Book();
-    book.setId(id);
-    book.setTitle(title);
-    book.setAuthor(author);
-    book.setDescription(description);
-    book.setLanguage(Language.fromCode(language));
-    book.setCondition(Condition.fromCode(condition));
+    book.setId(this.id);
+    book.setTitle(this.title);
+    book.setAuthor(this.author);
+    book.setDescription(this.description);
+    book.setLanguage(Language.fromCode(this.language));
+    book.setCondition(Condition.fromCode(this.condition));
     book.setGenres(this.genres.stream().map(Genre::new).toList());
-    book.setCoverPhotoFile(coverPhoto);
+    book.setCoverPhotoFiles(this.coverPhotos);
     return book;
   }
 
   private void validateProperties() {
-    ValidationUtil.validateMediaType(coverPhoto);
     if (!ValidationUtil.validateNotBlank(this.id)) {
       throw new BadRequestException("bookIdCannotBeBlank", this.id);
     }
@@ -97,11 +96,14 @@ public class UpdateBookRequest {
     if (this.genres == null || this.genres.isEmpty()) {
       throw new BadRequestException("atLeastOneGenreNeeded", this.genres);
     }
-    if (this.coverPhoto == null) {
-      throw new BadRequestException("coverPhotoIsRequired");
-    }
     if (!ValidationUtil.validateNotBlank(this.swapCondition)) {
       throw new BadRequestException("swapConditionIsRequired");
+    }
+    if (this.coverPhotos == null) {
+      throw new BadRequestException("atLeastOneCoverPhotoIsRequired");
+    }
+    for (var coverPhoto : this.coverPhotos) {
+      ValidationUtil.validateMediaType(coverPhoto);
     }
   }
 }
