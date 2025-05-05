@@ -12,6 +12,4 @@ import com.kirjaswappi.backend.jpa.daos.SwapRequestDao;
 public interface SwapRequestRepository extends MongoRepository<SwapRequestDao, String> {
   @Query(value = "{ 'sender.id': ?0, 'receiver.id': ?1, 'bookToSwapWith.id': ?2 }", exists = true)
   boolean existsAlready(String senderId, String receiverId, String bookToSwapWithId);
-
-  boolean existsBySenderIdAndReceiverIdAndBookToSwapWithId(String senderId, String receiverId, String bookToSwapWithId);
 }

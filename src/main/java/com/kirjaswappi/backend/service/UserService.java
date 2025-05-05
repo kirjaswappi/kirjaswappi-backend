@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.kirjaswappi.backend.common.service.exceptions.InvalidCredentials;
 import com.kirjaswappi.backend.common.utils.Util;
+import com.kirjaswappi.backend.jpa.daos.BookDao;
 import com.kirjaswappi.backend.jpa.daos.UserDao;
 import com.kirjaswappi.backend.jpa.repositories.BookRepository;
 import com.kirjaswappi.backend.jpa.repositories.GenreRepository;
@@ -70,26 +71,31 @@ public class UserService {
   public User getUser(String id) {
     var userDao = userRepository.findByIdAndIsEmailVerifiedTrue(id)
         .orElseThrow(() -> new UserNotFoundException(id));
-    setBookCoverPhotos(userDao);
+    setCoverPhotos(userDao);
     return UserMapper.toEntity(userDao);
   }
 
-  private void setBookCoverPhotos(UserDao userDao) {
+  private void setCoverPhotos(UserDao userDao) {
     if (userDao.getBooks() != null) {
-      userDao.getBooks().forEach(bookDao -> {
-        var imageUrls = new ArrayList<String>();
-        bookDao.getCoverPhotos().forEach(uniqueId -> {
-          var imageUrl = photoService.getBookCoverPhoto(uniqueId);
-          imageUrls.add(imageUrl);
-        });
-        bookDao.setCoverPhotos(imageUrls);
-      });
+      userDao.getBooks().forEach(this::fetchAndSetImage);
     }
+    if (userDao.getFavBooks() != null) {
+      userDao.getFavBooks().forEach(this::fetchAndSetImage);
+    }
+  }
+
+  private void fetchAndSetImage(BookDao bookDao) {
+    var imageUrls = new ArrayList<String>();
+    bookDao.getCoverPhotos().forEach(uniqueId -> {
+      var imageUrl = photoService.getBookCoverPhoto(uniqueId);
+      imageUrls.add(imageUrl);
+    });
+    bookDao.setCoverPhotos(imageUrls);
   }
 
   public List<User> getUsers() {
     return userRepository.findAllByIsEmailVerifiedTrue().stream().map(userDao -> {
-      setBookCoverPhotos(userDao);
+      setCoverPhotos(userDao);
       return UserMapper.toEntity(userDao);
     }).toList();
   }

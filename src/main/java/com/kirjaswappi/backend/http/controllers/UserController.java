@@ -97,8 +97,8 @@ public class UserController {
   @Operation(summary = "Find all users.", responses = {
       @ApiResponse(responseCode = "200", description = "List of users.") })
   public ResponseEntity<List<UserResponse>> getUsers() {
-    var userResponses = userService.getUsers().stream().map(UserResponse::new).toList();
-    return ResponseEntity.status(HttpStatus.OK).body(userResponses);
+    List<User> users = userService.getUsers();
+    return ResponseEntity.status(HttpStatus.OK).body(users.stream().map(UserResponse::new).toList());
   }
 
   @DeleteMapping(ID)

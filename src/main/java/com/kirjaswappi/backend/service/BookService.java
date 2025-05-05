@@ -87,7 +87,7 @@ public class BookService {
   }
 
   public SwappableBook getSwappableBookById(String swappableBookId) {
-    Optional<BookDao> bookDao = bookRepository.findBySwapConditionSwappableBooksId(swappableBookId);
+    var bookDao = bookRepository.findByIsDeletedFalseAndSwapConditionSwappableBooksId(swappableBookId);
     var swappableBookDao = bookDao.flatMap(book -> book.getSwapCondition()
         .getSwappableBooks()
         .stream()
