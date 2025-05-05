@@ -82,4 +82,10 @@ public class GenreService {
         .orElseThrow(() -> new GenreNotFoundException(genreId));
     return GenreMapper.toEntity(dao);
   }
+
+  public Genre getGenreByName(String genreName) {
+    var dao = genreRepository.findByName(genreName)
+        .orElseThrow(() -> new GenreNotFoundException(genreName));
+    return GenreMapper.toEntity(dao);
+  }
 }

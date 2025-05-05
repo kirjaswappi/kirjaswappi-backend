@@ -25,7 +25,7 @@ public class BookResponse {
   private final String language;
   private final String description;
   private final String condition;
-  private final String coverPhotoUrl;
+  private final List<String> coverPhotoUrls;
   private OwnerResponse owner;
   private SwapConditionResponse swapCondition;
 
@@ -37,7 +37,7 @@ public class BookResponse {
     this.language = entity.getLanguage() == null ? null : entity.getLanguage().getCode();
     this.description = entity.getDescription() == null ? null : entity.getDescription();
     this.condition = entity.getCondition() == null ? null : entity.getCondition().getCode();
-    this.coverPhotoUrl = entity.getCoverPhoto() == null ? null : entity.getCoverPhoto();
+    this.coverPhotoUrls = entity.getCoverPhotos() == null ? null : entity.getCoverPhotos();
     this.owner = entity.getOwner() == null ? null : new OwnerResponse(entity.getOwner());
     this.swapCondition = entity.getSwapCondition() == null ? null
         : new SwapConditionResponse(entity.getSwapCondition());

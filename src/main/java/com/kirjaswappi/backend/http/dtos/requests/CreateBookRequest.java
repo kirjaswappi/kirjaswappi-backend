@@ -43,8 +43,8 @@ public class CreateBookRequest {
   @Schema(description = "The genres of the book.", example = "[\"Fiction\"]", requiredMode = REQUIRED)
   private List<String> genres;
 
-  @Schema(description = "The cover photo of the book.", example = "book-cover-photo.jpg", requiredMode = REQUIRED)
-  private MultipartFile coverPhoto;
+  @Schema(description = "The cover photos of the book.", example = "book-cover-photo.jpg", requiredMode = REQUIRED)
+  private List<MultipartFile> coverPhotos;
 
   @Schema(description = "The user ID of the book owner.", example = "123456", requiredMode = REQUIRED)
   private String ownerId;
@@ -67,21 +67,20 @@ public class CreateBookRequest {
   public Book toEntity() {
     this.validateProperties();
     var book = new Book();
-    book.setTitle(title);
-    book.setAuthor(author);
-    book.setDescription(description);
-    book.setLanguage(Language.fromCode(language));
-    book.setCondition(Condition.fromCode(condition));
+    book.setTitle(this.title);
+    book.setAuthor(this.author);
+    book.setDescription(this.description);
+    book.setLanguage(Language.fromCode(this.language));
+    book.setCondition(Condition.fromCode(this.condition));
     book.setGenres(this.genres.stream().map(Genre::new).toList());
-    book.setCoverPhotoFile(coverPhoto);
+    book.setCoverPhotoFiles(this.coverPhotos);
     var user = new User();
-    user.setId(ownerId);
+    user.setId(this.ownerId);
     book.setOwner(user);
     return book;
   }
 
   private void validateProperties() {
-    ValidationUtil.validateMediaType(coverPhoto);
     if (!ValidationUtil.validateNotBlank(this.title)) {
       throw new BadRequestException("bookTitleCannotBeBlank", this.title);
     }
@@ -97,15 +96,17 @@ public class CreateBookRequest {
     if (this.genres == null || this.genres.isEmpty()) {
       throw new BadRequestException("atLeastOneGenreNeeded", this.genres);
     }
-    if (this.coverPhoto == null) {
-      throw new BadRequestException("coverPhotoIsRequired");
+    if (!ValidationUtil.validateNotBlank(this.swapCondition)) {
+      throw new BadRequestException("swapConditionIsRequired");
+    }
+    if (this.coverPhotos == null) {
+      throw new BadRequestException("atLeastOneCoverPhotoIsRequired");
+    }
+    for (var coverPhoto : this.coverPhotos) {
+      ValidationUtil.validateMediaType(coverPhoto);
     }
     if (!ValidationUtil.validateNotBlank(this.ownerId)) {
       throw new BadRequestException("ownerIdCannotBeBlank", this.ownerId);
     }
-    if (!ValidationUtil.validateNotBlank(this.swapCondition)) {
-      throw new BadRequestException("swapConditionIsRequired");
-    }
   }
-
 }
