@@ -41,6 +41,7 @@ import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 public class UserController {
   @Autowired
   private UserService userService;
+
   @Autowired
   private OTPService otpService;
 

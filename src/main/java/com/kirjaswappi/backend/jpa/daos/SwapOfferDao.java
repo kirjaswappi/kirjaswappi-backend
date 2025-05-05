@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import org.springframework.data.mongodb.core.mapping.DBRef;
+
 import com.mongodb.lang.Nullable;
 
 @Getter
@@ -17,8 +19,10 @@ import com.mongodb.lang.Nullable;
 @AllArgsConstructor
 public class SwapOfferDao {
   @Nullable
+  @DBRef
   private SwappableBookDao offeredBook;
 
   @Nullable
+  @DBRef
   private GenreDao offeredGenre;
 }
