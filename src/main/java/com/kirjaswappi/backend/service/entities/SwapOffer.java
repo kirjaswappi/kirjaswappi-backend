@@ -9,16 +9,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import org.springframework.web.multipart.MultipartFile;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ExchangeableBook {
-  private String id;
-  private String title;
-  private String author;
-  private String coverPhoto;
-  private MultipartFile coverPhotoFile;
+public class SwapOffer {
+  private SwappableBook offeredBook;
+  private Genre offeredGenre;
 }

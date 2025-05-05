@@ -4,26 +4,25 @@
  */
 package com.kirjaswappi.backend.jpa.daos;
 
-import java.util.List;
-
-import jakarta.validation.constraints.NotNull;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import org.springframework.data.mongodb.core.mapping.DBRef;
+
+import com.mongodb.lang.Nullable;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ExchangeConditionDao {
-  @NotNull
-  private boolean openForOffers;
+public class SwapOfferDao {
+  @Nullable
+  @DBRef
+  private SwappableBookDao offeredBook;
 
-  @NotNull
-  private List<GenreDao> exchangeableGenres;
-
-  @NotNull
-  private List<ExchangeableBookDao> exchangeableBooks;
+  @Nullable
+  @DBRef
+  private GenreDao offeredGenre;
 }

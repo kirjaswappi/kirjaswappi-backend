@@ -53,9 +53,9 @@ public class AdminUserController {
   }
 
   @GetMapping
-  @Operation(summary = "Get all admin users.", responses = {
+  @Operation(summary = "Find all admin users.", responses = {
       @ApiResponse(responseCode = "200", description = "List of admin users.") })
-  public ResponseEntity<List<AdminUserResponse>> getAdminUsers() {
+  public ResponseEntity<List<AdminUserResponse>> findAdminUsers() {
     List<AdminUserResponse> userListResponses = adminUserService.getAdminUsers()
         .stream().map(AdminUserResponse::new).toList();
     return ResponseEntity.status(HttpStatus.OK).body(userListResponses);

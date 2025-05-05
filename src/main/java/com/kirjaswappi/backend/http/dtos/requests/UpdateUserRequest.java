@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import com.kirjaswappi.backend.http.validations.ValidationUtil;
+import com.kirjaswappi.backend.service.entities.Genre;
 import com.kirjaswappi.backend.service.entities.User;
 import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 
@@ -66,7 +67,8 @@ public class UpdateUserRequest {
     entity.setCountry(this.country);
     entity.setPhoneNumber(this.phoneNumber);
     entity.setAboutMe(this.aboutMe);
-    entity.setFavGenres(this.favGenres);
+    entity.setFavGenres(
+        this.favGenres == null ? null : this.favGenres.stream().map(favGenre -> new Genre(null, favGenre)).toList());
     return entity;
   }
 

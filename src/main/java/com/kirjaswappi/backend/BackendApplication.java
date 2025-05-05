@@ -15,8 +15,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
 public class BackendApplication {
 
   public static void main(String[] args) {
-    System.out.println("Hello, KirjaSwappi!");
-    System.out.println("Running on profile: " + System.getProperty("spring.profiles.active"));
+    System.out.println("*** KirjaSwappi Backend ***");
+    System.out.println("Running on " + System.getProperty("spring.profiles.active") + " profile");
     SpringApplication.run(BackendApplication.class, args);
   }
 }
