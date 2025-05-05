@@ -18,9 +18,9 @@ import com.kirjaswappi.backend.service.entities.Genre;
 @Setter
 @Relation(collectionRelation = "books")
 public class BookListResponse {
-  private final String id;
-  private final String title;
-  private final String author;
+  private String id;
+  private String title;
+  private String author;
   private List<String> genres;
   private String language;
   private String description;

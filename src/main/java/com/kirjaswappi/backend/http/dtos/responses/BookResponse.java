@@ -18,14 +18,14 @@ import com.kirjaswappi.backend.service.entities.User;
 @Getter
 @Setter
 public class BookResponse {
-  private final String id;
-  private final String title;
-  private final String author;
+  private String id;
+  private String title;
+  private String author;
   private List<String> genres;
-  private final String language;
-  private final String description;
-  private final String condition;
-  private final List<String> coverPhotoUrls;
+  private String language;
+  private String description;
+  private String condition;
+  private List<String> coverPhotoUrls;
   private OwnerResponse owner;
   private SwapConditionResponse swapCondition;
 
@@ -46,8 +46,8 @@ public class BookResponse {
   @Setter
   @Getter
   static class OwnerResponse {
-    private final String id;
-    private final String name;
+    private String id;
+    private String name;
 
     public OwnerResponse(User entity) {
       this.id = entity.getId();
@@ -81,10 +81,10 @@ public class BookResponse {
   @Setter
   @Getter
   static class SwappableBookResponse {
-    private final String id;
-    private final String title;
-    private final String author;
-    private final String coverPhotoUrl;
+    private String id;
+    private String title;
+    private String author;
+    private String coverPhotoUrl;
 
     public SwappableBookResponse(SwappableBook entity) {
       this.id = entity.getId();

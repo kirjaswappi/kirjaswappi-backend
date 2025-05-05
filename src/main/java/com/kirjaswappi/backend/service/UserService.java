@@ -70,6 +70,11 @@ public class UserService {
   public User getUser(String id) {
     var userDao = userRepository.findById(id)
         .orElseThrow(() -> new UserNotFoundException(id));
+    setBookCoverPhotos(userDao);
+    return UserMapper.toEntity(userDao);
+  }
+
+  private void setBookCoverPhotos(UserDao userDao) {
     if (userDao.getBooks() != null) {
       userDao.getBooks().forEach(bookDao -> {
         var imageUrls = new ArrayList<String>();
@@ -80,21 +85,11 @@ public class UserService {
         bookDao.setCoverPhotos(imageUrls);
       });
     }
-    return UserMapper.toEntity(userDao);
   }
 
   public List<User> getUsers() {
     return userRepository.findAll().stream().map(userDao -> {
-      if (userDao.getBooks() != null) {
-        userDao.getBooks().forEach(bookDao -> {
-          var imageUrls = new ArrayList<String>();
-          bookDao.getCoverPhotos().forEach(uniqueId -> {
-            var imageUrl = photoService.getBookCoverPhoto(uniqueId);
-            imageUrls.add(imageUrl);
-          });
-          bookDao.setCoverPhotos(imageUrls);
-        });
-      }
+      setBookCoverPhotos(userDao);
       return UserMapper.toEntity(userDao);
     }).toList();
   }
