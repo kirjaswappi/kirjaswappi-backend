@@ -25,7 +25,7 @@ public class CreateSwapRequest {
   @Schema(description = "The ID of the book a user want to swap with.", example = "123456")
   private String bookIdToSwapWith;
 
-  @Schema(description = "The ID of the receiver of swap request.", example = "123456")
+  @Schema(description = "Swap condition type of the book.", example = "ByBooks/ByGenres/GiveAway/OpenForOffers")
   private String swapType;
 
   private SwapOfferRequest swapOffer;
@@ -69,8 +69,8 @@ public class CreateSwapRequest {
       throw new BadRequestException("swapTypeCannotBeBlank");
     }
     if (swapOffer != null) {
-      boolean hasBook = swapOffer.getOfferedBook() != null;
-      boolean hasGenre = swapOffer.getOfferedGenre() != null;
+      boolean hasBook = swapOffer.getOfferedBookId() != null;
+      boolean hasGenre = swapOffer.getOfferedGenreId() != null;
       if (hasBook == hasGenre) { // true == true or false == false
         if (hasBook) {
           throw new BadRequestException("onlyOneOfTheSwapOfferCanBePresent");
@@ -86,17 +86,17 @@ public class CreateSwapRequest {
   @Setter
   private static class SwapOfferRequest {
     @Schema(description = "The ID of the book offered for swap request.", example = "123456")
-    private String offeredBook;
+    private String offeredBookId;
 
     @Schema(description = "The ID of the genre offered for swap request.", example = "123456")
-    private String offeredGenre;
+    private String offeredGenreId;
 
     public SwapOffer toEntity() {
-      if (this.offeredBook == null) {
-        return new SwapOffer(null, new Genre(this.offeredGenre, null));
+      if (this.offeredBookId == null) {
+        return new SwapOffer(null, new Genre(this.offeredGenreId, null));
       }
       var offeredBook = new SwappableBook();
-      offeredBook.setId(this.offeredBook);
+      offeredBook.setId(this.offeredBookId);
       return new SwapOffer(offeredBook, null);
     }
   }
