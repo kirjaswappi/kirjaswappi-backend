@@ -7,12 +7,20 @@ package com.kirjaswappi.backend.service.exceptions;
 import com.kirjaswappi.backend.common.exceptions.SystemException;
 
 public class ImageDeletionFailureException extends SystemException {
-  public ImageDeletionFailureException(String message) {
-    super(message);
+  private final Object[] params;
+
+  public ImageDeletionFailureException(Object... params) {
+    super("imageDeletionFailed");
+    this.params = params;
   }
 
   @Override
   public String getCode() {
     return "imageDeletionFailed";
+  }
+
+  @Override
+  public Object[] getParams() {
+    return params;
   }
 }

@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.LookupOperation;
 import org.springframework.data.mongodb.core.aggregation.MatchOperation;
+import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -46,10 +47,14 @@ public class CustomBookRepositoryImpl implements CustomBookRepository {
       // Define the match operation based on the query criteria
       MatchOperation matchOperation = Aggregation.match(criteria);
 
+      // Define the required fields
+      ProjectionOperation projectOperation = Aggregation
+          .project("id", "title", "author", "genres", "language", "description", "condition", "coverPhotos");
+
       // Define the aggregation pipeline
       Aggregation aggregation = Aggregation.newAggregation(
           lookupOperation,
-          matchOperation,
+          matchOperation, projectOperation,
           Aggregation.skip(pageable.getOffset()),
           Aggregation.limit(pageable.getPageSize()));
 
@@ -59,7 +64,7 @@ public class CustomBookRepositoryImpl implements CustomBookRepository {
       // Separate count query to get total matching documents
       var aggregationWithoutLimit = Aggregation.newAggregation(
           lookupOperation,
-          matchOperation);
+          matchOperation, projectOperation);
       long totalBooks = mongoTemplate.aggregate(aggregationWithoutLimit, "books", BookDao.class).getMappedResults()
           .size();
       return new PageImpl<>(bookDaos, pageable, totalBooks);

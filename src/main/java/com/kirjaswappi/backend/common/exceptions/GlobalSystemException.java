@@ -13,4 +13,9 @@ public class GlobalSystemException extends SystemException {
   public String getCode() {
     return "GlobalSystemException";
   }
+
+  @Override
+  public Object[] getParams() {
+    return new Object[0];
+  }
 }
