@@ -100,7 +100,8 @@ public class BookService {
     var criteria = filter.buildSearchAndFilterCriteria();
     pageable = getPageableWithValidSortingCriteria(pageable);
     var bookDaos = bookRepository.findAllBooksByFilter(criteria, pageable);
-    return mapToBookPage(bookDaos, pageable);
+    var books = bookDaos.stream().map(this::bookWithCoverPhotoUrl).toList();
+    return new PageImpl<>(books, pageable, bookDaos.getTotalElements());
   }
 
   // keeping the book cover photo for future references
@@ -235,9 +236,14 @@ public class BookService {
     return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(allowedOrders));
   }
 
-  private Book bookWithImageUrlAndOwner(BookDao bookDao) {
+  private Book bookWithCoverPhotoUrl(BookDao bookDao) {
     var book = fetchImageUrlForBookCoverPhoto(bookDao);
     fetchImageUrlForSwappableBooksIfExists(book);
+    return book;
+  }
+
+  private Book bookWithImageUrlAndOwner(BookDao bookDao) {
+    var book = bookWithCoverPhotoUrl(bookDao);
     return bookWithOwner(bookDao.getOwner(), book);
   }
 
@@ -271,11 +277,6 @@ public class BookService {
       String coverPhotoUrl = photoService.getBookCoverPhoto(uniqueId);
       parentBook.getSwapCondition().getSwappableBooks().get(i).setCoverPhoto(coverPhotoUrl);
     }
-  }
-
-  private Page<Book> mapToBookPage(Page<BookDao> bookDaos, Pageable pageable) {
-    var books = bookDaos.stream().map(this::bookWithImageUrlAndOwner).toList();
-    return new PageImpl<>(books, pageable, bookDaos.getTotalElements());
   }
 
   public List<Book> getMoreBooksOfTheUser(String bookId) {

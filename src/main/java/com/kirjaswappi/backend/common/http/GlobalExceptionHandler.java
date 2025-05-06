@@ -20,8 +20,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import com.kirjaswappi.backend.common.exceptions.BusinessException;
 import com.kirjaswappi.backend.common.exceptions.SystemException;
 import com.kirjaswappi.backend.common.service.exceptions.InvalidCredentials;
-import com.kirjaswappi.backend.service.exceptions.ResourceNotFoundException;
-import com.kirjaswappi.backend.service.exceptions.UserNotFoundException;
+import com.kirjaswappi.backend.service.exceptions.*;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -49,6 +48,29 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.NOT_FOUND)
   public ErrorResponse handleUserNotFoundException(UserNotFoundException exception, WebRequest webRequest) {
     return errorUtils.buildErrorResponse(exception, webRequest);
+  }
+
+  @ExceptionHandler(ImageUploadFailureException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ErrorResponse handleImageUploadFailureException(ImageUploadFailureException exception, WebRequest webRequest) {
+    return new ErrorResponse(new ErrorResponse.Error(exception.getCode(),
+        errorUtils.resolveMessage(exception.getCode(), exception.getParams(), webRequest.getLocale())));
+  }
+
+  @ExceptionHandler(ImageUrlFetchFailureException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ErrorResponse handleImageUrlFetchFailureException(ImageUrlFetchFailureException exception,
+      WebRequest webRequest) {
+    return new ErrorResponse(new ErrorResponse.Error(exception.getCode(),
+        errorUtils.resolveMessage(exception.getCode(), exception.getParams(), webRequest.getLocale())));
+  }
+
+  @ExceptionHandler(ImageDeletionFailureException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ErrorResponse handleImageDeletionFailureException(ImageDeletionFailureException exception,
+      WebRequest webRequest) {
+    return new ErrorResponse(new ErrorResponse.Error(exception.getCode(),
+        errorUtils.resolveMessage(exception.getCode(), exception.getParams(), webRequest.getLocale())));
   }
 
   @ExceptionHandler(SystemException.class)
