@@ -15,7 +15,10 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.LookupOperation;
 import org.springframework.data.mongodb.core.aggregation.MatchOperation;
+import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
 import com.kirjaswappi.backend.common.exceptions.GlobalSystemException;
@@ -31,6 +34,7 @@ public class CustomBookRepositoryImpl implements CustomBookRepository {
     this.mongoTemplate = mongoTemplate;
   }
 
+  @Override
   public Page<BookDao> findAllBooksByFilter(Criteria criteria, Pageable pageable) {
     try {
       // Define the lookup operation to join BookDao with GenreDao
@@ -43,20 +47,37 @@ public class CustomBookRepositoryImpl implements CustomBookRepository {
       // Define the match operation based on the query criteria
       MatchOperation matchOperation = Aggregation.match(criteria);
 
+      // Define the required fields
+      ProjectionOperation projectOperation = Aggregation
+          .project("id", "title", "author", "genres", "language", "description", "condition", "coverPhotos");
+
       // Define the aggregation pipeline
       Aggregation aggregation = Aggregation.newAggregation(
           lookupOperation,
-          matchOperation,
+          matchOperation, projectOperation,
           Aggregation.skip(pageable.getOffset()),
           Aggregation.limit(pageable.getPageSize()));
 
       // Execute the aggregation query
       List<BookDao> bookDaos = mongoTemplate.aggregate(aggregation, "books", BookDao.class).getMappedResults();
-      long total = bookDaos.size();
-      return new PageImpl<>(bookDaos, pageable, total);
+
+      // Separate count query to get total matching documents
+      var aggregationWithoutLimit = Aggregation.newAggregation(
+          lookupOperation,
+          matchOperation, projectOperation);
+      long totalBooks = mongoTemplate.aggregate(aggregationWithoutLimit, "books", BookDao.class).getMappedResults()
+          .size();
+      return new PageImpl<>(bookDaos, pageable, totalBooks);
     } catch (Exception e) {
       logger.error("Error occurred while fetching books: " + e.getMessage());
       throw new GlobalSystemException("Error occurred while fetching books, please try again later");
     }
+  }
+
+  @Override
+  public void deleteLogically(String id) {
+    Query query = new Query(Criteria.where("_id").is(id));
+    Update update = new Update().set("isDeleted", true);
+    mongoTemplate.updateFirst(query, update, BookDao.class);
   }
 }

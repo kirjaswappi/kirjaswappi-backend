@@ -33,7 +33,7 @@ public class GenreService {
   }
 
   public Genre addGenre(Genre genre) {
-    // check if genre already exists:
+    // check if the genre already exists:
     if (genreRepository.existsByName(genre.getName())) {
       throw new GenreAlreadyExistsException(genre.getName());
     }
@@ -66,8 +66,8 @@ public class GenreService {
   private boolean isGenreInBooks(UserDao user, String id) {
     return user.getBooks() != null && user.getBooks().stream()
         .anyMatch(book -> book.getGenres().stream().anyMatch(genre -> genre.getId().equals(id)) &&
-            book.getExchangeCondition() != null &&
-            book.getExchangeCondition().getExchangeableGenres().stream().anyMatch(g -> g.getId().equals(id)));
+            book.getSwapCondition() != null &&
+            book.getSwapCondition().getSwappableGenres().stream().anyMatch(g -> g.getId().equals(id)));
   }
 
   public Genre updateGenre(Genre entity) {
@@ -75,5 +75,17 @@ public class GenreService {
         .orElseThrow(() -> new GenreNotFoundException(entity.getId()));
     dao.setName(entity.getName());
     return GenreMapper.toEntity(genreRepository.save(dao));
+  }
+
+  public Genre getGenreById(String genreId) {
+    var dao = genreRepository.findById(genreId)
+        .orElseThrow(() -> new GenreNotFoundException(genreId));
+    return GenreMapper.toEntity(dao);
+  }
+
+  public Genre getGenreByName(String genreName) {
+    var dao = genreRepository.findByName(genreName)
+        .orElseThrow(() -> new GenreNotFoundException(genreName));
+    return GenreMapper.toEntity(dao);
   }
 }

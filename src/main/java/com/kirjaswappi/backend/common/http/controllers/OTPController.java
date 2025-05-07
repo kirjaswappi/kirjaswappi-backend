@@ -40,7 +40,7 @@ public class OTPController {
   }
 
   @PostMapping(VERIFY_OTP)
-  @Operation(summary = "Verify OTP.", description = "Verify OTP of a user.", responses = {
+  @Operation(summary = "Verify OTP of a user.", description = "Verify OTP of a user.", responses = {
       @ApiResponse(responseCode = "200", description = "OTP Verified.") })
   public ResponseEntity<VerifyOtpResponse> verifyOTP(@RequestBody VerifyOtpRequest request) {
     String email = otpService.verifyOTPByEmail(request.toEntity());

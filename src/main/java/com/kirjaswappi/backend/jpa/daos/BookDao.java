@@ -44,7 +44,7 @@ public class BookDao {
   private String condition;
 
   @NotNull
-  private String coverPhoto;
+  private List<String> coverPhotos;
 
   @NotNull
   @DBRef
@@ -55,5 +55,8 @@ public class BookDao {
   private UserDao owner;
 
   @NotNull
-  private ExchangeConditionDao exchangeCondition;
+  private SwapConditionDao swapCondition;
+
+  @NotNull
+  private boolean isDeleted = false;
 }
