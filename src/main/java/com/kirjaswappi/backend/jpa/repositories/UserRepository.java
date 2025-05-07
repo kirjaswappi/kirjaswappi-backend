@@ -4,6 +4,7 @@
  */
 package com.kirjaswappi.backend.jpa.repositories;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -16,4 +17,8 @@ public interface UserRepository extends MongoRepository<UserDao, String> {
   Optional<UserDao> findByEmail(String email);
 
   Optional<UserDao> findByEmailAndIsEmailVerified(String email, boolean isEmailVerified);
+
+  Optional<UserDao> findByIdAndIsEmailVerifiedTrue(String id);
+
+  List<UserDao> findAllByIsEmailVerifiedTrue();
 }

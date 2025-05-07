@@ -4,7 +4,6 @@
  */
 package com.kirjaswappi.backend.http.dtos.requests;
 
-import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED;
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
 import java.util.List;
@@ -17,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.kirjaswappi.backend.http.validations.ValidationUtil;
 import com.kirjaswappi.backend.service.entities.Book;
+import com.kirjaswappi.backend.service.entities.Genre;
 import com.kirjaswappi.backend.service.enums.Condition;
 import com.kirjaswappi.backend.service.enums.Language;
 import com.kirjaswappi.backend.service.exceptions.BadRequestException;
@@ -26,32 +26,54 @@ import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 public class UpdateBookRequest {
   @Schema(description = "The ID of the book.", example = "123456", requiredMode = REQUIRED)
   private String id;
+
   @Schema(description = "The title of the book.", example = "The Alchemist", requiredMode = REQUIRED)
   private String title;
+
   @Schema(description = "The author of the book.", example = "Paulo Coelho", requiredMode = REQUIRED)
   private String author;
-  @Schema(description = "The description of the book.", example = "A novel by Paulo Coelho", requiredMode = NOT_REQUIRED)
+
+  @Schema(description = "The description of the book.", example = "A novel by Paulo Coelho")
   private String description;
+
   @Schema(description = "The language of the book.", example = "English", requiredMode = REQUIRED)
   private String language;
+
   @Schema(description = "The condition of the book.", example = "New", requiredMode = REQUIRED)
   private String condition;
+
   @Schema(description = "The genres of the book.", example = "[\"Fiction\"]", requiredMode = REQUIRED)
   private List<String> genres;
-  @Schema(description = "The cover photo of the book.", requiredMode = REQUIRED)
-  private MultipartFile coverPhoto;
+
+  @Schema(description = "The cover photos of the book.", example = "book-cover-photo.jpg", requiredMode = REQUIRED)
+  private List<MultipartFile> coverPhotos;
+
+  @Schema(description = "Swap condition of the book in JSON format.", requiredMode = REQUIRED, example = "{\n" +
+      "  \"conditionType\": \"ByBooks\",\n" +
+      "  \"giveAway\": false,\n" +
+      "  \"openForOffers\": false,\n" +
+      "  \"genres\": [],\n" +
+      "  \"books\": [\n" +
+      "    {\n" +
+      "      \"title\": \"The Alchemist\",\n" +
+      "      \"author\": \"Paulo Coelho\",\n" +
+      "      \"coverPhoto\": \"swappable-book-cover-photo.jpg\"\n" +
+      "    }\n" +
+      "  ]\n" +
+      "}")
+  private String swapCondition;
 
   public Book toEntity() {
     this.validateProperties();
     var book = new Book();
-    book.setId(id);
-    book.setTitle(title);
-    book.setAuthor(author);
-    book.setDescription(description);
-    book.setLanguage(Language.fromCode(language));
-    book.setCondition(Condition.fromCode(condition));
-    book.setGenres(genres);
-    book.setCoverPhotoFile(coverPhoto);
+    book.setId(this.id);
+    book.setTitle(this.title);
+    book.setAuthor(this.author);
+    book.setDescription(this.description);
+    book.setLanguage(Language.fromCode(this.language));
+    book.setCondition(Condition.fromCode(this.condition));
+    book.setGenres(this.genres.stream().map(Genre::new).toList());
+    book.setCoverPhotoFiles(this.coverPhotos);
     return book;
   }
 
@@ -74,9 +96,14 @@ public class UpdateBookRequest {
     if (this.genres == null || this.genres.isEmpty()) {
       throw new BadRequestException("atLeastOneGenreNeeded", this.genres);
     }
-    if (this.coverPhoto == null) {
-      throw new BadRequestException("coverPhotoIsRequired", this.coverPhoto);
+    if (!ValidationUtil.validateNotBlank(this.swapCondition)) {
+      throw new BadRequestException("swapConditionIsRequired");
     }
-    ValidationUtil.validateMediaType(coverPhoto);
+    if (this.coverPhotos == null) {
+      throw new BadRequestException("atLeastOneCoverPhotoIsRequired");
+    }
+    for (var coverPhoto : this.coverPhotos) {
+      ValidationUtil.validateMediaType(coverPhoto);
+    }
   }
 }

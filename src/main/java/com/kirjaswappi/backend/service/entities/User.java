@@ -32,13 +32,15 @@ public class User {
   private String country;
   private String phoneNumber;
   private String aboutMe;
-  private List<String> favGenres;
+  private List<Genre> favGenres;
   @Nullable
   private String profilePhoto;
   @Nullable
   private String coverPhoto;
   @Nullable
   private List<Book> books;
+  @Nullable
+  private List<Book> favBooks;
 
   public void setPassword(String password, String salt) {
     this.password = hashPassword(password, salt);

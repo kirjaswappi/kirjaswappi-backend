@@ -12,4 +12,6 @@ import com.kirjaswappi.backend.jpa.daos.BookDao;
 
 public interface CustomBookRepository {
   Page<BookDao> findAllBooksByFilter(Criteria criteria, Pageable pageable);
+
+  void deleteLogically(String bookId);
 }

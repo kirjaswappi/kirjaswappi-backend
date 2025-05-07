@@ -27,8 +27,9 @@ public class Book {
   private String description;
   private Language language;
   private Condition condition;
-  private List<String> genres;
-  private String coverPhoto;
-  private MultipartFile coverPhotoFile;
+  private List<Genre> genres;
+  private List<String> coverPhotos;
+  private List<MultipartFile> coverPhotoFiles;
   private User owner;
+  private SwapCondition swapCondition;
 }

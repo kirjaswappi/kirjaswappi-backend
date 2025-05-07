@@ -4,14 +4,9 @@
  */
 package com.kirjaswappi.backend.http.controllers;
 
-import static com.kirjaswappi.backend.common.utils.Constants.API_BASE;
-import static com.kirjaswappi.backend.common.utils.Constants.BY_EMAIL;
-import static com.kirjaswappi.backend.common.utils.Constants.BY_ID;
-import static com.kirjaswappi.backend.common.utils.Constants.COVER_PHOTO;
-import static com.kirjaswappi.backend.common.utils.Constants.EMAIL;
-import static com.kirjaswappi.backend.common.utils.Constants.ID;
-import static com.kirjaswappi.backend.common.utils.Constants.PHOTOS;
-import static com.kirjaswappi.backend.common.utils.Constants.PROFILE_PHOTO;
+import static com.kirjaswappi.backend.common.utils.Constants.*;
+
+import java.util.List;
 
 import jakarta.validation.Valid;
 
@@ -31,7 +26,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kirjaswappi.backend.http.dtos.requests.CreatePhotoRequest;
+import com.kirjaswappi.backend.http.dtos.requests.CreateSupportedCoverPhotoRequest;
 import com.kirjaswappi.backend.http.dtos.responses.PhotoResponse;
+import com.kirjaswappi.backend.http.dtos.responses.SupportedCoverPhotoListResponse;
 import com.kirjaswappi.backend.service.PhotoService;
 
 @RestController
@@ -42,69 +39,95 @@ public class PhotoController {
   private PhotoService photoService;
 
   @PostMapping(PROFILE_PHOTO)
-  @Operation(summary = "Add a profile photo.", description = "Add a profile photo to a user.", responses = {
-      @ApiResponse(responseCode = "200", description = "Profile Photo Added.") })
+  @Operation(summary = "Add profile photo.", description = "Add profile photo to a user.", responses = {
+      @ApiResponse(responseCode = "200", description = "Profile photo added.") })
   public ResponseEntity<PhotoResponse> addProfilePhoto(@Valid @ModelAttribute CreatePhotoRequest request) {
     var imageUrl = photoService.addProfilePhoto(request.getUserId(), request.getImage());
     return ResponseEntity.ok(new PhotoResponse(imageUrl));
   }
 
   @PostMapping(COVER_PHOTO)
-  @Operation(summary = "Add a cover photo.", description = "Add a cover photo to a user.", responses = {
-      @ApiResponse(responseCode = "200", description = "Cover Photo Added.") })
+  @Operation(summary = "Add cover photo.", description = "Add cover photo to a user.", responses = {
+      @ApiResponse(responseCode = "200", description = "Cover photo added.") })
   public ResponseEntity<PhotoResponse> addCoverPhoto(@Valid @ModelAttribute CreatePhotoRequest request) {
     var imageUrl = photoService.addCoverPhoto(request.getUserId(), request.getImage());
     return ResponseEntity.ok(new PhotoResponse(imageUrl));
   }
 
   @DeleteMapping(PROFILE_PHOTO + ID)
-  @Operation(summary = "Delete a profile photo.", description = "Delete a profile photo of a user.", responses = {
-      @ApiResponse(responseCode = "204", description = "Profile Photo Deleted.") })
-  public ResponseEntity<Void> deleteProfilePhoto(@Parameter(description = "User Id.") @PathVariable String id) {
+  @Operation(summary = "Delete profile photo.", description = "Delete profile photo of a user.", responses = {
+      @ApiResponse(responseCode = "204", description = "Profile photo deleted.") })
+  public ResponseEntity<Void> deleteProfilePhoto(@Parameter(description = "User ID.") @PathVariable String id) {
     photoService.deleteProfilePhoto(id);
     return ResponseEntity.noContent().build();
   }
 
   @DeleteMapping(COVER_PHOTO + ID)
-  @Operation(summary = "Delete a cover photo.", description = "Delete a cover photo of a user.", responses = {
-      @ApiResponse(responseCode = "204", description = "Cover Photo Deleted.") })
-  public ResponseEntity<Void> deleteCoverPhoto(@Parameter(description = "User Id.") @PathVariable String id) {
+  @Operation(summary = "Delete cover photo.", description = "Delete cover photo of a user.", responses = {
+      @ApiResponse(responseCode = "204", description = "Cover photo deleted.") })
+  public ResponseEntity<Void> deleteCoverPhoto(@Parameter(description = "User ID.") @PathVariable String id) {
     photoService.deleteCoverPhoto(id);
     return ResponseEntity.noContent().build();
   }
 
   @GetMapping(PROFILE_PHOTO + BY_EMAIL + EMAIL)
-  @Operation(summary = "Get a profile photo by email.", description = "Get a profile photo of a user by email.", responses = {
-      @ApiResponse(responseCode = "200", description = "Profile Photo Found.") })
+  @Operation(summary = "Get profile photo by email.", description = "Get profile photo of a user by email.", responses = {
+      @ApiResponse(responseCode = "200", description = "Profile photo found.") })
   public ResponseEntity<PhotoResponse> getProfilePhotoByEmail(
-      @Parameter(description = "User Email.") @PathVariable String email) {
+      @Parameter(description = "User email.") @PathVariable String email) {
     var imageUrl = photoService.getPhotoByUserEmail(email, true);
     return ResponseEntity.ok(new PhotoResponse(imageUrl));
   }
 
   @GetMapping(COVER_PHOTO + BY_EMAIL + EMAIL)
-  @Operation(summary = "Get a cover photo by email.", description = "Get a cover photo of a user by email.", responses = {
-      @ApiResponse(responseCode = "200", description = "Cover Photo Found.") })
+  @Operation(summary = "Get cover photo by email.", description = "Get cover photo of a user by email.", responses = {
+      @ApiResponse(responseCode = "200", description = "Cover photo found.") })
   public ResponseEntity<PhotoResponse> getCoverPhotoByEmail(
-      @Parameter(description = "User Email.") @PathVariable String email) {
+      @Parameter(description = "User email.") @PathVariable String email) {
     var imageUrl = photoService.getPhotoByUserEmail(email, false);
     return ResponseEntity.ok(new PhotoResponse(imageUrl));
   }
 
   @GetMapping(PROFILE_PHOTO + BY_ID + ID)
-  @Operation(summary = "Get a profile photo by user id.", description = "Get a profile photo of a user by user id.", responses = {
-      @ApiResponse(responseCode = "200", description = "Profile Photo Found.") })
+  @Operation(summary = "Get profile photo by user id.", description = "Get profile photo of a user by user ID.", responses = {
+      @ApiResponse(responseCode = "200", description = "Profile photo found.") })
   public ResponseEntity<PhotoResponse> getProfilePhotoById(
-      @Parameter(description = "User Id.") @PathVariable String id) {
+      @Parameter(description = "User ID.") @PathVariable String id) {
     var imageUrl = photoService.getPhotoByUserId(id, true);
     return ResponseEntity.ok(new PhotoResponse(imageUrl));
   }
 
   @GetMapping(COVER_PHOTO + BY_ID + ID)
-  @Operation(summary = "Get a cover photo by user id.", description = "Get a cover photo of a user by user id.", responses = {
-      @ApiResponse(responseCode = "200", description = "Cover Photo Found.") })
-  public ResponseEntity<PhotoResponse> getCoverPhotoById(@Parameter(description = "User Id.") @PathVariable String id) {
+  @Operation(summary = "Get cover photo by user id.", description = "Get cover photo of a user by user ID.", responses = {
+      @ApiResponse(responseCode = "200", description = "Cover photo found.") })
+  public ResponseEntity<PhotoResponse> getCoverPhotoById(@Parameter(description = "User ID.") @PathVariable String id) {
     var imageUrl = photoService.getPhotoByUserId(id, false);
     return ResponseEntity.ok(new PhotoResponse(imageUrl));
+  }
+
+  @PostMapping(SUPPORTED_COVER_PHOTOS)
+  @Operation(summary = "Add supported cover photo.", description = "Add supported cover photo.", responses = {
+      @ApiResponse(responseCode = "200", description = "Supported cover photo added.") })
+  public ResponseEntity<PhotoResponse> addSupportedCoverPhoto(
+      @Valid @ModelAttribute CreateSupportedCoverPhotoRequest request) {
+    var imageUrl = photoService.addSupportedCoverPhoto(request.getCoverPhoto());
+    return ResponseEntity.ok(new PhotoResponse(imageUrl));
+  }
+
+  @GetMapping(SUPPORTED_COVER_PHOTOS)
+  @Operation(summary = "Find all supported cover photos.", description = "Find all supported cover photos.", responses = {
+      @ApiResponse(responseCode = "200", description = "List of all supported cover photos.") })
+  public ResponseEntity<List<SupportedCoverPhotoListResponse>> findSupportedCoverPhotos() {
+    var supportedCoverPhotos = photoService.findSupportedCoverPhoto();
+    return ResponseEntity.ok(supportedCoverPhotos.stream().map(SupportedCoverPhotoListResponse::new).toList());
+  }
+
+  @DeleteMapping(SUPPORTED_COVER_PHOTOS + ID)
+  @Operation(summary = "Delete a supported cover photo.", description = "Delete a supported cover photo.", responses = {
+      @ApiResponse(responseCode = "204", description = "Cover photo deleted.") })
+  public ResponseEntity<Void> deleteSupportedCoverPhoto(
+      @Parameter(description = "Supported cover photo ID.") @PathVariable String id) {
+    photoService.deleteSupportedCoverPhoto(id);
+    return ResponseEntity.noContent().build();
   }
 }
