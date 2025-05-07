@@ -7,12 +7,20 @@ package com.kirjaswappi.backend.service.exceptions;
 import com.kirjaswappi.backend.common.exceptions.SystemException;
 
 public class ImageUploadFailureException extends SystemException {
-  public ImageUploadFailureException(String message) {
-    super(message);
+  private final Object[] params;
+
+  public ImageUploadFailureException(Object... params) {
+    super("imageUploadFailed");
+    this.params = params;
   }
 
   @Override
   public String getCode() {
     return "imageUploadFailed";
+  }
+
+  @Override
+  public Object[] getParams() {
+    return params;
   }
 }

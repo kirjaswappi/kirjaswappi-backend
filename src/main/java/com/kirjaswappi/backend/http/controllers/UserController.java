@@ -65,7 +65,7 @@ public class UserController {
 
   @PostMapping(FAVOURITE_BOOKS)
   @Operation(summary = "Add a favourite book to a user.", responses = {
-      @ApiResponse(responseCode = "200", description = "Book added.") })
+      @ApiResponse(responseCode = "200", description = "Book added to favourite list.") })
   public ResponseEntity<UserResponse> addFavouriteBook(@Valid @RequestBody AddFavouriteBookRequest request) {
     User entity = request.toEntity();
     User updatedUser = userService.addFavouriteBook(entity);
@@ -97,8 +97,8 @@ public class UserController {
   @Operation(summary = "Find all users.", responses = {
       @ApiResponse(responseCode = "200", description = "List of users.") })
   public ResponseEntity<List<UserResponse>> getUsers() {
-    var userResponses = userService.getUsers().stream().map(UserResponse::new).toList();
-    return ResponseEntity.status(HttpStatus.OK).body(userResponses);
+    List<User> users = userService.getUsers();
+    return ResponseEntity.status(HttpStatus.OK).body(users.stream().map(UserResponse::new).toList());
   }
 
   @DeleteMapping(ID)
@@ -130,7 +130,7 @@ public class UserController {
 
   @PostMapping(RESET_PASSWORD + EMAIL)
   @Operation(summary = "Reset password.", responses = {
-      @ApiResponse(responseCode = "200", description = "Password reset successfully.") })
+      @ApiResponse(responseCode = "200", description = "Password reset successful.") })
   public ResponseEntity<ResetPasswordResponse> resetPassword(
       @Parameter(description = "User email.") @PathVariable String email,
       @Valid @RequestBody ResetPasswordRequest request) {

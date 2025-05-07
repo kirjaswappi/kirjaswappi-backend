@@ -87,7 +87,7 @@ public class BookService {
   }
 
   public SwappableBook getSwappableBookById(String swappableBookId) {
-    Optional<BookDao> bookDao = bookRepository.findBySwapConditionSwappableBooksId(swappableBookId);
+    var bookDao = bookRepository.findByIsDeletedFalseAndSwapConditionSwappableBooksId(swappableBookId);
     var swappableBookDao = bookDao.flatMap(book -> book.getSwapCondition()
         .getSwappableBooks()
         .stream()
@@ -100,7 +100,8 @@ public class BookService {
     var criteria = filter.buildSearchAndFilterCriteria();
     pageable = getPageableWithValidSortingCriteria(pageable);
     var bookDaos = bookRepository.findAllBooksByFilter(criteria, pageable);
-    return mapToBookPage(bookDaos, pageable);
+    var books = bookDaos.stream().map(this::bookWithCoverPhotoUrl).toList();
+    return new PageImpl<>(books, pageable, bookDaos.getTotalElements());
   }
 
   // keeping the book cover photo for future references
@@ -168,7 +169,7 @@ public class BookService {
   }
 
   private void setOwnerToBook(Book book, BookDao bookDao) {
-    var owner = userRepository.findById(book.getOwner().getId())
+    var owner = userRepository.findByIdAndIsEmailVerifiedTrue(book.getOwner().getId())
         .orElseThrow(() -> new UserNotFoundException(book.getOwner().getId()));
     bookDao.setOwner(owner);
   }
@@ -192,7 +193,7 @@ public class BookService {
   }
 
   private void addBookToOwner(BookDao dao) {
-    var owner = userRepository.findById(dao.getOwner().getId())
+    var owner = userRepository.findByIdAndIsEmailVerifiedTrue(dao.getOwner().getId())
         .orElseThrow(() -> new UserNotFoundException(dao.getOwner().getId()));
     owner.setBooks(Optional.ofNullable(owner.getBooks()).orElseGet(ArrayList::new));
     owner.getBooks().add(dao);
@@ -208,7 +209,7 @@ public class BookService {
   }
 
   private void removeBookFromOwner(BookDao dao) {
-    var owner = userRepository.findById(dao.getOwner().getId())
+    var owner = userRepository.findByIdAndIsEmailVerifiedTrue(dao.getOwner().getId())
         .orElseThrow(() -> new UserNotFoundException(dao.getOwner().getId()));
     if (owner.getBooks() != null) {
       owner.setBooks(owner.getBooks().stream()
@@ -235,9 +236,14 @@ public class BookService {
     return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(allowedOrders));
   }
 
-  private Book bookWithImageUrlAndOwner(BookDao bookDao) {
+  private Book bookWithCoverPhotoUrl(BookDao bookDao) {
     var book = fetchImageUrlForBookCoverPhoto(bookDao);
     fetchImageUrlForSwappableBooksIfExists(book);
+    return book;
+  }
+
+  private Book bookWithImageUrlAndOwner(BookDao bookDao) {
+    var book = bookWithCoverPhotoUrl(bookDao);
     return bookWithOwner(bookDao.getOwner(), book);
   }
 
@@ -271,11 +277,6 @@ public class BookService {
       String coverPhotoUrl = photoService.getBookCoverPhoto(uniqueId);
       parentBook.getSwapCondition().getSwappableBooks().get(i).setCoverPhoto(coverPhotoUrl);
     }
-  }
-
-  private Page<Book> mapToBookPage(Page<BookDao> bookDaos, Pageable pageable) {
-    var books = bookDaos.stream().map(this::bookWithImageUrlAndOwner).toList();
-    return new PageImpl<>(books, pageable, bookDaos.getTotalElements());
   }
 
   public List<Book> getMoreBooksOfTheUser(String bookId) {

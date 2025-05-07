@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.kirjaswappi.backend.common.service.exceptions.InvalidCredentials;
 import com.kirjaswappi.backend.common.utils.Util;
+import com.kirjaswappi.backend.jpa.daos.BookDao;
 import com.kirjaswappi.backend.jpa.daos.UserDao;
 import com.kirjaswappi.backend.jpa.repositories.BookRepository;
 import com.kirjaswappi.backend.jpa.repositories.GenreRepository;
@@ -68,28 +69,33 @@ public class UserService {
   }
 
   public User getUser(String id) {
-    var userDao = userRepository.findById(id)
+    var userDao = userRepository.findByIdAndIsEmailVerifiedTrue(id)
         .orElseThrow(() -> new UserNotFoundException(id));
-    setBookCoverPhotos(userDao);
+    setCoverPhotos(userDao);
     return UserMapper.toEntity(userDao);
   }
 
-  private void setBookCoverPhotos(UserDao userDao) {
+  private void setCoverPhotos(UserDao userDao) {
     if (userDao.getBooks() != null) {
-      userDao.getBooks().forEach(bookDao -> {
-        var imageUrls = new ArrayList<String>();
-        bookDao.getCoverPhotos().forEach(uniqueId -> {
-          var imageUrl = photoService.getBookCoverPhoto(uniqueId);
-          imageUrls.add(imageUrl);
-        });
-        bookDao.setCoverPhotos(imageUrls);
-      });
+      userDao.getBooks().forEach(this::fetchAndSetImage);
+    }
+    if (userDao.getFavBooks() != null) {
+      userDao.getFavBooks().forEach(this::fetchAndSetImage);
     }
   }
 
+  private void fetchAndSetImage(BookDao bookDao) {
+    var imageUrls = new ArrayList<String>();
+    bookDao.getCoverPhotos().forEach(uniqueId -> {
+      var imageUrl = photoService.getBookCoverPhoto(uniqueId);
+      imageUrls.add(imageUrl);
+    });
+    bookDao.setCoverPhotos(imageUrls);
+  }
+
   public List<User> getUsers() {
-    return userRepository.findAll().stream().map(userDao -> {
-      setBookCoverPhotos(userDao);
+    return userRepository.findAllByIsEmailVerifiedTrue().stream().map(userDao -> {
+      setCoverPhotos(userDao);
       return UserMapper.toEntity(userDao);
     }).toList();
   }
@@ -100,7 +106,7 @@ public class UserService {
 
   public User updateUser(User user) {
     // validate user exists:
-    var dao = userRepository.findById(user.getId())
+    var dao = userRepository.findByIdAndIsEmailVerifiedTrue(user.getId())
         .orElseThrow(() -> new UserNotFoundException(user.getId()));
 
     // check email verification status:
@@ -155,7 +161,7 @@ public class UserService {
 
   public void verifyCurrentPassword(User user) {
     // get salt from email:
-    UserDao dao = userRepository.findByEmail(user.getEmail())
+    UserDao dao = userRepository.findByEmailAndIsEmailVerified(user.getEmail(), true)
         .orElseThrow(() -> new UserNotFoundException(user.getEmail()));
 
     // hash password with salt:
@@ -167,10 +173,16 @@ public class UserService {
     }
   }
 
+  // TODO: send email to the user confirming the password change.
   public String changePassword(User user) {
     // get user from email:
     UserDao dao = userRepository.findByEmail(user.getEmail())
         .orElseThrow(() -> new UserNotFoundException(user.getEmail()));
+
+    // check email verification status:
+    if (!dao.isEmailVerified()) {
+      throw new BadRequestException("userExistsButNotVerified", user.getEmail());
+    }
 
     // forbid newPassword to be the same as currentPassword:
     String currentPassword = dao.getPassword();
@@ -191,6 +203,7 @@ public class UserService {
     return dao.getEmail();
   }
 
+  // TODO: send confirmation to the verified user email.
   public String verifyEmail(String email) {
     // get user from email:
     UserDao dao = userRepository.findByEmail(email)
@@ -204,7 +217,8 @@ public class UserService {
   }
 
   public User addFavouriteBook(User user) {
-    var userDao = userRepository.findById(user.getId()).orElseThrow(() -> new UserNotFoundException(user.getEmail()));
+    var userDao = userRepository.findByIdAndIsEmailVerifiedTrue(user.getId())
+        .orElseThrow(() -> new UserNotFoundException(user.getEmail()));
 
     assert user.getFavBooks() != null;
     var bookId = user.getFavBooks().get(0).getId();

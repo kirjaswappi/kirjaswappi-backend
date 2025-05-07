@@ -30,4 +30,9 @@ public abstract class SystemException extends RuntimeException {
    * Return a code unique for this type of exception, e. g. "inconsistentData"
    */
   public abstract String getCode();
+
+  /**
+   * Returns object parameters of the exception
+   */
+  public abstract Object[] getParams();
 }
