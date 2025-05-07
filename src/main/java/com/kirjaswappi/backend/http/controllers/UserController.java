@@ -29,18 +29,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kirjaswappi.backend.common.service.OTPService;
-import com.kirjaswappi.backend.http.dtos.requests.AuthenticateUserRequest;
-import com.kirjaswappi.backend.http.dtos.requests.ChangePasswordRequest;
-import com.kirjaswappi.backend.http.dtos.requests.CreateUserRequest;
-import com.kirjaswappi.backend.http.dtos.requests.ResetPasswordRequest;
-import com.kirjaswappi.backend.http.dtos.requests.UpdateUserRequest;
-import com.kirjaswappi.backend.http.dtos.requests.VerifyEmailRequest;
-import com.kirjaswappi.backend.http.dtos.responses.ChangePasswordResponse;
-import com.kirjaswappi.backend.http.dtos.responses.CreateUserResponse;
-import com.kirjaswappi.backend.http.dtos.responses.ResetPasswordResponse;
-import com.kirjaswappi.backend.http.dtos.responses.UpdateUserResponse;
-import com.kirjaswappi.backend.http.dtos.responses.UserResponse;
-import com.kirjaswappi.backend.http.dtos.responses.VerifyEmailResponse;
+import com.kirjaswappi.backend.http.dtos.requests.*;
+import com.kirjaswappi.backend.http.dtos.responses.*;
 import com.kirjaswappi.backend.service.UserService;
 import com.kirjaswappi.backend.service.entities.User;
 import com.kirjaswappi.backend.service.exceptions.BadRequestException;
@@ -51,6 +41,7 @@ import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 public class UserController {
   @Autowired
   private UserService userService;
+
   @Autowired
   private OTPService otpService;
 
@@ -72,10 +63,19 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.OK).body(new VerifyEmailResponse(verifiedEmail));
   }
 
+  @PostMapping(FAVOURITE_BOOKS)
+  @Operation(summary = "Add a favourite book to a user.", responses = {
+      @ApiResponse(responseCode = "200", description = "Book added to favourite list.") })
+  public ResponseEntity<UserResponse> addFavouriteBook(@Valid @RequestBody AddFavouriteBookRequest request) {
+    User entity = request.toEntity();
+    User updatedUser = userService.addFavouriteBook(entity);
+    return ResponseEntity.status(HttpStatus.OK).body(new UserResponse(updatedUser));
+  }
+
   @PutMapping(ID)
   @Operation(summary = "Update user.", responses = {
       @ApiResponse(responseCode = "200", description = "User updated.") })
-  public ResponseEntity<UpdateUserResponse> updateUser(@Parameter(description = "User Id.") @PathVariable String id,
+  public ResponseEntity<UpdateUserResponse> updateUser(@Parameter(description = "User ID.") @PathVariable String id,
       @Valid @RequestBody UpdateUserRequest user) {
     // validate id:
     if (!id.equals(user.getId())) {
@@ -86,25 +86,25 @@ public class UserController {
   }
 
   @GetMapping(ID)
-  @Operation(summary = "Get user by User Id.", responses = {
+  @Operation(summary = "Find user by User ID.", responses = {
       @ApiResponse(responseCode = "200", description = "User found.") })
-  public ResponseEntity<UserResponse> getUser(@Parameter(description = "User Id.") @PathVariable String id) {
+  public ResponseEntity<UserResponse> getUser(@Parameter(description = "User ID.") @PathVariable String id) {
     User user = userService.getUser(id);
     return ResponseEntity.status(HttpStatus.OK).body(new UserResponse(user));
   }
 
   @GetMapping
-  @Operation(summary = "Get all users.", responses = {
+  @Operation(summary = "Find all users.", responses = {
       @ApiResponse(responseCode = "200", description = "List of users.") })
   public ResponseEntity<List<UserResponse>> getUsers() {
-    var userResponses = userService.getUsers().stream().map(UserResponse::new).toList();
-    return ResponseEntity.status(HttpStatus.OK).body(userResponses);
+    List<User> users = userService.getUsers();
+    return ResponseEntity.status(HttpStatus.OK).body(users.stream().map(UserResponse::new).toList());
   }
 
   @DeleteMapping(ID)
   @Operation(summary = "Delete user.", responses = {
       @ApiResponse(responseCode = "204", description = "User deleted.") })
-  public ResponseEntity<Void> deleteUser(@Parameter(description = "User Id.") @PathVariable String id) {
+  public ResponseEntity<Void> deleteUser(@Parameter(description = "User ID.") @PathVariable String id) {
     userService.deleteUser(id);
     return ResponseEntity.noContent().build();
   }
@@ -121,7 +121,7 @@ public class UserController {
   @Operation(summary = "Change password.", responses = {
       @ApiResponse(responseCode = "200", description = "Password changed.") })
   public ResponseEntity<ChangePasswordResponse> changePassword(
-      @Parameter(description = "User Email.") @PathVariable String email,
+      @Parameter(description = "User email.") @PathVariable String email,
       @Valid @RequestBody ChangePasswordRequest request) {
     userService.verifyCurrentPassword(request.toVerifyPasswordEntity(email));
     String userEmail = userService.changePassword(request.toChangePasswordEntity(email));
@@ -130,9 +130,9 @@ public class UserController {
 
   @PostMapping(RESET_PASSWORD + EMAIL)
   @Operation(summary = "Reset password.", responses = {
-      @ApiResponse(responseCode = "200", description = "Password reset.") })
+      @ApiResponse(responseCode = "200", description = "Password reset successful.") })
   public ResponseEntity<ResetPasswordResponse> resetPassword(
-      @Parameter(description = "User Email.") @PathVariable String email,
+      @Parameter(description = "User email.") @PathVariable String email,
       @Valid @RequestBody ResetPasswordRequest request) {
     String userEmail = userService.changePassword(request.toUserEntity(email));
     return ResponseEntity.status(HttpStatus.OK).body(new ResetPasswordResponse(userEmail));

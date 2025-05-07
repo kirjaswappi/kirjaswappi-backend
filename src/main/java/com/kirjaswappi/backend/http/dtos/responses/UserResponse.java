@@ -9,6 +9,7 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
+import com.kirjaswappi.backend.service.entities.Genre;
 import com.kirjaswappi.backend.service.entities.User;
 
 @Getter
@@ -27,6 +28,7 @@ public class UserResponse {
   private String aboutMe;
   private List<String> favGenres;
   private List<BookListResponse> books;
+  private List<BookListResponse> favBooks;
 
   public UserResponse(User entity) {
     this.id = entity.getId();
@@ -40,7 +42,10 @@ public class UserResponse {
     this.country = entity.getCountry();
     this.phoneNumber = entity.getPhoneNumber();
     this.aboutMe = entity.getAboutMe();
-    this.favGenres = entity.getFavGenres();
-    this.books = entity.getBooks() != null ? entity.getBooks().stream().map(BookListResponse::new).toList() : null;
+    this.favGenres = entity.getFavGenres() != null ? entity.getFavGenres().stream().map(Genre::getName).toList()
+        : List.of();
+    this.books = entity.getBooks() != null ? entity.getBooks().stream().map(BookListResponse::new).toList() : List.of();
+    this.favBooks = entity.getFavBooks() != null ? entity.getFavBooks().stream().map(BookListResponse::new).toList()
+        : List.of();
   }
 }

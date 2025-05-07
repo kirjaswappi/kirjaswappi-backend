@@ -36,7 +36,7 @@ public class CreatePhotoRequest {
     }
     // validate image:
     if (this.image == null) {
-      throw new BadRequestException("imageCannotBeNull", this.image);
+      throw new BadRequestException("imageCannotBeNull");
     }
     ValidationUtil.validateMediaType(this.image);
   }

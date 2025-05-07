@@ -4,6 +4,8 @@
  */
 package com.kirjaswappi.backend.mapper;
 
+import java.util.List;
+
 import lombok.NoArgsConstructor;
 
 import org.springframework.stereotype.Component;
@@ -26,14 +28,14 @@ public class BookMapper {
     entity.setLanguage(Language.fromCode(dao.getLanguage()));
     entity.setCondition(Condition.fromCode(dao.getCondition()));
     entity.setGenres(dao.getGenres().stream().map(GenreMapper::toEntity).toList());
-    if (dao.getCoverPhoto() != null) {
-      entity.setCoverPhoto(dao.getCoverPhoto());
+    if (dao.getCoverPhotos() != null) {
+      entity.setCoverPhotos(dao.getCoverPhotos());
     }
-    entity.setExchangeCondition(ExchangeConditionMapper.toEntity(dao.getExchangeCondition()));
+    entity.setSwapCondition(SwapConditionMapper.toEntity(dao.getSwapCondition()));
     return entity;
   }
 
-  public static Book toEntity(BookDao dao, String imageUrl) {
+  public static Book toEntity(BookDao dao, List<String> imageUrls) {
     var entity = new Book();
     entity.setId(dao.getId());
     entity.setTitle(dao.getTitle());
@@ -42,8 +44,8 @@ public class BookMapper {
     entity.setLanguage(Language.fromCode(dao.getLanguage()));
     entity.setCondition(Condition.fromCode(dao.getCondition()));
     entity.setGenres(dao.getGenres().stream().map(GenreMapper::toEntity).toList());
-    entity.setCoverPhoto(imageUrl);
-    entity.setExchangeCondition(ExchangeConditionMapper.toEntity(dao.getExchangeCondition()));
+    entity.setCoverPhotos(imageUrls);
+    entity.setSwapCondition(SwapConditionMapper.toEntity(dao.getSwapCondition()));
     return entity;
   }
 
@@ -52,7 +54,6 @@ public class BookMapper {
     return book;
   }
 
-  // This is without the genres, cover photo and owner
   public static BookDao toDao(Book entity) {
     var dao = new BookDao();
     if (entity.getId() != null) {
@@ -63,7 +64,10 @@ public class BookMapper {
     dao.setDescription(entity.getDescription());
     dao.setLanguage(entity.getLanguage().getCode());
     dao.setCondition(entity.getCondition().getCode());
-    dao.setExchangeCondition(ExchangeConditionMapper.toDao(entity.getExchangeCondition()));
+    dao.setSwapCondition(SwapConditionMapper.toDao(entity.getSwapCondition()));
+    dao.setGenres(entity.getGenres() == null ? null : entity.getGenres().stream().map(GenreMapper::toDao).toList());
+    dao.setCoverPhotos(entity.getCoverPhotos() == null ? null : entity.getCoverPhotos());
+    dao.setOwner(entity.getOwner() == null ? null : UserMapper.toDao(entity.getOwner()));
     return dao;
   }
 }

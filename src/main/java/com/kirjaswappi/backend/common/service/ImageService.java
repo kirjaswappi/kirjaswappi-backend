@@ -31,6 +31,7 @@ import com.kirjaswappi.backend.service.exceptions.ResourceNotFoundException;
 public class ImageService {
   @Value("${s3.bucket}")
   private String bucketName;
+
   @Autowired
   private MinioClient minioClient;
 
@@ -46,9 +47,8 @@ public class ImageService {
                 .build());
       }
     } catch (Exception e) {
-      throw new ImageUploadFailureException("Failed to upload image.");
+      throw new ImageUploadFailureException(uniqueId);
     }
-
   }
 
   @Cacheable(value = "imageUrls", key = "#uniqueId")
@@ -65,7 +65,7 @@ public class ImageService {
               .expiry(7, TimeUnit.DAYS)
               .build());
     } catch (Exception e) {
-      throw new ImageUrlFetchFailureException("Failed to fetch image URL.");
+      throw new ImageUrlFetchFailureException(uniqueId);
     }
   }
 
@@ -81,7 +81,7 @@ public class ImageService {
               .object(uniqueId)
               .build());
     } catch (Exception e) {
-      throw new ImageDeletionFailureException("Failed to delete image.");
+      throw new ImageDeletionFailureException(uniqueId);
     }
   }
 }

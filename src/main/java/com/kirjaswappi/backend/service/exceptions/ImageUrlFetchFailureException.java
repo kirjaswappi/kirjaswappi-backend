@@ -7,12 +7,20 @@ package com.kirjaswappi.backend.service.exceptions;
 import com.kirjaswappi.backend.common.exceptions.SystemException;
 
 public class ImageUrlFetchFailureException extends SystemException {
-  public ImageUrlFetchFailureException(String message) {
-    super(message);
+  private final Object[] params;
+
+  public ImageUrlFetchFailureException(Object... params) {
+    super("imageUrlFetchFailed");
+    this.params = params;
   }
 
   @Override
   public String getCode() {
     return "imageUrlFetchFailed";
+  }
+
+  @Override
+  public Object[] getParams() {
+    return params;
   }
 }
