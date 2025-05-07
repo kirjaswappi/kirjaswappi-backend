@@ -80,4 +80,8 @@ public class UserDao {
   @Nullable
   @DBRef
   private List<BookDao> books;
+
+  @Nullable
+  @DBRef
+  private List<BookDao> favBooks;
 }

@@ -5,19 +5,20 @@
 package com.kirjaswappi.backend.mapper;
 
 import java.util.Objects;
+import java.util.UUID;
 
 import lombok.NoArgsConstructor;
 
 import org.springframework.stereotype.Component;
 
-import com.kirjaswappi.backend.jpa.daos.ExchangeableBookDao;
-import com.kirjaswappi.backend.service.entities.ExchangeableBook;
+import com.kirjaswappi.backend.jpa.daos.SwappableBookDao;
+import com.kirjaswappi.backend.service.entities.SwappableBook;
 
 @Component
 @NoArgsConstructor
-public class ExchangeableBookMapper {
-  public static ExchangeableBook toEntity(ExchangeableBookDao dao) {
-    var entity = new ExchangeableBook();
+public class SwappableBookMapper {
+  public static SwappableBook toEntity(SwappableBookDao dao) {
+    var entity = new SwappableBook();
     entity.setId(dao.getId());
     entity.setTitle(dao.getTitle());
     entity.setAuthor(dao.getAuthor());
@@ -27,9 +28,9 @@ public class ExchangeableBookMapper {
     return entity;
   }
 
-  public static ExchangeableBook toEntity(ExchangeableBookDao dao, String imageUrl) {
+  public static SwappableBook toEntity(SwappableBookDao dao, String imageUrl) {
     Objects.requireNonNull(imageUrl);
-    var entity = new ExchangeableBook();
+    var entity = new SwappableBook();
     entity.setId(dao.getId());
     entity.setTitle(dao.getTitle());
     entity.setAuthor(dao.getAuthor());
@@ -37,11 +38,12 @@ public class ExchangeableBookMapper {
     return entity;
   }
 
-  public static ExchangeableBookDao toDao(ExchangeableBook entity) {
-    var dao = new ExchangeableBookDao();
+  public static SwappableBookDao toDao(SwappableBook entity) {
+    var dao = new SwappableBookDao();
     if (entity.getId() != null) {
       dao.setId(entity.getId());
-    }
+    } else
+      dao.setId(UUID.randomUUID().toString());
     dao.setTitle(entity.getTitle());
     dao.setAuthor(entity.getAuthor());
     if (entity.getCoverPhoto() != null) {
@@ -50,7 +52,8 @@ public class ExchangeableBookMapper {
     return dao;
   }
 
-  public static ExchangeableBookDao toDao(ExchangeableBookDao dao, String imageUrl) {
+  public static SwappableBookDao toDao(SwappableBookDao dao, String imageUrl) {
+    Objects.requireNonNull(dao.getId());
     Objects.requireNonNull(imageUrl);
     dao.setCoverPhoto(imageUrl);
     return dao;

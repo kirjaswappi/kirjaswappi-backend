@@ -4,6 +4,7 @@
  */
 package com.kirjaswappi.backend.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +13,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.kirjaswappi.backend.common.service.exceptions.InvalidCredentials;
 import com.kirjaswappi.backend.common.utils.Util;
+import com.kirjaswappi.backend.jpa.daos.BookDao;
 import com.kirjaswappi.backend.jpa.daos.UserDao;
+import com.kirjaswappi.backend.jpa.repositories.BookRepository;
 import com.kirjaswappi.backend.jpa.repositories.GenreRepository;
 import com.kirjaswappi.backend.jpa.repositories.UserRepository;
 import com.kirjaswappi.backend.mapper.UserMapper;
 import com.kirjaswappi.backend.service.entities.User;
 import com.kirjaswappi.backend.service.exceptions.BadRequestException;
+import com.kirjaswappi.backend.service.exceptions.BookNotFoundException;
 import com.kirjaswappi.backend.service.exceptions.UserAlreadyExistsException;
 import com.kirjaswappi.backend.service.exceptions.UserNotFoundException;
 
@@ -30,6 +34,8 @@ public class UserService {
   GenreRepository genreRepository;
   @Autowired
   PhotoService photoService;
+  @Autowired
+  private BookRepository bookRepository;
 
   public User addUser(User user) {
     this.checkUserExistButNotVerified(user);
@@ -63,25 +69,33 @@ public class UserService {
   }
 
   public User getUser(String id) {
-    var userDao = userRepository.findById(id)
+    var userDao = userRepository.findByIdAndIsEmailVerifiedTrue(id)
         .orElseThrow(() -> new UserNotFoundException(id));
-    if (userDao.getBooks() != null) {
-      userDao.getBooks().forEach(bookDao -> {
-        var imageUrl = photoService.getBookCoverPhoto(bookDao.getCoverPhoto());
-        bookDao.setCoverPhoto(imageUrl);
-      });
-    }
+    setCoverPhotos(userDao);
     return UserMapper.toEntity(userDao);
   }
 
+  private void setCoverPhotos(UserDao userDao) {
+    if (userDao.getBooks() != null) {
+      userDao.getBooks().forEach(this::fetchAndSetImage);
+    }
+    if (userDao.getFavBooks() != null) {
+      userDao.getFavBooks().forEach(this::fetchAndSetImage);
+    }
+  }
+
+  private void fetchAndSetImage(BookDao bookDao) {
+    var imageUrls = new ArrayList<String>();
+    bookDao.getCoverPhotos().forEach(uniqueId -> {
+      var imageUrl = photoService.getBookCoverPhoto(uniqueId);
+      imageUrls.add(imageUrl);
+    });
+    bookDao.setCoverPhotos(imageUrls);
+  }
+
   public List<User> getUsers() {
-    return userRepository.findAll().stream().map(userDao -> {
-      if (userDao.getBooks() != null) {
-        userDao.getBooks().forEach(bookDao -> {
-          var imageUrl = photoService.getBookCoverPhoto(bookDao.getCoverPhoto());
-          bookDao.setCoverPhoto(imageUrl);
-        });
-      }
+    return userRepository.findAllByIsEmailVerifiedTrue().stream().map(userDao -> {
+      setCoverPhotos(userDao);
       return UserMapper.toEntity(userDao);
     }).toList();
   }
@@ -92,7 +106,7 @@ public class UserService {
 
   public User updateUser(User user) {
     // validate user exists:
-    var dao = userRepository.findById(user.getId())
+    var dao = userRepository.findByIdAndIsEmailVerifiedTrue(user.getId())
         .orElseThrow(() -> new UserNotFoundException(user.getId()));
 
     // check email verification status:
@@ -118,8 +132,8 @@ public class UserService {
     dao.setAboutMe(user.getAboutMe());
     // update favGenres:
     var favGenres = user.getFavGenres().stream()
-        .map(genre -> genreRepository.findByName(genre)
-            .orElseThrow(() -> new BadRequestException("genreNotFound", genre)))
+        .map(genre -> genreRepository.findByName(genre.getName())
+            .orElseThrow(() -> new BadRequestException("genreNotFound", genre.getName())))
         .toList();
     dao.setFavGenres(favGenres);
     userRepository.save(dao);
@@ -147,7 +161,7 @@ public class UserService {
 
   public void verifyCurrentPassword(User user) {
     // get salt from email:
-    UserDao dao = userRepository.findByEmail(user.getEmail())
+    UserDao dao = userRepository.findByEmailAndIsEmailVerified(user.getEmail(), true)
         .orElseThrow(() -> new UserNotFoundException(user.getEmail()));
 
     // hash password with salt:
@@ -159,10 +173,16 @@ public class UserService {
     }
   }
 
+  // TODO: send email to the user confirming the password change.
   public String changePassword(User user) {
     // get user from email:
     UserDao dao = userRepository.findByEmail(user.getEmail())
         .orElseThrow(() -> new UserNotFoundException(user.getEmail()));
+
+    // check email verification status:
+    if (!dao.isEmailVerified()) {
+      throw new BadRequestException("userExistsButNotVerified", user.getEmail());
+    }
 
     // forbid newPassword to be the same as currentPassword:
     String currentPassword = dao.getPassword();
@@ -183,6 +203,7 @@ public class UserService {
     return dao.getEmail();
   }
 
+  // TODO: send confirmation to the verified user email.
   public String verifyEmail(String email) {
     // get user from email:
     UserDao dao = userRepository.findByEmail(email)
@@ -193,5 +214,32 @@ public class UserService {
     userRepository.save(dao);
 
     return dao.getEmail();
+  }
+
+  public User addFavouriteBook(User user) {
+    var userDao = userRepository.findByIdAndIsEmailVerifiedTrue(user.getId())
+        .orElseThrow(() -> new UserNotFoundException(user.getEmail()));
+
+    assert user.getFavBooks() != null;
+    var bookId = user.getFavBooks().get(0).getId();
+    var favBookDao = bookRepository.findByIdAndIsDeletedFalse(bookId)
+        .orElseThrow(() -> new BookNotFoundException(bookId));
+
+    // validations:
+    if (favBookDao.getOwner().getId().equals(user.getId())) {
+      throw new BadRequestException("ownBookCannotBeAddedAsFavBook");
+    }
+    if (userDao.getFavBooks() != null && userDao.getFavBooks().stream()
+        .anyMatch(book -> book.getId().equals(favBookDao.getId()))) {
+      throw new BadRequestException("bookAlreadyExistsAsFavBook", bookId);
+    }
+
+    if (userDao.getFavBooks() != null)
+      userDao.getFavBooks().add(favBookDao);
+    else
+      userDao.setFavBooks(List.of(favBookDao));
+
+    userRepository.save(userDao);
+    return getUser(user.getId());
   }
 }

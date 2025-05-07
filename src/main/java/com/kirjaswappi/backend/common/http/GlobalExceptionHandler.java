@@ -6,7 +6,11 @@ package com.kirjaswappi.backend.common.http;
 
 import static com.kirjaswappi.backend.common.utils.PathProvider.getCurrentPath;
 
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -16,8 +20,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import com.kirjaswappi.backend.common.exceptions.BusinessException;
 import com.kirjaswappi.backend.common.exceptions.SystemException;
 import com.kirjaswappi.backend.common.service.exceptions.InvalidCredentials;
-import com.kirjaswappi.backend.service.exceptions.ResourceNotFoundException;
-import com.kirjaswappi.backend.service.exceptions.UserNotFoundException;
+import com.kirjaswappi.backend.service.exceptions.*;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -47,6 +50,29 @@ public class GlobalExceptionHandler {
     return errorUtils.buildErrorResponse(exception, webRequest);
   }
 
+  @ExceptionHandler(ImageUploadFailureException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ErrorResponse handleImageUploadFailureException(ImageUploadFailureException exception, WebRequest webRequest) {
+    return new ErrorResponse(new ErrorResponse.Error(exception.getCode(),
+        errorUtils.resolveMessage(exception.getCode(), exception.getParams(), webRequest.getLocale())));
+  }
+
+  @ExceptionHandler(ImageUrlFetchFailureException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ErrorResponse handleImageUrlFetchFailureException(ImageUrlFetchFailureException exception,
+      WebRequest webRequest) {
+    return new ErrorResponse(new ErrorResponse.Error(exception.getCode(),
+        errorUtils.resolveMessage(exception.getCode(), exception.getParams(), webRequest.getLocale())));
+  }
+
+  @ExceptionHandler(ImageDeletionFailureException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ErrorResponse handleImageDeletionFailureException(ImageDeletionFailureException exception,
+      WebRequest webRequest) {
+    return new ErrorResponse(new ErrorResponse.Error(exception.getCode(),
+        errorUtils.resolveMessage(exception.getCode(), exception.getParams(), webRequest.getLocale())));
+  }
+
   @ExceptionHandler(SystemException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ErrorResponse handleGenericSystemException(SystemException exception, WebRequest webRequest) {
@@ -65,5 +91,12 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ErrorResponse handleGenericBusinessException(BusinessException exception, WebRequest webRequest) {
     return errorUtils.buildErrorResponse(exception, webRequest);
+  }
+
+  @ExceptionHandler(HttpMessageNotReadableException.class)
+  public ResponseEntity<?> handleJsonParseError(HttpMessageNotReadableException ex) {
+    return ResponseEntity
+        .badRequest()
+        .body(Map.of("error", "Invalid JSON payload", "details", ex.getMessage()));
   }
 }

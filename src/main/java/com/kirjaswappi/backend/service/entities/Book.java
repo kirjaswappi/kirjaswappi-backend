@@ -28,8 +28,8 @@ public class Book {
   private Language language;
   private Condition condition;
   private List<Genre> genres;
-  private String coverPhoto;
-  private MultipartFile coverPhotoFile;
+  private List<String> coverPhotos;
+  private List<MultipartFile> coverPhotoFiles;
   private User owner;
-  private ExchangeCondition exchangeCondition;
+  private SwapCondition swapCondition;
 }
