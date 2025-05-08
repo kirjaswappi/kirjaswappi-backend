@@ -47,16 +47,26 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y gh jq
 
-      - name: Comment on PR with coverage summary
+      - name: Comment on PR with coverage percentages
+        if: ${{ github.event_name == 'pull_request' }}
         run: |
           REPORT=$(<badges/coverage-summary.json)
-          RAW_COVERAGE=$(jq -r '.coverage' <<< "$REPORT")
-          RAW_BRANCHES=$(jq -r '.branches' <<< "$REPORT")
-          COVERAGE=$(printf "%.1f" "$RAW_COVERAGE")
-          BRANCHES=$(printf "%.1f" "$RAW_BRANCHES")
+          COVERAGE=$(jq -r '.coverage' <<< "$REPORT")
+          BRANCHES=$(jq -r '.branches' <<< "$REPORT")
           NEWLINE=$'\n'
-          BODY="## ✅ Test Coverage Summary${NEWLINE}- **Line Coverage:** ${COVERAGE}${NEWLINE}- **Branch Coverage:** ${BRANCHES}"
+          BODY="## ✅ Test Coverage${NEWLINE}* **Line Coverage:** ${COVERAGE}%${NEWLINE}* **Branch Coverage:** ${BRANCHES}%"
+          
+          # Delete previous comments by github-actions
+          COMMENTS=$(gh pr view ${{ github.event.pull_request.number }} --json comments -q ".comments[].id")
+          for comment_id in $COMMENTS; do
+            BODY_TEXT=$(gh pr comment ${{ github.event.pull_request.number }} --comment-id "$comment_id" --json body -q ".body")
+            if [[ "$BODY_TEXT" == *" Test Coverage"* ]]; then
+              gh pr comment ${{ github.event.pull_request.number }} --comment-id "$comment_id" --delete || true
+            fi
+          done
+          
+          # Post new comment
           gh pr comment ${{ github.event.pull_request.number }} -b "${BODY}"
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
         continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -30,8 +30,7 @@ jobs:
       - name: Deploy to GitHub Packages
         run: mvn deploy -s .github/mvn/settings.xml -DskipTests
         env:
-          USERNAME_GIT: ${{ secrets.USERNAME_GIT }}
-          PASSWORD_GIT: ${{ secrets.TOKEN_GITHUB }}
+          PASSWORD_GIT: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set Version for Release
         run: echo "VERSION=0.0.${{ github.run_number }}" >> $GITHUB_ENV
@@ -39,7 +38,7 @@ jobs:
       - name: Create GitHub Release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: v${{ env.VERSION }}
           release_name: Release v${{ env.VERSION }}
