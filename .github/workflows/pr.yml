@@ -51,16 +51,37 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y gh jq
 
-      - name: Comment on PR with coverage percentages
+      - name: Comment on PR with Coverage (Improved)
         if: ${{ github.event_name == 'pull_request' }}
+        shell: bash
         run: |
           REPORT=$(<badges/coverage-summary.json)
           RAW_COVERAGE=$(jq -r '.coverage' <<< "$REPORT")
           RAW_BRANCHES=$(jq -r '.branches' <<< "$REPORT")
-          COVERAGE=$(printf "%.1f%%" "$RAW_COVERAGE")
-          BRANCHES=$(printf "%.1f%%" "$RAW_BRANCHES")
+
+          # Round values
+          COVERAGE=$(printf "%.0f" "$RAW_COVERAGE")
+          BRANCHES=$(printf "%.0f" "$RAW_BRANCHES")
+
+          # Determine badge colors
+          get_badge_color() {
+            local percent=$1
+            if (( percent >= 90 )); then echo "brightgreen"
+            elif (( percent >= 75 )); then echo "yellow"
+            elif (( percent >= 50 )); then echo "orange"
+            else echo "red"; fi
+          }
+
+          COLOR_COV=$(get_badge_color $COVERAGE)
+          COLOR_BRANCH=$(get_badge_color $BRANCHES)
+
           NEWLINE=$'\n'
-          BODY="## ✅  Test Coverage Summary${NEWLINE}* __Coverage:__ ${COVERAGE}${NEWLINE}* __Branches:__ ${BRANCHES}"
+          BODY="## 🧪 Test Coverage Summary${NEWLINE}"
+          BODY+="| Metric     | Coverage |${NEWLINE}"
+          BODY+="|------------|----------|${NEWLINE}"
+          BODY+="| ✅ **Lines**    | ![Lines](https://img.shields.io/badge/Coverage-${COVERAGE}%25-${COLOR_COV}) |${NEWLINE}"
+          BODY+="| ✅ **Branches** | ![Branches](https://img.shields.io/badge/Branches-${BRANCHES}%25-${COLOR_BRANCH}) |"
+
           gh pr comment ${{ github.event.pull_request.number }} --body "${BODY}" --edit-last --create-if-none
         continue-on-error: true
         env:
