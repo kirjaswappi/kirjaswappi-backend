@@ -52,11 +52,11 @@ public class CloudSecurityConfig {
   public SecurityFilterChain defaultSecurityFilterChain(FilterApiRequest filterApiRequest, HttpSecurity http)
       throws Exception {
     return http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .csrf(csrf -> csrf.disable()) // Disable CSRF protection
+        .csrf(csrf -> csrf.ignoringRequestMatchers(HEALTH, API_DOCS, SWAGGER_UI, API_BASE + AUTHENTICATE,
+            API_BASE + AUTHENTICATE + REFRESH)) // Enable CSRF protection but ignore specific endpoints
         .authorizeHttpRequests(authorize -> authorize
             .requestMatchers(HEALTH, API_DOCS, SWAGGER_UI, API_BASE + AUTHENTICATE,
                 API_BASE + AUTHENTICATE + REFRESH)
-            .permitAll()
             .requestMatchers(POST, API_BASE + ADMIN_USERS).hasAuthority(ADMIN)
             .requestMatchers(GET, API_BASE + ADMIN_USERS).hasAuthority(ADMIN)
             .requestMatchers(DELETE, API_BASE + ADMIN_USERS).hasAuthority(ADMIN)
