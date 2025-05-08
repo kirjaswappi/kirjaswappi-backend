@@ -56,7 +56,7 @@ jobs:
           COVERAGE=$(printf "%.1f" "$RAW_COVERAGE")
           BRANCHES=$(printf "%.1f" "$RAW_BRANCHES")
           NEWLINE=$'\n'
-          BODY="## ✅ Test Coverage Summary{NEWLINE}* __Coverage:__ ${COVERAGE}${NEWLINE}* __Branches:__ ${BRANCHES}"
+          BODY="## ✅ Test Coverage Summary{NEWLINE} * __Coverage:__ ${COVERAGE}${NEWLINE}* __Branches:__ ${BRANCHES}"
           gh pr comment ${{github.event.pull_request.number}} --body "${BODY}" --edit-last --create-if-none
         continue-on-error: true
         env:
