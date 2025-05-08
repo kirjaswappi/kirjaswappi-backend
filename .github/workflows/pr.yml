@@ -18,8 +18,8 @@ jobs:
           distribution: 'sapmachine'
           java-version: '21'
 
-      - name: Run Tests
-        run: mvn test -Dspring.profiles.active=cloud
+      - name: Run Tests and Generate Coverage Report
+        run: mvn test jacoco:report -Dspring.profiles.active=cloud
         env:
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
           MONGODB_DATABASE: ${{ secrets.MONGODB_DATABASE }}
