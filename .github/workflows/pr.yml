@@ -50,10 +50,12 @@ jobs:
       - name: Comment on PR with coverage summary
         run: |
           REPORT=$(<badges/coverage-summary.json)
-          COVERAGE=$(jq -r '.coverage' <<< "$REPORT")%
-          BRANCHES=$(jq -r '.branches' <<< "$REPORT")%
+          RAW_COVERAGE=$(jq -r '.coverage' <<< "$REPORT")
+          RAW_BRANCHES=$(jq -r '.branches' <<< "$REPORT")
+          COVERAGE=$(printf "%.1f" "$RAW_COVERAGE")
+          BRANCHES=$(printf "%.1f" "$RAW_BRANCHES")
           NEWLINE=$'\n'
-          BODY="## ✅ JaCoCo Test Coverage Summary${NEWLINE}- **Line Coverage:** ${COVERAGE}${NEWLINE}- **Branch Coverage:** ${BRANCHES}"
+          BODY="## JaCoCo Test Coverage Summary Statistics${NEWLINE}* __Coverage:__ ${COVERAGE}%${NEWLINE}* __Branches:__ ${BRANCHES}%"
           gh pr comment ${{ github.event.pull_request.number }} -b "${BODY}"
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
