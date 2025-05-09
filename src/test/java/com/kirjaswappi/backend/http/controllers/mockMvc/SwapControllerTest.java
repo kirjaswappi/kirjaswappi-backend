@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.Instant;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -45,7 +46,8 @@ class SwapControllerTest {
   private ObjectMapper objectMapper;
 
   @Test
-  void createSwapRequest_shouldReturnOk_whenValidRequest() throws Exception {
+  @DisplayName("Should return OK when creating a valid swap request")
+  void shouldReturnOk_whenValidRequest() throws Exception {
     CreateSwapRequest request = new CreateSwapRequest();
     request.setSenderId("user1");
     request.setReceiverId("user2");
@@ -112,6 +114,7 @@ class SwapControllerTest {
   }
 
   @Test
+  @DisplayName("Should return BadRequest when required fields are missing")
   void shouldReturnBadRequest_whenMissingRequiredFields() throws Exception {
     CreateSwapRequest request = new CreateSwapRequest(); // All fields null
 
@@ -122,6 +125,7 @@ class SwapControllerTest {
   }
 
   @Test
+  @DisplayName("Should return BadRequest when both swap offers are present")
   void shouldReturnBadRequest_whenBothSwapOffersPresent() throws Exception {
     CreateSwapRequest request = new CreateSwapRequest();
     request.setSenderId("user1");
@@ -141,6 +145,7 @@ class SwapControllerTest {
   }
 
   @Test
+  @DisplayName("Should return BadRequest when no swap offer is present")
   void shouldReturnBadRequest_whenNoSwapOfferPresent() throws Exception {
     CreateSwapRequest request = new CreateSwapRequest();
     request.setSenderId("user1");
@@ -157,6 +162,7 @@ class SwapControllerTest {
   }
 
   @Test
+  @DisplayName("Should return NoContent when deleting all swap requests")
   void shouldReturnNoContent() throws Exception {
     mockMvc.perform(delete(API_PATH))
         .andExpect(status().isNoContent());
