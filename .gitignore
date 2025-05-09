@@ -26,5 +26,8 @@ replay_pid*
 # IntelIJ
 .idea
 
+# VS Code
+.vscode
+
 # Target Folder #
 target/
