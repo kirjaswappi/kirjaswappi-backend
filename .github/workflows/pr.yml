@@ -23,7 +23,7 @@ jobs:
           java-version: '21'
 
       - name: Run Tests and Generate Coverage Report
-        run: mvn test jacoco:report -Dspring.profiles.active=cloud
+        run: mvn test jacoco:report -Dspring.profiles.active=local
         env:
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
           MONGODB_DATABASE: ${{ secrets.MONGODB_DATABASE }}
