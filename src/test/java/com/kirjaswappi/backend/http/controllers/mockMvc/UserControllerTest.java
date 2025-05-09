@@ -16,21 +16,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kirjaswappi.backend.common.http.ErrorUtils;
 import com.kirjaswappi.backend.common.service.OTPService;
 import com.kirjaswappi.backend.common.service.exceptions.InvalidCredentials;
 import com.kirjaswappi.backend.http.controllers.UserController;
+import com.kirjaswappi.backend.http.controllers.mockMvc.config.CustomMockMvcConfiguration;
 import com.kirjaswappi.backend.http.dtos.requests.*;
 import com.kirjaswappi.backend.http.dtos.responses.*;
 import com.kirjaswappi.backend.service.UserService;
@@ -40,43 +35,26 @@ import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 import com.kirjaswappi.backend.service.exceptions.BookNotFoundException;
 import com.kirjaswappi.backend.service.exceptions.UserNotFoundException;
 
-@ActiveProfiles("local")
 @WebMvcTest(UserController.class)
+@Import(CustomMockMvcConfiguration.class)
 public class UserControllerTest {
-  @Autowired
-  private MockMvc mockMvc;
-  @Autowired
-  private ObjectMapper objectMapper;
-  @MockBean
-  private UserService userService;
-  @MockBean
-  private OTPService otpService;
-  @MockBean
-  private ErrorUtils errorUtils;
-
-  private User user;
-  private CreateUserRequest createUserRequest;
-  private CreateUserResponse createUserResponse;
   private static final String API_BASE = "/api/v1/users";
 
-  @TestConfiguration
-  static class CustomMockMvcConfiguration {
-    @Profile("local")
-    @Bean
-    public MockMvc mockMvcLocal(WebApplicationContext webApplicationContext) {
-      return MockMvcBuilders.webAppContextSetup(webApplicationContext)
-          .defaultRequest(get("/").header("Host", "localhost:8080"))
-          .build();
-    }
+  @Autowired
+  private MockMvc mockMvc;
 
-    @Profile("cloud")
-    @Bean
-    public MockMvc mockMvcCloud(WebApplicationContext webApplicationContext) {
-      return MockMvcBuilders.webAppContextSetup(webApplicationContext)
-          .defaultRequest(get("/").header("Host", "localhost:10000"))
-          .build();
-    }
-  }
+  @Autowired
+  private ObjectMapper objectMapper;
+
+  @MockBean
+  private UserService userService;
+
+  @MockBean
+  private OTPService otpService;
+
+  private User user;
+
+  private CreateUserRequest createUserRequest;
 
   @BeforeEach
   void setUp() {
@@ -90,7 +68,6 @@ public class UserControllerTest {
     createUserRequest.setEmail("test@example.com");
     createUserRequest.setPassword("password");
     createUserRequest.setConfirmPassword("password");
-    createUserResponse = new CreateUserResponse(user);
   }
 
   @Test
