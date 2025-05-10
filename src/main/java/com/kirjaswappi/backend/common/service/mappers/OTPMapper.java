@@ -4,7 +4,7 @@
  */
 package com.kirjaswappi.backend.common.service.mappers;
 
-import java.util.Date;
+import java.time.Instant;
 
 import org.springframework.stereotype.Component;
 
@@ -25,7 +25,7 @@ public class OTPMapper {
     var dao = new OTPDao();
     dao.setEmail(entity.getEmail());
     dao.setOtp(entity.getOtp());
-    dao.setCreatedAt(new Date());
+    dao.setCreatedAt(Instant.now());
     return dao;
   }
 }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.kirjaswappi.backend.common.jpa.daos.AdminUserDao;
 import com.kirjaswappi.backend.common.service.entities.AdminUser;
+import com.kirjaswappi.backend.common.service.enums.Role;
 
 @Component
 public class AdminUserMapper {
@@ -15,7 +16,7 @@ public class AdminUserMapper {
     var entity = new AdminUser();
     entity.setUsername(dao.getUsername());
     entity.setPassword(dao.getPassword());
-    entity.setRole(dao.getRole());
+    entity.setRole(Role.fromCode(dao.getRole()));
     return entity;
   }
 
@@ -23,7 +24,7 @@ public class AdminUserMapper {
     var dao = new AdminUserDao();
     dao.setUsername(user.getUsername());
     dao.setPassword(user.getPassword());
-    dao.setRole(user.getRole());
+    dao.setRole(user.getRole().getCode());
     return dao;
   }
 }
