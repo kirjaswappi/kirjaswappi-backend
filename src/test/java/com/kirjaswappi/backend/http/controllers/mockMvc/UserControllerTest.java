@@ -22,12 +22,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kirjaswappi.backend.common.http.controllers.mockMvc.config.CustomMockMvcConfiguration;
 import com.kirjaswappi.backend.common.service.OTPService;
 import com.kirjaswappi.backend.common.service.exceptions.InvalidCredentials;
 import com.kirjaswappi.backend.http.controllers.UserController;
-import com.kirjaswappi.backend.http.controllers.mockMvc.config.CustomMockMvcConfiguration;
 import com.kirjaswappi.backend.http.dtos.requests.*;
-import com.kirjaswappi.backend.http.dtos.responses.*;
 import com.kirjaswappi.backend.service.UserService;
 import com.kirjaswappi.backend.service.entities.Genre;
 import com.kirjaswappi.backend.service.entities.User;

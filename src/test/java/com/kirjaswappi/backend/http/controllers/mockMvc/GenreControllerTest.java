@@ -23,8 +23,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kirjaswappi.backend.common.http.controllers.mockMvc.config.CustomMockMvcConfiguration;
 import com.kirjaswappi.backend.http.controllers.GenreController;
-import com.kirjaswappi.backend.http.controllers.mockMvc.config.CustomMockMvcConfiguration;
 import com.kirjaswappi.backend.http.dtos.requests.CreateGenreRequest;
 import com.kirjaswappi.backend.http.dtos.requests.UpdateGenreRequest;
 import com.kirjaswappi.backend.service.GenreService;

@@ -30,8 +30,8 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kirjaswappi.backend.common.http.controllers.mockMvc.config.CustomMockMvcConfiguration;
 import com.kirjaswappi.backend.http.controllers.BookController;
-import com.kirjaswappi.backend.http.controllers.mockMvc.config.CustomMockMvcConfiguration;
 import com.kirjaswappi.backend.service.BookService;
 import com.kirjaswappi.backend.service.entities.Book;
 import com.kirjaswappi.backend.service.enums.Condition;

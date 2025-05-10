@@ -23,8 +23,8 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.kirjaswappi.backend.common.http.controllers.mockMvc.config.CustomMockMvcConfiguration;
 import com.kirjaswappi.backend.http.controllers.PhotoController;
-import com.kirjaswappi.backend.http.controllers.mockMvc.config.CustomMockMvcConfiguration;
 import com.kirjaswappi.backend.service.PhotoService;
 import com.kirjaswappi.backend.service.entities.Photo;
 

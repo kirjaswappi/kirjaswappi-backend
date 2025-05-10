@@ -11,6 +11,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import com.kirjaswappi.backend.common.service.entities.AdminUser;
+import com.kirjaswappi.backend.http.validations.ValidationUtil;
+import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 
 @Getter
 @Setter
@@ -21,9 +23,21 @@ public class AuthenticationRequest {
   private String password;
 
   public AdminUser toEntity() {
+    this.validateProperties();
     var entity = new AdminUser();
     entity.setUsername(this.username.toLowerCase());
     entity.setPassword(this.password);
     return entity;
+  }
+
+  private void validateProperties() {
+    // validate user name:
+    if (!ValidationUtil.validateNotBlank(this.username)) {
+      throw new BadRequestException("usernameCannotBeBlank", this.username);
+    }
+    // validate password:
+    if (!ValidationUtil.validateNotBlank(this.password)) {
+      throw new BadRequestException("passwordCannotBeBlank", this.password);
+    }
   }
 }

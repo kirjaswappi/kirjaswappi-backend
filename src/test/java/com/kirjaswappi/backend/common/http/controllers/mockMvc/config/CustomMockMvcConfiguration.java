@@ -2,7 +2,7 @@
  * Copyright (c) 2025 KirjaSwappi or KirjaSwappi affiliate company. All rights reserved.
  * Author: Mahiuddin Al Kamal <mahiuddinalkamal>
  */
-package com.kirjaswappi.backend.http.controllers.mockMvc.config;
+package com.kirjaswappi.backend.common.http.controllers.mockMvc.config;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
