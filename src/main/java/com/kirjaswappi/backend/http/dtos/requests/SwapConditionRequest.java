@@ -140,7 +140,7 @@ public class SwapConditionRequest {
 
           try {
             MultipartFile coverPhoto = Util.convertBase64ImageToMultipartFile(
-                base64Image, "Swappable-Book-Cover-Photo.jpg", contentType);
+                base64Image, "Swappable-Book-Cover-Photo." + contentType.split("/")[1], contentType);
             if (coverPhoto == null) {
               throw new BadRequestException("invalidSwappableBookCoverPhoto");
             }
