@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -54,8 +55,8 @@ public class SwapConditionRequest {
       genres = List.of();
     if (this.books == null)
       books = List.of();
-    List<Genre> swappableGenres = this.genres.stream().map(Genre::new).toList();
-    List<SwappableBook> swappableBooks = this.books.stream().map(BookRequest::toEntity).toList();
+    List<Genre> swappableGenres = this.genres.stream().map(Genre::new).collect(Collectors.toList());
+    List<SwappableBook> swappableBooks = this.books.stream().map(BookRequest::toEntity).collect(Collectors.toList());
 
     checkIfOnlyOneOfTheSwapConditionIsProvided(conditionTypeCode, giveAway,
         openForOffers, swappableGenres, swappableBooks);
