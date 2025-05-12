@@ -145,7 +145,7 @@ public class BookService {
   // also, keeping the photos for reference
   private static void keepOldSwappableBooksForReferenceIfExists(Book updatedBook, BookDao existingBookDao) {
     var oldSwappableBooks = existingBookDao.getSwapCondition().getSwappableBooks();
-    if (oldSwappableBooks != null) {
+    if (oldSwappableBooks != null && !oldSwappableBooks.isEmpty()) {
       oldSwappableBooks.forEach(swappableBookDao -> swappableBookDao.setDeleted(true));
       var oldSwappableBooksDaos = oldSwappableBooks.stream().map(SwappableBookMapper::toEntity).toList();
       updatedBook.getSwapCondition().getSwappableBooks().addAll(oldSwappableBooksDaos);

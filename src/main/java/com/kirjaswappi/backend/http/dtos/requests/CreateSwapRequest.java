@@ -84,7 +84,7 @@ public class CreateSwapRequest {
 
   @Getter
   @Setter
-  private static class SwapOfferRequest {
+  public static class SwapOfferRequest {
     @Schema(description = "The ID of the book offered for swap request.", example = "123456")
     private String offeredBookId;
 

@@ -101,7 +101,10 @@ public class UserService {
   }
 
   public void deleteUser(String id) {
-    userRepository.deleteById(id);
+    // validate user exists:
+    var dao = userRepository.findById(id)
+        .orElseThrow(() -> new UserNotFoundException(id));
+    userRepository.delete(dao);
   }
 
   public User updateUser(User user) {
