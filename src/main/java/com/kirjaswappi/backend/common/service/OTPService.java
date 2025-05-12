@@ -8,6 +8,8 @@ import static com.kirjaswappi.backend.common.utils.Constants.NUMERIC;
 
 import java.io.IOException;
 import java.security.SecureRandom;
+import java.time.Duration;
+import java.time.Instant;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,21 +27,24 @@ import com.kirjaswappi.backend.service.exceptions.UserNotFoundException;
 @Transactional
 public class OTPService {
   @Autowired
-  private EmailService emailService;
-  @Autowired
   private OTPRepository otpRepository;
+
   @Autowired
   private OTPMapper otpMapper;
+
   @Autowired
   private UserService userService;
 
+  @Autowired
+  private EmailService emailService;
+
+  private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+
   private static String generateOTP() {
-    SecureRandom secureRandom = new SecureRandom();
-    StringBuilder otp = new StringBuilder();
-    for (int i = 0; i < 6; i++) {
-      otp.append(NUMERIC.charAt(secureRandom.nextInt(NUMERIC.length())));
-    }
-    return otp.toString();
+    return SECURE_RANDOM.ints(6, 0, NUMERIC.length())
+        .mapToObj(NUMERIC::charAt)
+        .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
+        .toString();
   }
 
   private OTP getOTP(String email) {
@@ -55,8 +60,8 @@ public class OTPService {
       throw new BadRequestException("otpDoesNotMatch", otp);
     }
 
-    // check createAt of OTP with current time plus 15 minutes:
-    if (otpEntity.getCreatedAt().getTime() + 15 * 60 * 1000 < System.currentTimeMillis()) {
+    // Check if the OTP is older than 15 minutes
+    if (otpEntity.getCreatedAt().plus(Duration.ofMinutes(15)).isBefore(Instant.now())) {
       throw new BadRequestException("otpExpired", otp);
     }
 

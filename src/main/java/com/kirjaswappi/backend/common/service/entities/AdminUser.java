@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import com.kirjaswappi.backend.common.service.enums.Role;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,5 +18,5 @@ import lombok.Setter;
 public class AdminUser {
   String username;
   String password;
-  String role;
+  Role role;
 }

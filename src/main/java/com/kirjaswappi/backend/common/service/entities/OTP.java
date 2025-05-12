@@ -4,7 +4,7 @@
  */
 package com.kirjaswappi.backend.common.service.entities;
 
-import java.util.Date;
+import java.time.Instant;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,5 +18,5 @@ import lombok.Setter;
 public class OTP {
   private String email;
   private String otp;
-  private Date createdAt;
+  private Instant createdAt;
 }
