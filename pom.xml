@@ -2,12 +2,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.3.1</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<version>3.4.5</version>
+		<relativePath/>
 	</parent>
+
 	<groupId>com.kirjaswappi</groupId>
 	<artifactId>backend</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
@@ -33,60 +35,76 @@
 			<url>https://maven.pkg.github.com/kirjaswappi/kirjaswappi-backend</url>
 		</repository>
 	</distributionManagement>
+
 	<properties>
-		<java.version>17</java.version>
-		<spring-cloud.version>2023.0.2</spring-cloud.version>
+		<java.version>21</java.version>
+		<spring-cloud.version>2024.0.1</spring-cloud.version>
 	</properties>
+
 	<dependencies>
-		<!-- Health check Dependency -->
+		<!-- Health check -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
-		<!-- Database Dependency -->
+
+		<!-- MongoDB -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-mongodb</artifactId>
 		</dependency>
-		<!-- Validation Dependency -->
+
+		<!-- Validation -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
-		<!-- RestAPI Dependency -->
+
+		<!-- Web -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-		<!-- Resilience Dependency -->
+
+		<!-- Resilience4j Circuit Breaker -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
 		</dependency>
-		<!-- Dev Dependency -->
+
+		<!-- Spring Retry -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-circuitbreaker-spring-retry</artifactId>
+		</dependency>
+
+		<!-- Lombok -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
-		<!-- Tests Dependency -->
+
+		<!-- Testing -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!-- Swagger documentation -->
+
+		<!-- Swagger / OpenAPI -->
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-			<version>2.6.0</version>
+			<version>2.8.8</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
-			<version>2.6.0</version>
+			<version>2.8.8</version>
 		</dependency>
-		<!-- Security for APIs -->
+
+		<!-- Security -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
@@ -107,33 +125,37 @@
 			<version>0.12.6</version>
 			<scope>runtime</scope>
 		</dependency>
-		<!-- Mail Sender -->
+
+		<!-- Mail -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
-		<!-- Minio -->
+
+		<!-- MinIO -->
 		<dependency>
 			<groupId>io.minio</groupId>
 			<artifactId>minio</artifactId>
 			<version>8.5.17</version>
 		</dependency>
-		<!-- Spring Hateoas -->
+
+		<!-- HATEOAS -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-hateoas</artifactId>
 		</dependency>
-		<!-- Mongock Spring Boot Starter -->
+
+		<!-- Mongock -->
 		<dependency>
 			<groupId>io.mongock</groupId>
 			<artifactId>mongock-springboot</artifactId>
 		</dependency>
-		<!-- Mongock MongoDB Spring Data v4 Driver -->
 		<dependency>
 			<groupId>io.mongock</groupId>
 			<artifactId>mongodb-springdata-v4-driver</artifactId>
 		</dependency>
 	</dependencies>
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -155,10 +177,13 @@
 
 	<build>
 		<plugins>
+			<!-- Native image -->
 			<plugin>
 				<groupId>org.graalvm.buildtools</groupId>
 				<artifactId>native-maven-plugin</artifactId>
 			</plugin>
+
+			<!-- Spring Boot -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
@@ -171,6 +196,8 @@
 					</excludes>
 				</configuration>
 			</plugin>
+
+			<!-- Spotless -->
 			<plugin>
 				<groupId>com.diffplug.spotless</groupId>
 				<artifactId>spotless-maven-plugin</artifactId>
@@ -202,10 +229,12 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<!-- Jacoco -->
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.10</version>
+				<version>0.8.11</version>
 				<executions>
 					<execution>
 						<id>prepare-agent</id>
@@ -230,7 +259,6 @@
 					</execution>
 				</executions>
 			</plugin>
-
 		</plugins>
 	</build>
 </project>
