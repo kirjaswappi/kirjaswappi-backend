@@ -4,7 +4,7 @@
  */
 package com.kirjaswappi.backend.common.jpa.daos;
 
-import java.util.Date;
+import java.time.Instant;
 
 import jakarta.validation.constraints.NotNull;
 
@@ -26,5 +26,5 @@ public class OTPDao {
   @NotNull
   private String otp;
   @NotNull
-  private Date createdAt;
+  private Instant createdAt;
 }

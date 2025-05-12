@@ -5,36 +5,47 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   publish_and_release:
     runs-on: ubuntu-latest
     container: maven:3-sapmachine-21
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Run Build Package
+      - name: Set up Maven cache
+        uses: actions/cache@v3
+        with:
+          path: /root/.m2
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Build Package (skip tests)
         run: mvn clean package -DskipTests
 
-      - name: Publish to GitHub Packages Apache Maven
+      - name: Deploy to GitHub Packages
         run: mvn deploy -s .github/mvn/settings.xml -DskipTests
         env:
-          USERNAME_GIT: ${{ secrets.USERNAME_GIT }}
-          PASSWORD_GIT: ${{ secrets.TOKEN_GITHUB }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set Version
-        id: set_version
-        run: echo "::set-output name=version::0.0.${{ github.run_number }}"
+      - name: Set Version for Release
+        run: echo "VERSION=0.0.${{ github.run_number }}" >> $GITHUB_ENV
 
-      - name: Create Release
-        id: create_release
+      - name: Create GitHub Release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ steps.set_version.outputs.version }}
-          release_name: Release v${{ steps.set_version.outputs.version }}
+          tag_name: v${{ env.VERSION }}
+          release_name: Release v${{ env.VERSION }}
           draft: false
           prerelease: false

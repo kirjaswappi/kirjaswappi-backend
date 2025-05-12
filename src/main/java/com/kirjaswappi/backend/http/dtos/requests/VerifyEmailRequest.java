@@ -6,7 +6,7 @@ package com.kirjaswappi.backend.http.dtos.requests;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
-import java.util.Date;
+import java.time.Instant;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -27,7 +27,7 @@ public class VerifyEmailRequest {
 
   public OTP toEntity() {
     this.validateProperties(this.email, this.otp);
-    return new OTP(this.email.toLowerCase(), this.otp, new Date());
+    return new OTP(this.email.toLowerCase(), this.otp, Instant.now());
   }
 
   private void validateProperties(String email, String otp) {
