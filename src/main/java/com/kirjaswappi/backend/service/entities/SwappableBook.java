@@ -21,4 +21,5 @@ public class SwappableBook {
   private String author;
   private String coverPhoto;
   private MultipartFile coverPhotoFile;
+  private boolean isDeleted;
 }
