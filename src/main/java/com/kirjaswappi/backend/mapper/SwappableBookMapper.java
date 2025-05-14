@@ -25,6 +25,7 @@ public class SwappableBookMapper {
     if (dao.getCoverPhoto() != null) {
       entity.setCoverPhoto(dao.getCoverPhoto());
     }
+    entity.setDeleted(dao.isDeleted());
     return entity;
   }
 
@@ -35,6 +36,7 @@ public class SwappableBookMapper {
     entity.setTitle(dao.getTitle());
     entity.setAuthor(dao.getAuthor());
     entity.setCoverPhoto(imageUrl);
+    entity.setDeleted(dao.isDeleted());
     return entity;
   }
 
@@ -49,6 +51,7 @@ public class SwappableBookMapper {
     if (entity.getCoverPhoto() != null) {
       dao.setCoverPhoto(entity.getCoverPhoto());
     }
+    dao.setDeleted(entity.isDeleted());
     return dao;
   }
 

@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,8 @@ import com.kirjaswappi.backend.service.exceptions.UserNotFoundException;
 @Service
 @Transactional
 public class PhotoService {
+  private final Logger logger = LoggerFactory.getLogger(PhotoService.class);
+
   @Autowired
   private ImageService imageService;
 
@@ -35,18 +39,22 @@ public class PhotoService {
   private PhotoRepository photoRepository;
 
   public String addProfilePhoto(String userId, MultipartFile file) {
+    logger.debug("Adding profile photo for user: {}", userId);
     return addUserPhoto(userId, file, true);
   }
 
   public String addCoverPhoto(String userId, MultipartFile file) {
+    logger.debug("Adding cover photo for user: {}", userId);
     return addUserPhoto(userId, file, false);
   }
 
   public void deleteProfilePhoto(String userId) {
+    logger.debug("Deleting profile photo for user: {}", userId);
     deleteUserPhoto(userId, true);
   }
 
   public void deleteCoverPhoto(String userId) {
+    logger.debug("Deleting cover photo for user: {}", userId);
     deleteUserPhoto(userId, false);
   }
 
@@ -63,14 +71,17 @@ public class PhotoService {
   }
 
   public void addBookCoverPhoto(MultipartFile file, String uniqueId) {
+    logger.debug("Adding cover photo for book with uniqueId: {}", uniqueId);
     imageService.uploadImage(file, uniqueId);
   }
 
   public void deleteBookCoverPhoto(String uniqueId) {
+    logger.debug("Deleting cover photo for book with uniqueId: {}", uniqueId);
     imageService.deleteImage(uniqueId);
   }
 
   public String getBookCoverPhoto(String uniqueId) {
+    logger.debug("Fetching cover photo URL for book with uniqueId: {}", uniqueId);
     return imageService.getDownloadUrl(uniqueId);
   }
 

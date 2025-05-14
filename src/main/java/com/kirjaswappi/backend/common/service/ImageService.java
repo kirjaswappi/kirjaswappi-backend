@@ -13,6 +13,8 @@ import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
 import io.minio.http.Method;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
@@ -29,6 +31,8 @@ import com.kirjaswappi.backend.service.exceptions.ResourceNotFoundException;
 @Service
 @Transactional
 public class ImageService {
+  private final Logger logger = LoggerFactory.getLogger(ImageService.class);
+
   @Value("${s3.bucket}")
   private String bucketName;
 
@@ -47,15 +51,13 @@ public class ImageService {
                 .build());
       }
     } catch (Exception e) {
+      logger.error("Image upload failed {}", e.getMessage());
       throw new ImageUploadFailureException(uniqueId);
     }
   }
 
   @Cacheable(value = "imageUrls", key = "#uniqueId")
   public String getDownloadUrl(String uniqueId) {
-    if (uniqueId == null) {
-      throw new ResourceNotFoundException("photoNotFound");
-    }
     try {
       return minioClient.getPresignedObjectUrl(
           GetPresignedObjectUrlArgs.builder()
@@ -65,6 +67,7 @@ public class ImageService {
               .expiry(7, TimeUnit.DAYS)
               .build());
     } catch (Exception e) {
+      logger.error("Image fetch failed {}", e.getMessage());
       throw new ImageUrlFetchFailureException(uniqueId);
     }
   }
@@ -81,6 +84,7 @@ public class ImageService {
               .object(uniqueId)
               .build());
     } catch (Exception e) {
+      logger.error("Image deletion failed {}", e.getMessage());
       throw new ImageDeletionFailureException(uniqueId);
     }
   }
