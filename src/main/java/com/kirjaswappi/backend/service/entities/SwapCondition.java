@@ -16,18 +16,18 @@ import com.kirjaswappi.backend.service.enums.SwapType;
 @Setter
 @NoArgsConstructor
 public class SwapCondition {
-  private SwapType conditionType;
+  private SwapType swapType;
   private boolean giveAway;
   private boolean openForOffers;
   private List<Genre> swappableGenres;
   private List<SwappableBook> swappableBooks;
 
-  public SwapCondition(SwapType conditionType,
+  public SwapCondition(SwapType swapType,
       boolean giveAway,
       boolean openForOffers,
       List<Genre> swappableGenres,
       List<SwappableBook> swappableBooks) {
-    this.conditionType = conditionType;
+    this.swapType = swapType;
     this.giveAway = giveAway;
     this.openForOffers = openForOffers;
     this.swappableGenres = swappableGenres != null ? swappableGenres : List.of();

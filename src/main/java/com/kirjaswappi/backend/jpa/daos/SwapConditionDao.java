@@ -19,7 +19,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class SwapConditionDao {
   @NotNull
-  private String conditionType;
+  private String swapType;
 
   @NotNull
   private boolean giveAway;

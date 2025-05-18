@@ -60,7 +60,7 @@ class BookControllerTest {
   void shouldCreateBookWithConditionTypeByBooksSuccessfully() throws Exception {
     String swapCondition = """
         {
-          "conditionType": "ByBooks",
+          "swapType": "ByBooks",
           "giveAway": false,
           "openForOffers": false,
           "genres": null,
@@ -95,7 +95,7 @@ class BookControllerTest {
   void shouldCreateBookWithConditionTypeByGenresSuccessfully() throws Exception {
     String swapCondition = """
         {
-          "conditionType": "ByGenres",
+          "swapType": "ByGenres",
           "giveAway": false,
           "openForOffers": false,
           "genres": "Fiction",
@@ -126,7 +126,7 @@ class BookControllerTest {
   void shouldCreateBookWithConditionTypeByGiveAwaySuccessfully() throws Exception {
     String swapCondition = """
         {
-          "conditionType": "GiveAway",
+          "swapType": "GiveAway",
           "giveAway": true,
           "openForOffers": false,
           "genres": null,
@@ -157,7 +157,7 @@ class BookControllerTest {
   void shouldCreateBookWithConditionTypeByOpenForOffersSuccessfully() throws Exception {
     String swapCondition = """
         {
-          "conditionType": "OpenForOffers",
+          "swapType": "OpenForOffers",
           "giveAway": false,
           "openForOffers": true,
           "genres": null,
@@ -188,7 +188,7 @@ class BookControllerTest {
   void shouldUpdateBookWithConditionTypeByBooksSuccessfully() throws Exception {
     String swapCondition = """
         {
-          "conditionType": "ByBooks",
+          "swapType": "ByBooks",
           "giveAway": false,
           "openForOffers": false,
           "genres": null,
@@ -229,7 +229,7 @@ class BookControllerTest {
   void shouldUpdateBookWithConditionTypeByGenresSuccessfully() throws Exception {
     String swapCondition = """
         {
-          "conditionType": "ByGenres",
+          "swapType": "ByGenres",
           "giveAway": false,
           "openForOffers": false,
           "genres": "Fiction",
@@ -266,7 +266,7 @@ class BookControllerTest {
   void shouldUpdateBookWithConditionTypeByGiveAwaySuccessfully() throws Exception {
     String swapCondition = """
         {
-          "conditionType": "GiveAway",
+          "swapType": "GiveAway",
           "giveAway": true,
           "openForOffers": false,
           "genres": null,
@@ -303,7 +303,7 @@ class BookControllerTest {
   void shouldUpdateBookWithConditionTypeByOpenForOffersSuccessfully() throws Exception {
     String swapCondition = """
         {
-          "conditionType": "OpenForOffers",
+          "swapType": "OpenForOffers",
           "giveAway": false,
           "openForOffers": true,
           "genres": null,
