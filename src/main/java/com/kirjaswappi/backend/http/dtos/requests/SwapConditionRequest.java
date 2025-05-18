@@ -34,8 +34,8 @@ import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 @Setter
 @JsonDeserialize(using = SwapConditionRequest.SwapConditionRequestDeserializer.class)
 public class SwapConditionRequest {
-  @Schema(description = "The condition type for swapping the book.", example = "GiveAway, OpenForOffers, ByGenres, ByBooks")
-  private String conditionType;
+  @Schema(description = "Swap type for swapping the book.", example = "GiveAway, OpenForOffers, ByGenres, ByBooks")
+  private String swapType;
 
   @Schema(description = "To give away the book for free.", example = "true")
   private boolean giveAway;
@@ -50,7 +50,7 @@ public class SwapConditionRequest {
   private List<BookRequest> books;
 
   public SwapCondition toEntity() {
-    SwapType conditionTypeCode = SwapType.fromCode(conditionType);
+    SwapType swapTypeEnum = SwapType.fromCode(swapType);
     if (this.genres == null)
       genres = List.of();
     if (this.books == null)
@@ -58,12 +58,12 @@ public class SwapConditionRequest {
     List<Genre> swappableGenres = this.genres.stream().map(Genre::new).collect(Collectors.toList());
     List<SwappableBook> swappableBooks = this.books.stream().map(BookRequest::toEntity).collect(Collectors.toList());
 
-    checkIfOnlyOneOfTheSwapConditionIsProvided(conditionTypeCode, giveAway,
+    checkIfOnlyOneOfTheSwapConditionIsProvided(swapTypeEnum, giveAway,
         openForOffers, swappableGenres, swappableBooks);
 
     validateSwapCondition();
 
-    return new SwapCondition(conditionTypeCode, giveAway, openForOffers,
+    return new SwapCondition(swapTypeEnum, giveAway, openForOffers,
         swappableGenres, swappableBooks);
   }
 
@@ -112,7 +112,7 @@ public class SwapConditionRequest {
         node = mapper.readTree(node.asText());
       }
       SwapConditionRequest request = new SwapConditionRequest();
-      request.setConditionType(node.get("conditionType").asText());
+      request.setSwapType(node.get("swapType").asText());
       request.setGiveAway(node.get("giveAway").asBoolean());
       request.setOpenForOffers(node.get("openForOffers").asBoolean());
       request.setGenres(node.hasNonNull("genres") ? Arrays.asList(node.get("genres").asText().split(",")) : null);

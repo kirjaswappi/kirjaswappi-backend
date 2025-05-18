@@ -58,14 +58,14 @@ public class BookResponse {
   @Setter
   @Getter
   static class SwapConditionResponse {
-    private String conditionType;
+    private String swapType;
     private boolean giveAway;
     private boolean openForOffers;
     private List<Genre> swappableGenres;
     private List<SwappableBookResponse> swappableBooks;
 
     public SwapConditionResponse(SwapCondition entity) {
-      this.conditionType = entity.getConditionType().getCode();
+      this.swapType = entity.getSwapType().getCode();
       this.giveAway = entity.isGiveAway();
       this.openForOffers = entity.isOpenForOffers();
       if (entity.getSwappableGenres() != null) {

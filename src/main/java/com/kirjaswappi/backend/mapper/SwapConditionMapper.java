@@ -20,7 +20,7 @@ public class SwapConditionMapper {
       return new SwapCondition();
     }
     var entity = new SwapCondition();
-    entity.setConditionType(SwapType.fromCode(dao.getConditionType()));
+    entity.setSwapType(SwapType.fromCode(dao.getSwapType()));
     entity.setGiveAway(dao.isGiveAway());
     entity.setOpenForOffers(dao.isOpenForOffers());
     entity.setSwappableGenres(dao.getSwappableGenres().stream().map(GenreMapper::toEntity).toList());
@@ -30,7 +30,7 @@ public class SwapConditionMapper {
 
   public static SwapConditionDao toDao(SwapCondition entity) {
     var dao = new SwapConditionDao();
-    dao.setConditionType(entity.getConditionType().getCode());
+    dao.setSwapType(entity.getSwapType().getCode());
     dao.setGiveAway(entity.isGiveAway());
     dao.setOpenForOffers(entity.isOpenForOffers());
     dao.setSwappableGenres(entity.getSwappableGenres().stream().map(GenreMapper::toDao).toList());
