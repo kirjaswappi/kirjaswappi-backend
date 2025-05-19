@@ -5,6 +5,7 @@
 package com.kirjaswappi.backend.common.configs;
 
 import static com.kirjaswappi.backend.common.configs.CloudSecurityConfig.Scopes.ADMIN;
+import static com.kirjaswappi.backend.common.configs.CloudSecurityConfig.Scopes.USER;
 import static com.kirjaswappi.backend.common.utils.Constants.*;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
@@ -58,7 +59,7 @@ public class CloudSecurityConfig {
                 API_BASE + AUTHENTICATE + REFRESH)
             .permitAll()
             .requestMatchers(POST, API_BASE + ADMIN_USERS).hasAuthority(ADMIN)
-            .requestMatchers(GET, API_BASE + ADMIN_USERS).hasAuthority(ADMIN)
+            .requestMatchers(GET, API_BASE + ADMIN_USERS).hasAnyAuthority(ADMIN, USER)
             .requestMatchers(DELETE, API_BASE + ADMIN_USERS).hasAuthority(ADMIN)
             .anyRequest().authenticated())
         .addFilterBefore(filterApiRequest, UsernamePasswordAuthenticationFilter.class)
@@ -67,7 +68,7 @@ public class CloudSecurityConfig {
   }
 
   static class Scopes {
-    public static final String ADMIN = "Admin";
-    public static final String USER = "User";
+    public static final String ADMIN = "ADMIN";
+    public static final String USER = "USER";
   }
 }
