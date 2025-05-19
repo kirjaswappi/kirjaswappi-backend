@@ -36,11 +36,7 @@ public class CloudSecurityConfig {
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
     configuration.setAllowedOriginPatterns(List.of("*")); // Allow all origins or customize as per your need
-    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")); // Allow all
-                                                                                                        // HTTP methods
-                                                                                                        // or customize
-                                                                                                        // as per your
-                                                                                                        // need
+    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
     configuration.setAllowCredentials(true);
     configuration.setAllowedHeaders(List.of("*")); // Allow all headers or customize as per your need
 
@@ -60,7 +56,7 @@ public class CloudSecurityConfig {
             .permitAll()
             .requestMatchers(POST, API_BASE + ADMIN_USERS).hasAuthority(ADMIN)
             .requestMatchers(GET, API_BASE + ADMIN_USERS).hasAnyAuthority(ADMIN, USER)
-            .requestMatchers(DELETE, API_BASE + ADMIN_USERS).hasAuthority(ADMIN)
+            .requestMatchers(DELETE, API_BASE + ADMIN_USERS + USERNAME).hasAuthority(ADMIN)
             .anyRequest().authenticated())
         .addFilterBefore(filterApiRequest, UsernamePasswordAuthenticationFilter.class)
         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
