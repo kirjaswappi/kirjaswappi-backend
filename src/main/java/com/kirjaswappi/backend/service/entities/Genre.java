@@ -16,6 +16,7 @@ import lombok.Setter;
 public class Genre {
   private String id;
   private String name;
+  private Genre parent;
 
   public Genre(String genreName) {
     this.name = genreName;

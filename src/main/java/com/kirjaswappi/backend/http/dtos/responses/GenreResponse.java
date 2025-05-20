@@ -14,9 +14,14 @@ import com.kirjaswappi.backend.service.entities.Genre;
 public class GenreResponse {
   private String id;
   private String name;
+  private GenreResponse parentGenre;
 
   public GenreResponse(Genre entity) {
     this.id = entity.getId();
     this.name = entity.getName();
+    if (entity.getParent() == null)
+      this.parentGenre = null;
+    else
+      this.parentGenre = new GenreResponse(entity.getParent());
   }
 }

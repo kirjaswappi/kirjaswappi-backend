@@ -67,8 +67,7 @@ public class UpdateUserRequest {
     entity.setCountry(this.country);
     entity.setPhoneNumber(this.phoneNumber);
     entity.setAboutMe(this.aboutMe);
-    entity.setFavGenres(
-        this.favGenres == null ? null : this.favGenres.stream().map(favGenre -> new Genre(null, favGenre)).toList());
+    entity.setFavGenres(this.favGenres == null ? null : this.favGenres.stream().map(Genre::new).toList());
     return entity;
   }
 

@@ -12,7 +12,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import com.mongodb.lang.Nullable;
 
 @Document(collection = "genres")
 @Getter
@@ -25,4 +28,8 @@ public class GenreDao {
 
   @NotNull
   private String name;
+
+  @Nullable
+  @DBRef
+  private GenreDao parent;
 }
