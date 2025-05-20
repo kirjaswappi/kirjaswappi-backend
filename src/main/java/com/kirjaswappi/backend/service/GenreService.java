@@ -29,7 +29,7 @@ public class GenreService {
   UserRepository userRepository;
 
   public List<Genre> getGenres() {
-    // fetch all the child genres
+    // fetch all the genres
     return genreRepository.findAll().stream().map(GenreMapper::toEntity)
         .toList();
   }
