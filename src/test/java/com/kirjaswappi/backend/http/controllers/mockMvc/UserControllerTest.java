@@ -211,8 +211,8 @@ public class UserControllerTest {
     updatedUser.setCountry("UpdatedCountry");
     updatedUser.setPhoneNumber("UpdatedPhoneNumber");
     updatedUser.setAboutMe("UpdatedAboutMe");
-    updatedUser.setFavGenres(List.of(new Genre("GenreId1", "UpdatedGenre1"),
-        new Genre("GenreId2", "UpdatedGenre2")));
+    updatedUser.setFavGenres(List.of(new Genre("GenreId1", "UpdatedGenre1", null),
+        new Genre("GenreId2", "UpdatedGenre2", null)));
     return updatedUser;
   }
 

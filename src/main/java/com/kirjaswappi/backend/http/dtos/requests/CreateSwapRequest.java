@@ -93,7 +93,7 @@ public class CreateSwapRequest {
 
     public SwapOffer toEntity() {
       if (this.offeredBookId == null) {
-        return new SwapOffer(null, new Genre(this.offeredGenreId, null));
+        return new SwapOffer(null, new Genre(this.offeredGenreId, null, null));
       }
       var offeredBook = new SwappableBook();
       offeredBook.setId(this.offeredBookId);

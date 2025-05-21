@@ -15,10 +15,12 @@ import com.kirjaswappi.backend.service.entities.Genre;
 @NoArgsConstructor
 public class GenreMapper {
   public static Genre toEntity(GenreDao dao) {
-    return new Genre(dao.getId(), dao.getName());
+    return new Genre(dao.getId(), dao.getName(),
+        dao.getParent() == null ? null : toEntity(dao.getParent()));
   }
 
   public static GenreDao toDao(Genre entity) {
-    return new GenreDao(entity.getId(), entity.getName());
+    return new GenreDao(entity.getId(), entity.getName(),
+        entity.getParent() == null ? null : toDao(entity.getParent()));
   }
 }

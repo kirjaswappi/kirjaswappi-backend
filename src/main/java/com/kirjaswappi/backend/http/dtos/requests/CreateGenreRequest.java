@@ -20,10 +20,19 @@ public class CreateGenreRequest {
   @Schema(description = "The name of the genre.", example = "Fiction", requiredMode = REQUIRED)
   private String name;
 
+  @Schema(description = "The ID of the parent genre.", example = "123456 or null", requiredMode = REQUIRED)
+  private String parentId;
+
   public Genre toEntity() {
     this.validateProperties();
     var entity = new Genre();
     entity.setName(this.name);
+    if (parentId != null && !parentId.trim().isEmpty()) {
+      var parentGenre = new Genre();
+      parentGenre.setId(parentId);
+      entity.setParent(parentGenre);
+    } else
+      entity.setParent(null);
     return entity;
   }
 

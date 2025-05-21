@@ -47,7 +47,7 @@ class GenreControllerTest {
 
   @BeforeEach
   void setup() {
-    genre = new Genre("1", "Fantasy");
+    genre = new Genre("1", "Fantasy", null);
   }
 
   @Test
@@ -77,7 +77,7 @@ class GenreControllerTest {
     CreateGenreRequest request = new CreateGenreRequest();
     request.setName("Sci-Fi");
 
-    Genre savedGenre = new Genre("2", "Sci-Fi");
+    Genre savedGenre = new Genre("2", "Sci-Fi", null);
     when(genreService.addGenre(any())).thenReturn(savedGenre);
 
     mockMvc.perform(post("/api/v1/genres")
@@ -106,7 +106,7 @@ class GenreControllerTest {
     request.setId("1");
     request.setName("Adventure");
 
-    Genre updatedGenre = new Genre("1", "Adventure");
+    Genre updatedGenre = new Genre("1", "Adventure", null);
     when(genreService.updateGenre(any())).thenReturn(updatedGenre);
 
     mockMvc.perform(put("/api/v1/genres/1")

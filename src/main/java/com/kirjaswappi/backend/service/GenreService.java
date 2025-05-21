@@ -29,7 +29,9 @@ public class GenreService {
   UserRepository userRepository;
 
   public List<Genre> getGenres() {
-    return genreRepository.findAll().stream().map(GenreMapper::toEntity).toList();
+    // fetch all the genres
+    return genreRepository.findAll().stream().map(GenreMapper::toEntity)
+        .toList();
   }
 
   public Genre addGenre(Genre genre) {
@@ -37,7 +39,17 @@ public class GenreService {
     if (genreRepository.existsByName(genre.getName())) {
       throw new GenreAlreadyExistsException(genre.getName());
     }
+    checkAndFetchParentIfExists(genre);
     return GenreMapper.toEntity(genreRepository.save(GenreMapper.toDao(genre)));
+  }
+
+  private void checkAndFetchParentIfExists(Genre genre) {
+    // check and fetch parent if exists:
+    if (genre.getParent() != null) {
+      var parentGenre = genreRepository.findById(genre.getParent().getId())
+          .orElseThrow(GenreNotFoundException::new);
+      genre.setParent(GenreMapper.toEntity(parentGenre));
+    }
   }
 
   public void deleteGenre(String id) {
@@ -70,10 +82,16 @@ public class GenreService {
             book.getSwapCondition().getSwappableGenres().stream().anyMatch(g -> g.getId().equals(id)));
   }
 
-  public Genre updateGenre(Genre entity) {
-    var dao = genreRepository.findById(entity.getId())
-        .orElseThrow(() -> new GenreNotFoundException(entity.getId()));
-    dao.setName(entity.getName());
+  public Genre updateGenre(Genre genre) {
+    var dao = genreRepository.findById(genre.getId())
+        .orElseThrow(() -> new GenreNotFoundException(genre.getId()));
+    dao.setName(genre.getName());
+    if (genre.getParent() == null)
+      dao.setParent(null);
+    else {
+      checkAndFetchParentIfExists(genre);
+      dao.setParent(GenreMapper.toDao(genre.getParent()));
+    }
     return GenreMapper.toEntity(genreRepository.save(dao));
   }
 
