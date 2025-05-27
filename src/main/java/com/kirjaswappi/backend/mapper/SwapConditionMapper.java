@@ -30,6 +30,16 @@ public class SwapConditionMapper {
 
   public static SwapConditionDao toDao(SwapCondition entity) {
     var dao = new SwapConditionDao();
+    // Defensive: ensure swapType is not null
+    if (entity.getSwapType() == null) {
+      entity.setSwapType(com.kirjaswappi.backend.service.enums.SwapType.BY_BOOKS);
+    }
+    if (entity.getSwappableGenres() == null) {
+      entity.setSwappableGenres(java.util.List.of());
+    }
+    if (entity.getSwappableBooks() == null) {
+      entity.setSwappableBooks(java.util.List.of());
+    }
     dao.setSwapType(entity.getSwapType().getCode());
     dao.setGiveAway(entity.isGiveAway());
     dao.setOpenForOffers(entity.isOpenForOffers());

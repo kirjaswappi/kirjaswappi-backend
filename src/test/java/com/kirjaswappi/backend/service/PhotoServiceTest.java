@@ -18,6 +18,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.kirjaswappi.backend.common.service.ImageService;
+import com.kirjaswappi.backend.service.exceptions.ImageDeletionFailureException;
 import com.kirjaswappi.backend.service.exceptions.ImageUploadFailureException;
 
 class PhotoServiceTest {
@@ -34,7 +35,7 @@ class PhotoServiceTest {
   }
 
   @Test
-  @DisplayName("Should throw ImageUploadFailureException when upload fails")
+  @DisplayName("Throws when image upload fails for book cover photo")
   void addBookCoverPhotoThrowsOnFailure() {
     MultipartFile file = mock(MultipartFile.class);
     doThrow(new ImageUploadFailureException()).when(imageService).uploadImage(any(MultipartFile.class), anyString());
@@ -42,7 +43,15 @@ class PhotoServiceTest {
   }
 
   @Test
-  @DisplayName("Should return image URL when getBookCoverPhoto is called")
+  @DisplayName("Adds book cover photo successfully")
+  void addBookCoverPhotoSuccess() {
+    MultipartFile file = mock(MultipartFile.class);
+    doNothing().when(imageService).uploadImage(any(MultipartFile.class), anyString());
+    assertDoesNotThrow(() -> photoService.addBookCoverPhoto(file, "id"));
+  }
+
+  @Test
+  @DisplayName("Returns URL for book cover photo")
   void getBookCoverPhotoReturnsUrl() {
     String uniqueId = "cover-photo-id";
     String expectedUrl = "http://example.com/photo.jpg";
@@ -52,7 +61,16 @@ class PhotoServiceTest {
   }
 
   @Test
-  @DisplayName("Should call imageService.deleteImage when deleteBookCoverPhoto is called")
+  @DisplayName("Returns null if book cover photo not found")
+  void getBookCoverPhotoReturnsNullIfNotFound() {
+    String uniqueId = "notfound";
+    when(imageService.getDownloadUrl(uniqueId)).thenReturn(null);
+    String actualUrl = photoService.getBookCoverPhoto(uniqueId);
+    assertNull(actualUrl);
+  }
+
+  @Test
+  @DisplayName("Deletes book cover photo via image service")
   void deleteBookCoverPhotoCallsImageService() {
     String uniqueId = "cover-photo-id";
     doNothing().when(imageService).deleteImage(uniqueId);
@@ -60,5 +78,11 @@ class PhotoServiceTest {
     verify(imageService, times(1)).deleteImage(uniqueId);
   }
 
-  // Add more tests for getBookCoverPhoto, deleteBookCoverPhoto, etc.
+  @Test
+  @DisplayName("Throws if image service fails when deleting book cover photo")
+  void deleteBookCoverPhotoThrowsIfImageServiceFails() {
+    String uniqueId = "cover-photo-id";
+    doThrow(new ImageDeletionFailureException()).when(imageService).deleteImage(uniqueId);
+    assertThrows(ImageDeletionFailureException.class, () -> photoService.deleteBookCoverPhoto(uniqueId));
+  }
 }

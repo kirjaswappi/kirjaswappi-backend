@@ -86,11 +86,15 @@ public class UserService {
 
   private void fetchAndSetImage(BookDao bookDao) {
     var imageUrls = new ArrayList<String>();
-    bookDao.getCoverPhotos().forEach(uniqueId -> {
-      var imageUrl = photoService.getBookCoverPhoto(uniqueId);
-      imageUrls.add(imageUrl);
-    });
-    bookDao.setCoverPhotos(imageUrls);
+    if (bookDao.getCoverPhotos() != null) {
+      bookDao.getCoverPhotos().forEach(uniqueId -> {
+        var imageUrl = photoService.getBookCoverPhoto(uniqueId);
+        imageUrls.add(imageUrl);
+      });
+      bookDao.setCoverPhotos(imageUrls);
+    } else {
+      bookDao.setCoverPhotos(new ArrayList<>());
+    }
   }
 
   public List<User> getUsers() {
@@ -223,7 +227,9 @@ public class UserService {
     var userDao = userRepository.findByIdAndIsEmailVerifiedTrue(user.getId())
         .orElseThrow(() -> new UserNotFoundException(user.getEmail()));
 
-    assert user.getFavBooks() != null;
+    if (user.getFavBooks() == null || user.getFavBooks().isEmpty()) {
+      throw new BadRequestException("favBooksListIsNullOrEmpty");
+    }
     var bookId = user.getFavBooks().get(0).getId();
     var favBookDao = bookRepository.findByIdAndIsDeletedFalse(bookId)
         .orElseThrow(() -> new BookNotFoundException(bookId));
@@ -240,7 +246,7 @@ public class UserService {
     if (userDao.getFavBooks() != null)
       userDao.getFavBooks().add(favBookDao);
     else
-      userDao.setFavBooks(List.of(favBookDao));
+      userDao.setFavBooks(new java.util.ArrayList<>(List.of(favBookDao)));
 
     userRepository.save(userDao);
     return getUser(user.getId());

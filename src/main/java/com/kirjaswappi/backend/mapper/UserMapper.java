@@ -4,6 +4,8 @@
  */
 package com.kirjaswappi.backend.mapper;
 
+import java.util.List;
+
 import lombok.NoArgsConstructor;
 
 import org.springframework.stereotype.Component;
@@ -12,7 +14,7 @@ import com.kirjaswappi.backend.jpa.daos.UserDao;
 import com.kirjaswappi.backend.service.entities.User;
 
 @Component
-@NoArgsConstructor
+@NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 public class UserMapper {
   public static User toEntity(UserDao dao) {
     var entity = new User();
@@ -34,8 +36,21 @@ public class UserMapper {
     entity.setProfilePhoto(dao.getProfilePhoto() != null ? dao.getProfilePhoto() : null);
     entity.setCoverPhoto(dao.getCoverPhoto() != null ? dao.getCoverPhoto() : null);
     entity.setBooks(dao.getBooks() != null ? dao.getBooks().stream().map(BookMapper::toEntity).toList() : null);
-    entity
-        .setFavBooks(dao.getFavBooks() != null ? dao.getFavBooks().stream().map(BookMapper::toEntity).toList() : null);
+    if (dao.getFavBooks() != null) {
+      entity.setFavBooks(dao.getFavBooks().stream().map(bookDao -> {
+        if (bookDao.getLanguage() == null)
+          bookDao.setLanguage("English");
+        if (bookDao.getCondition() == null)
+          bookDao.setCondition("Good");
+        if (bookDao.getGenres() == null)
+          bookDao.setGenres(List.of());
+        if (bookDao.getCoverPhotos() == null)
+          bookDao.setCoverPhotos(List.of());
+        return BookMapper.toEntity(bookDao);
+      }).toList());
+    } else {
+      entity.setFavBooks(null);
+    }
     return entity;
   }
 
