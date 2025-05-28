@@ -86,11 +86,15 @@ public class UserService {
 
   private void fetchAndSetImage(BookDao bookDao) {
     var imageUrls = new ArrayList<String>();
-    bookDao.getCoverPhotos().forEach(uniqueId -> {
-      var imageUrl = photoService.getBookCoverPhoto(uniqueId);
-      imageUrls.add(imageUrl);
-    });
-    bookDao.setCoverPhotos(imageUrls);
+    if (bookDao.getCoverPhotos() != null) {
+      bookDao.getCoverPhotos().forEach(uniqueId -> {
+        var imageUrl = photoService.getBookCoverPhoto(uniqueId);
+        imageUrls.add(imageUrl);
+      });
+      bookDao.setCoverPhotos(imageUrls);
+    } else {
+      bookDao.setCoverPhotos(new ArrayList<>());
+    }
   }
 
   public List<User> getUsers() {
@@ -223,8 +227,10 @@ public class UserService {
     var userDao = userRepository.findByIdAndIsEmailVerifiedTrue(user.getId())
         .orElseThrow(() -> new UserNotFoundException(user.getEmail()));
 
-    assert user.getFavBooks() != null;
-    var bookId = user.getFavBooks().get(0).getId();
+    if (user.getFavBooks() == null || user.getFavBooks().isEmpty()) {
+      throw new BadRequestException("favBooksListIsNullOrEmpty");
+    }
+    var bookId = user.getFavBooks().getFirst().getId();
     var favBookDao = bookRepository.findByIdAndIsDeletedFalse(bookId)
         .orElseThrow(() -> new BookNotFoundException(bookId));
 

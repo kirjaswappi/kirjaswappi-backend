@@ -23,8 +23,12 @@ public class SwapConditionMapper {
     entity.setSwapType(SwapType.fromCode(dao.getSwapType()));
     entity.setGiveAway(dao.isGiveAway());
     entity.setOpenForOffers(dao.isOpenForOffers());
-    entity.setSwappableGenres(dao.getSwappableGenres().stream().map(GenreMapper::toEntity).toList());
-    entity.setSwappableBooks(dao.getSwappableBooks().stream().map(SwappableBookMapper::toEntity).toList());
+    if (dao.getSwappableGenres() != null) {
+      entity.setSwappableGenres(dao.getSwappableGenres().stream().map(GenreMapper::toEntity).toList());
+    }
+    if (entity.getSwappableBooks() != null) {
+      entity.setSwappableBooks(dao.getSwappableBooks().stream().map(SwappableBookMapper::toEntity).toList());
+    }
     return entity;
   }
 

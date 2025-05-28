@@ -28,9 +28,8 @@ public class UserMapper {
     entity.setCountry(dao.getCountry());
     entity.setPhoneNumber(dao.getPhoneNumber());
     entity.setAboutMe(dao.getAboutMe());
-    if (dao.getFavGenres() != null) {
-      entity.setFavGenres(dao.getFavGenres().stream().map(GenreMapper::toEntity).toList());
-    }
+    entity.setFavGenres(
+        dao.getFavGenres() != null ? dao.getFavGenres().stream().map(GenreMapper::toEntity).toList() : null);
     entity.setProfilePhoto(dao.getProfilePhoto() != null ? dao.getProfilePhoto() : null);
     entity.setCoverPhoto(dao.getCoverPhoto() != null ? dao.getCoverPhoto() : null);
     entity.setBooks(dao.getBooks() != null ? dao.getBooks().stream().map(BookMapper::toEntity).toList() : null);
