@@ -15,7 +15,6 @@ import com.kirjaswappi.backend.common.jpa.repositories.AdminUserRepository;
 import com.kirjaswappi.backend.common.service.entities.AdminUser;
 import com.kirjaswappi.backend.common.service.exceptions.InvalidCredentials;
 import com.kirjaswappi.backend.common.service.mappers.AdminUserMapper;
-import com.kirjaswappi.backend.common.utils.JwtUtil;
 import com.kirjaswappi.backend.service.exceptions.UserAlreadyExistsException;
 import com.kirjaswappi.backend.service.exceptions.UserNotFoundException;
 
@@ -26,8 +25,6 @@ public class AdminUserService {
   private AdminUserRepository adminUserRepository;
   @Autowired
   private AdminUserMapper mapper;
-  @Autowired
-  private JwtUtil jwtTokenUtil;
 
   public AdminUser getAdminUserInfo(String username) {
     return mapper.toEntity(adminUserRepository.findByUsername(username)
