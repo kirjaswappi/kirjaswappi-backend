@@ -12,7 +12,7 @@ import com.kirjaswappi.backend.jpa.daos.UserDao;
 import com.kirjaswappi.backend.service.entities.User;
 
 @Component
-@NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
+@NoArgsConstructor
 public class UserMapper {
   public static User toEntity(UserDao dao) {
     var entity = new User();

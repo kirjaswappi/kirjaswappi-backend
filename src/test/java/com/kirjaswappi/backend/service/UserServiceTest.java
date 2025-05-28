@@ -287,7 +287,6 @@ class UserServiceTest {
     when(bookRepository.findByIdAndIsDeletedFalse("bookId")).thenReturn(Optional.of(bookDao));
     when(userRepository.save(userDao)).thenReturn(userDao);
     when(userRepository.findByIdAndIsEmailVerifiedTrue("id")).thenReturn(Optional.of(userDao));
-//    when(userService.getUser("id")).thenReturn(user);
     assertNotNull(userService.addFavouriteBook(user));
   }
 }

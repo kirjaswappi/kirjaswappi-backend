@@ -7,28 +7,163 @@ package com.kirjaswappi.backend.common.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import com.kirjaswappi.backend.common.jpa.daos.OTPDao;
+import com.kirjaswappi.backend.common.jpa.repositories.OTPRepository;
+import com.kirjaswappi.backend.common.service.entities.OTP;
+import com.kirjaswappi.backend.common.service.mappers.OTPMapper;
+import com.kirjaswappi.backend.service.UserService;
+import com.kirjaswappi.backend.service.exceptions.BadRequestException;
+import com.kirjaswappi.backend.service.exceptions.ResourceNotFoundException;
+import com.kirjaswappi.backend.service.exceptions.UserNotFoundException;
+
 class OTPServiceTest {
+  @Mock
+  private OTPRepository otpRepository;
+  @Mock
+  private OTPMapper otpMapper;
+  @Mock
+  private UserService userService;
+  @Mock
+  private EmailService emailService;
   @InjectMocks
   private OTPService otpService;
+
+  private final String email = "test@example.com";
+  private final String otpValue = "123456";
+  private OTP otp;
 
   @BeforeEach
   void setUp() {
     MockitoAnnotations.openMocks(this);
+    otp = new OTP();
+    otp.setEmail(email);
+    otp.setOtp(otpValue);
+    otp.setCreatedAt(Instant.now());
   }
 
   @Test
-  @DisplayName("Should throw exception when OTP is invalid")
-  void verifyOTPThrowsOnInvalid() {
-    // Add logic to simulate invalid OTP and assert exception
-    // Example: assertThrows(InvalidOtpException.class, () ->
-    // otpService.verifyOTPByEmail(...));
+  @DisplayName("Should throw exception when OTP not found")
+  void verifyOTPThrowsWhenNotFound() {
+    when(otpRepository.findByEmail(email)).thenReturn(Optional.empty());
+    assertThrows(ResourceNotFoundException.class, () -> otpService.verifyOTPByEmail(otp));
   }
 
-  // Add more tests for saveAndSendOTP, valid OTP, etc.
+  @Test
+  @DisplayName("Should throw exception when OTP does not match")
+  void verifyOTPThrowsOnInvalid() {
+    OTPDao dao = new OTPDao(email, "654321", Instant.now());
+    OTP storedOtp = new OTP();
+    storedOtp.setEmail(email);
+    storedOtp.setOtp("654321");
+    storedOtp.setCreatedAt(Instant.now());
+    when(otpRepository.findByEmail(email)).thenReturn(Optional.of(dao));
+    when(otpMapper.toEntity(dao)).thenReturn(storedOtp);
+    assertThrows(BadRequestException.class, () -> otpService.verifyOTPByEmail(otp));
+  }
+
+  @Test
+  @DisplayName("Should throw exception when OTP is expired")
+  void verifyOTPThrowsOnExpired() {
+    OTPDao dao = new OTPDao(email, otpValue, Instant.now().minus(Duration.ofMinutes(16)));
+    OTP storedOtp = new OTP();
+    storedOtp.setEmail(email);
+    storedOtp.setOtp(otpValue);
+    storedOtp.setCreatedAt(Instant.now().minus(Duration.ofMinutes(16)));
+    when(otpRepository.findByEmail(email)).thenReturn(Optional.of(dao));
+    when(otpMapper.toEntity(dao)).thenReturn(storedOtp);
+    assertThrows(BadRequestException.class, () -> otpService.verifyOTPByEmail(otp));
+  }
+
+  @Test
+  @DisplayName("Should verify OTP successfully")
+  void verifyOTPSuccess() {
+    OTPDao dao = new OTPDao(email, otpValue, Instant.now());
+    OTP storedOtp = new OTP();
+    storedOtp.setEmail(email);
+    storedOtp.setOtp(otpValue);
+    storedOtp.setCreatedAt(Instant.now());
+    when(otpRepository.findByEmail(email)).thenReturn(Optional.of(dao));
+    when(otpMapper.toEntity(dao)).thenReturn(storedOtp);
+    doNothing().when(otpRepository).deleteAllByEmail(email);
+    assertEquals(email, otpService.verifyOTPByEmail(otp));
+  }
+
+  @Test
+  @DisplayName("Should throw NPE when OTP is null (service does not handle null)")
+  void verifyOTPThrowsNPEOnNull() {
+    assertThrows(NullPointerException.class, () -> otpService.verifyOTPByEmail(null));
+  }
+
+  @Test
+  @DisplayName("Should throw exception when email is null in OTP")
+  void verifyOTPThrowsOnNullEmail() {
+    OTP nullEmailOtp = new OTP();
+    nullEmailOtp.setEmail(null);
+    nullEmailOtp.setOtp(otpValue);
+    nullEmailOtp.setCreatedAt(Instant.now());
+    assertThrows(ResourceNotFoundException.class, () -> otpService.verifyOTPByEmail(nullEmailOtp));
+  }
+
+  @Test
+  @DisplayName("Should throw exception when saveAndSendOTP called with null email")
+  void saveAndSendOTPThrowsOnNullEmail() {
+    assertThrows(UserNotFoundException.class, () -> otpService.saveAndSendOTP(null));
+  }
+
+  @Test
+  @DisplayName("Should throw exception when OTPRepository throws on findByEmail")
+  void verifyOTPThrowsWhenRepositoryThrows() {
+    when(otpRepository.findByEmail(email)).thenThrow(new RuntimeException("db error"));
+    assertThrows(RuntimeException.class, () -> otpService.verifyOTPByEmail(otp));
+  }
+
+  @Test
+  @DisplayName("Should throw exception when OTPRepository throws on saveAndSendOTP")
+  void saveAndSendOTPThrowsWhenRepositoryThrows() {
+    when(userService.checkIfUserExists(email)).thenReturn(true);
+    doThrow(new RuntimeException("db error")).when(otpRepository).deleteAllByEmail(email);
+    assertThrows(RuntimeException.class, () -> otpService.saveAndSendOTP(email));
+  }
+
+  @Test
+  @DisplayName("Should throw exception when EmailService throws on sendOTPByEmail")
+  void saveAndSendOTPThrowsWhenEmailServiceFails() throws Exception {
+    when(userService.checkIfUserExists(email)).thenReturn(true);
+    doNothing().when(otpRepository).deleteAllByEmail(email);
+    OTPDao dao = new OTPDao(email, otpValue, Instant.now());
+    when(otpMapper.toDao(any())).thenReturn(dao);
+    when(otpRepository.save(any())).thenReturn(dao);
+    doThrow(new RuntimeException("email fail")).when(emailService).sendOTPByEmail(any(), any());
+    assertThrows(RuntimeException.class, () -> otpService.saveAndSendOTP(email));
+  }
+
+  @Test
+  @DisplayName("Should throw exception when user not found for OTP")
+  void saveAndSendOTPThrowsWhenUserNotFound() {
+    when(userService.checkIfUserExists(email)).thenReturn(false);
+    assertThrows(UserNotFoundException.class, () -> otpService.saveAndSendOTP(email));
+  }
+
+  @Test
+  @DisplayName("Should save and send OTP successfully")
+  void saveAndSendOTPSuccess() throws Exception {
+    when(userService.checkIfUserExists(email)).thenReturn(true);
+    doNothing().when(otpRepository).deleteAllByEmail(email);
+    OTPDao dao = new OTPDao(email, otpValue, Instant.now());
+    when(otpMapper.toDao(any())).thenReturn(dao);
+    when(otpRepository.save(any())).thenReturn(dao);
+    doNothing().when(emailService).sendOTPByEmail(any(), any());
+    assertEquals(email, otpService.saveAndSendOTP(email));
+  }
 }
