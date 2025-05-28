@@ -4,8 +4,6 @@
  */
 package com.kirjaswappi.backend.mapper;
 
-import java.util.List;
-
 import lombok.NoArgsConstructor;
 
 import org.springframework.stereotype.Component;
@@ -30,27 +28,13 @@ public class UserMapper {
     entity.setCountry(dao.getCountry());
     entity.setPhoneNumber(dao.getPhoneNumber());
     entity.setAboutMe(dao.getAboutMe());
-    if (dao.getFavGenres() != null) {
-      entity.setFavGenres(dao.getFavGenres().stream().map(GenreMapper::toEntity).toList());
-    }
+    entity.setFavGenres(
+        dao.getFavGenres() != null ? dao.getFavGenres().stream().map(GenreMapper::toEntity).toList() : null);
     entity.setProfilePhoto(dao.getProfilePhoto() != null ? dao.getProfilePhoto() : null);
     entity.setCoverPhoto(dao.getCoverPhoto() != null ? dao.getCoverPhoto() : null);
     entity.setBooks(dao.getBooks() != null ? dao.getBooks().stream().map(BookMapper::toEntity).toList() : null);
-    if (dao.getFavBooks() != null) {
-      entity.setFavBooks(dao.getFavBooks().stream().map(bookDao -> {
-        if (bookDao.getLanguage() == null)
-          bookDao.setLanguage("English");
-        if (bookDao.getCondition() == null)
-          bookDao.setCondition("Good");
-        if (bookDao.getGenres() == null)
-          bookDao.setGenres(List.of());
-        if (bookDao.getCoverPhotos() == null)
-          bookDao.setCoverPhotos(List.of());
-        return BookMapper.toEntity(bookDao);
-      }).toList());
-    } else {
-      entity.setFavBooks(null);
-    }
+    entity
+        .setFavBooks(dao.getFavBooks() != null ? dao.getFavBooks().stream().map(BookMapper::toEntity).toList() : null);
     return entity;
   }
 

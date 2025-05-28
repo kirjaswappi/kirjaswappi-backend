@@ -32,6 +32,7 @@ import com.kirjaswappi.backend.service.entities.SwapCondition;
 import com.kirjaswappi.backend.service.entities.User;
 import com.kirjaswappi.backend.service.enums.Condition;
 import com.kirjaswappi.backend.service.enums.Language;
+import com.kirjaswappi.backend.service.enums.SwapType;
 import com.kirjaswappi.backend.service.exceptions.BookNotFoundException;
 import com.kirjaswappi.backend.service.filters.FindAllBooksFilter;
 
@@ -89,7 +90,8 @@ class BookServiceTest {
   @DisplayName("Saves a new book")
   void createBookSavesBook() {
     Book book = new Book();
-    book.setSwapCondition(new SwapCondition());
+    book.setSwapCondition(new SwapCondition(
+        SwapType.OPEN_FOR_OFFERS, false, true, null, null));
     book.setLanguage(Language.ENGLISH);
     book.setCondition(Condition.NEW);
     book.setGenres(List.of());
@@ -108,7 +110,7 @@ class BookServiceTest {
     var bookDao = new BookDao();
     bookDao.setId("id");
     bookDao.setSwapCondition(
-        new SwapConditionDao("ByBooks", false, false, List.of(), List.of()));
+        new SwapConditionDao("OpenForOffers", false, true, null, null));
     bookDao.setOwner(userDao);
     bookDao.setLanguage("English");
     bookDao.setCondition("New");
@@ -124,7 +126,8 @@ class BookServiceTest {
   void updateBookUpdatesBook() {
     Book book = new Book();
     book.setId("id");
-    book.setSwapCondition(new SwapCondition());
+    book.setSwapCondition(new SwapCondition(
+        SwapType.OPEN_FOR_OFFERS, false, true, null, null));
     book.setLanguage(Language.ENGLISH);
     book.setCondition(Condition.NEW);
     book.setGenres(List.of());
@@ -134,7 +137,7 @@ class BookServiceTest {
     var dao = new BookDao();
     dao.setId("id");
     dao.setSwapCondition(
-        new SwapConditionDao("ByBooks", false, false, List.of(), List.of()));
+        new SwapConditionDao("OpenForOffers", false, true, null, null));
     dao.setOwner(new UserDao());
     dao.setLanguage("English");
     dao.setCondition("New");

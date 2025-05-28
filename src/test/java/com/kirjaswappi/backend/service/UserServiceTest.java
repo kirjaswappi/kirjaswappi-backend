@@ -26,6 +26,8 @@ import com.kirjaswappi.backend.jpa.repositories.UserRepository;
 import com.kirjaswappi.backend.service.entities.Book;
 import com.kirjaswappi.backend.service.entities.Genre;
 import com.kirjaswappi.backend.service.entities.User;
+import com.kirjaswappi.backend.service.enums.Condition;
+import com.kirjaswappi.backend.service.enums.Language;
 import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 import com.kirjaswappi.backend.service.exceptions.BookNotFoundException;
 import com.kirjaswappi.backend.service.exceptions.UserAlreadyExistsException;
@@ -240,11 +242,15 @@ class UserServiceTest {
     user.setId("id");
     Book book = new Book();
     book.setId("bookId");
+    book.setLanguage(Language.ENGLISH);
+    book.setCondition(Condition.NEW);
     user.setFavBooks(List.of(book));
     UserDao userDao = new UserDao();
     userDao.setId("id");
     BookDao bookDao = new BookDao();
     bookDao.setId("bookId");
+    bookDao.setLanguage("English");
+    bookDao.setCondition("New");
     UserDao ownerDao = new UserDao();
     ownerDao.setId("other");
     bookDao.setOwner(ownerDao);
@@ -259,21 +265,29 @@ class UserServiceTest {
   void addFavouriteBookSuccess() {
     User user = new User();
     user.setId("id");
-    Book book = new Book();
-    book.setId("bookId");
-    user.setFavBooks(List.of(book));
+    Book favBook = new Book();
+    favBook.setId("bookId");
+    favBook.setLanguage(Language.ENGLISH);
+    favBook.setCondition(Condition.NEW);
+    favBook.setGenres(
+        List.of(new Genre("genreId", "Genre Name", null)));
+    user.setFavBooks(List.of(favBook));
     UserDao userDao = new UserDao();
     userDao.setId("id");
     BookDao bookDao = new BookDao();
     bookDao.setId("bookId");
+    bookDao.setLanguage("English");
+    bookDao.setCondition("New");
+    bookDao.setGenres(List.of(new GenreDao("genreId", "Genre Name", null)));
     UserDao ownerDao = new UserDao();
     ownerDao.setId("other");
     bookDao.setOwner(ownerDao);
-    userDao.setFavBooks(new java.util.ArrayList<>());
+    userDao.setFavBooks(null);
     when(userRepository.findByIdAndIsEmailVerifiedTrue("id")).thenReturn(Optional.of(userDao));
     when(bookRepository.findByIdAndIsDeletedFalse("bookId")).thenReturn(Optional.of(bookDao));
     when(userRepository.save(userDao)).thenReturn(userDao);
     when(userRepository.findByIdAndIsEmailVerifiedTrue("id")).thenReturn(Optional.of(userDao));
+//    when(userService.getUser("id")).thenReturn(user);
     assertNotNull(userService.addFavouriteBook(user));
   }
 }

@@ -230,7 +230,7 @@ public class UserService {
     if (user.getFavBooks() == null || user.getFavBooks().isEmpty()) {
       throw new BadRequestException("favBooksListIsNullOrEmpty");
     }
-    var bookId = user.getFavBooks().get(0).getId();
+    var bookId = user.getFavBooks().getFirst().getId();
     var favBookDao = bookRepository.findByIdAndIsDeletedFalse(bookId)
         .orElseThrow(() -> new BookNotFoundException(bookId));
 
@@ -246,7 +246,7 @@ public class UserService {
     if (userDao.getFavBooks() != null)
       userDao.getFavBooks().add(favBookDao);
     else
-      userDao.setFavBooks(new java.util.ArrayList<>(List.of(favBookDao)));
+      userDao.setFavBooks(List.of(favBookDao));
 
     userRepository.save(userDao);
     return getUser(user.getId());

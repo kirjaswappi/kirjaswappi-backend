@@ -23,23 +23,17 @@ public class SwapConditionMapper {
     entity.setSwapType(SwapType.fromCode(dao.getSwapType()));
     entity.setGiveAway(dao.isGiveAway());
     entity.setOpenForOffers(dao.isOpenForOffers());
-    entity.setSwappableGenres(dao.getSwappableGenres().stream().map(GenreMapper::toEntity).toList());
-    entity.setSwappableBooks(dao.getSwappableBooks().stream().map(SwappableBookMapper::toEntity).toList());
+    if (dao.getSwappableGenres() != null) {
+      entity.setSwappableGenres(dao.getSwappableGenres().stream().map(GenreMapper::toEntity).toList());
+    }
+    if (entity.getSwappableBooks() != null) {
+      entity.setSwappableBooks(dao.getSwappableBooks().stream().map(SwappableBookMapper::toEntity).toList());
+    }
     return entity;
   }
 
   public static SwapConditionDao toDao(SwapCondition entity) {
     var dao = new SwapConditionDao();
-    // Defensive: ensure swapType is not null
-    if (entity.getSwapType() == null) {
-      entity.setSwapType(com.kirjaswappi.backend.service.enums.SwapType.BY_BOOKS);
-    }
-    if (entity.getSwappableGenres() == null) {
-      entity.setSwappableGenres(java.util.List.of());
-    }
-    if (entity.getSwappableBooks() == null) {
-      entity.setSwappableBooks(java.util.List.of());
-    }
     dao.setSwapType(entity.getSwapType().getCode());
     dao.setGiveAway(entity.isGiveAway());
     dao.setOpenForOffers(entity.isOpenForOffers());
