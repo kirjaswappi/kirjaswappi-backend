@@ -26,7 +26,7 @@ public class SwapConditionMapper {
     if (dao.getSwappableGenres() != null) {
       entity.setSwappableGenres(dao.getSwappableGenres().stream().map(GenreMapper::toEntity).toList());
     }
-    if (entity.getSwappableBooks() != null) {
+    if (dao.getSwappableBooks() != null) {
       entity.setSwappableBooks(dao.getSwappableBooks().stream().map(SwappableBookMapper::toEntity).toList());
     }
     return entity;
