@@ -1,21 +1,25 @@
-# Use the official Maven image with SAP Machine 21
-FROM maven:3-sapmachine-21
+# Builder stage: build native image
+FROM maven:3-sapmachine-21 AS builder
+WORKDIR /app
+COPY . .
+RUN mvn clean package -Pnative -DskipTests
 
-# Set the working directory inside the container
+# Runtime stage: minimal image
+FROM alpine:latest
 WORKDIR /app
 
-# Copy the project files (including pom.xml)
-COPY . .
+# Copy native executable from builder
+COPY --from=builder /app/target/backend .
 
-# Build the JAR
-RUN mvn package -DskipTests
-
-# Set environment variables
+# Set environment variables (optional)
 ENV SPRING_PROFILES_ACTIVE=cloud
 ENV PORT=10000
 
 # Expose port
 EXPOSE $PORT
 
-# Run the Jar
-CMD ["java", "-jar", "target/backend-1.0.0-SNAPSHOT.jar"]
+# Make sure executable has permissions
+RUN chmod +x ./backend
+
+# Run the native executable
+CMD ["./backend"]

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
@@ -15,34 +16,15 @@
 	<version>1.0.0-SNAPSHOT</version>
 	<name>backend</name>
 	<description>Backend for KirjaSwappi</description>
-	<url/>
-	<licenses>
-		<license/>
-	</licenses>
-	<developers>
-		<developer/>
-	</developers>
-	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
-	</scm>
-	<distributionManagement>
-		<repository>
-			<id>github</id>
-			<name>GitHub Packages</name>
-			<url>https://maven.pkg.github.com/kirjaswappi/kirjaswappi-backend</url>
-		</repository>
-	</distributionManagement>
 
 	<properties>
 		<java.version>21</java.version>
 		<spring-cloud.version>2024.0.1</spring-cloud.version>
+		<start-class>com.kirjaswappi.backend.BackendApplication</start-class>
 	</properties>
 
 	<dependencies>
-		<!-- Health check -->
+		<!-- Actuator -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
@@ -66,7 +48,7 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
-		<!-- Resilience4j Circuit Breaker -->
+		<!-- Resilience4j -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
@@ -177,16 +159,25 @@
 
 	<build>
 		<plugins>
-			<!-- Native image -->
+			<!-- Native Image Plugin -->
 			<plugin>
 				<groupId>org.graalvm.buildtools</groupId>
 				<artifactId>native-maven-plugin</artifactId>
+				<version>0.10.2</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>compile-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 
-			<!-- Spring Boot -->
+			<!-- Spring Boot Plugin (used only in profile now) -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>3.4.5</version>
 				<configuration>
 					<excludes>
 						<exclude>
@@ -197,7 +188,7 @@
 				</configuration>
 			</plugin>
 
-			<!-- Spotless -->
+			<!-- Spotless Code Formatter -->
 			<plugin>
 				<groupId>com.diffplug.spotless</groupId>
 				<artifactId>spotless-maven-plugin</artifactId>
@@ -230,7 +221,7 @@
 				</executions>
 			</plugin>
 
-			<!-- Jacoco -->
+			<!-- Jacoco Coverage -->
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
@@ -261,4 +252,50 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<!-- Only build native image when -Pnative is passed -->
+		<profile>
+			<id>native</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.graalvm.buildtools</groupId>
+						<artifactId>native-maven-plugin</artifactId>
+						<version>0.10.2</version>
+						<executions>
+							<execution>
+								<goals>
+									<goal>compile-no-fork</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<mainClass>com.kirjaswappi.backend.BackendApplication</mainClass>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<!-- Optional Docker image build profile -->
+		<profile>
+			<id>docker-native</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<goals>
+									<goal>build-image</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
