@@ -1,25 +1,13 @@
-# Stage 1: Build native executable
-FROM ghcr.io/graalvm/native-image-community:latest AS build
-
-# Only install Maven — GraalVM image already has native-image, gcc, etc.
-RUN microdnf install -y maven && microdnf clean all
+FROM maven:3-sapmachine-24
 
 WORKDIR /app
 
 COPY . .
 
-RUN mvn -Pnative package -DskipTests
-
-# Stage 2: Runtime image
-FROM debian:bookworm-slim
-
-WORKDIR /app
-COPY --from=build /app/target/backend ./backend
-
-RUN chmod +x ./backend
+RUN mvn package -DskipTests
 
 ENV SPRING_PROFILES_ACTIVE=cloud
 ENV PORT=10000
 EXPOSE 10000
 
-CMD ["./backend"]
+CMD ["java", "-jar", "target/backend-1.0.0-SNAPSHOT.jar"]
