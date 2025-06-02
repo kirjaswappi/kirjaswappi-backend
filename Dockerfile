@@ -1,4 +1,4 @@
-# Stage 1: Build jar using Maven (with SAP Machine or OpenJDK)
+# Stage 1: Build jar using Maven
 FROM maven:3-sapmachine-24 AS build
 
 WORKDIR /app
