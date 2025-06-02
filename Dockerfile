@@ -1,25 +1,37 @@
-# Builder stage: build native image
-FROM maven:3-sapmachine-21 AS builder
+# Stage 1: Build jar using Maven (with SAP Machine or OpenJDK)
+FROM maven:3-sapmachine-24 AS build
+
 WORKDIR /app
+
 COPY . .
-RUN mvn clean package -Pnative -DskipTests
 
-# Runtime stage: minimal image
-FROM alpine:latest
+RUN mvn package -DskipTests
+
+# Stage 2: Build native image using GraalVM
+FROM ghcr.io/graalvm/native-image-community AS native-build
+
 WORKDIR /app
 
-# Copy native executable from builder
-COPY --from=builder /app/target/backend .
+# Copy the JAR from the Maven build stage
+COPY --from=build /app/target/backend-1.0.0-SNAPSHOT.jar ./app.jar
 
-# Set environment variables (optional)
+# Build native executable from the jar
+RUN native-image --no-fallback -jar app.jar --initialize-at-build-time=org.springframework.boot.loader.nio.file.NestedFileSystemProvider backend
+
+
+# Stage 3: Minimal runtime image with native executable
+FROM alpine:latest
+
+WORKDIR /app
+
+# Copy native executable from native-build stage
+COPY --from=native-build /app/backend .
+
 ENV SPRING_PROFILES_ACTIVE=cloud
 ENV PORT=10000
 
-# Expose port
 EXPOSE $PORT
 
-# Make sure executable has permissions
 RUN chmod +x ./backend
 
-# Run the native executable
 CMD ["./backend"]

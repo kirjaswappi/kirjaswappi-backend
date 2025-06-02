@@ -18,7 +18,7 @@
 	<description>Backend for KirjaSwappi</description>
 
 	<properties>
-		<java.version>21</java.version>
+		<java.version>24</java.version>
 		<spring-cloud.version>2024.0.1</spring-cloud.version>
 		<start-class>com.kirjaswappi.backend.BackendApplication</start-class>
 	</properties>
@@ -64,7 +64,8 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<optional>true</optional>
+			<version>1.18.38</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- Testing -->
@@ -159,32 +160,27 @@
 
 	<build>
 		<plugins>
-			<!-- Native Image Plugin -->
-			<plugin>
-				<groupId>org.graalvm.buildtools</groupId>
-				<artifactId>native-maven-plugin</artifactId>
-				<version>0.10.2</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>compile-no-fork</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
-			<!-- Spring Boot Plugin (used only in profile now) -->
+			<!-- Spring Boot Plugin -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<version>3.4.5</version>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.11.0</version>
 				<configuration>
-					<excludes>
-						<exclude>
+					<source>24</source>
+					<target>24</target>
+					<annotationProcessorPaths>
+						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
-						</exclude>
-					</excludes>
+							<version>1.18.38</version>
+						</path>
+					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
 
@@ -293,9 +289,15 @@
 								</goals>
 							</execution>
 						</executions>
+						<configuration>
+							<image>
+								<name>docker.io/kirjaswappi/backend-native:latest</name>
+							</image>
+						</configuration>
 					</plugin>
 				</plugins>
 			</build>
 		</profile>
 	</profiles>
+
 </project>
