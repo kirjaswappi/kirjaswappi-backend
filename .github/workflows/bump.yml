@@ -12,29 +12,33 @@ on:
       - main
 
 jobs:
-  reusable-steps:
-    name: Common reusable steps
+  deploy-doc:
+    if: ${{ github.event_name == 'push' }}
+    name: Deploy API documentation on Bump.sh
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-      - name: Bump.sh action
+        uses: actions/checkout@v3
+      - name: Deploy API documentation
         uses: bump-sh/github-action@v1
         with:
           doc: openapi
           token: ${{secrets.BUMP_TOKEN}}
           file: doc/api-documentation.yml
-
-  deploy-doc:
-    if: ${{ github.event_name == 'push' }}
-    name: Deploy API documentation on Bump.sh
-    uses: ./.github/workflows/bump.yml#reusable-steps
-
   api-diff:
     if: ${{ github.event_name == 'pull_request' }}
     name: Check API diff on Bump.sh
-    uses: ./.github/workflows/bump.yml#reusable-steps
-    with:
-      command: diff
-    env:
-      GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Comment pull request with API diff
+        uses: bump-sh/github-action@v1
+        with:
+          doc: openapi
+          token: ${{secrets.BUMP_TOKEN}}
+          file: doc/api-documentation.yml
+          command: diff
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
