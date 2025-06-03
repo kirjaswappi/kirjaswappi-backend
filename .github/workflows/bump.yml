@@ -14,20 +14,27 @@ on:
 
 jobs:
   generate-openapi:
-    name: Generate OpenAPI spec (via Maven plugin)
+    name: Generate OpenAPI spec (by running app)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-        
+
       - name: Set up JDK 24
         uses: actions/setup-java@v3
         with:
           java-version: '24'
           distribution: 'temurin'
 
-      - name: Generate OpenAPI spec
-        run: mvn clean compile springdoc-openapi:generate
+      - name: Build and run Spring Boot app
+        run: |
+          mvn spring-boot:run &
+          sleep 30  # adjust if app takes longer
+
+      - name: Download OpenAPI spec
+        run: |
+          mkdir -p doc
+          curl -s http://localhost:8080/v3/api-docs.yaml -o doc/api-documentation.yml
 
       - name: Upload OpenAPI artifact
         uses: actions/upload-artifact@v4
@@ -41,6 +48,9 @@ jobs:
     name: Deploy API documentation on Bump.sh
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Download OpenAPI artifact
         uses: actions/download-artifact@v4
         with:
@@ -60,6 +70,9 @@ jobs:
     name: Check API diff on Bump.sh
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Download OpenAPI artifact
         uses: actions/download-artifact@v4
         with:
