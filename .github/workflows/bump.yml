@@ -15,10 +15,16 @@ on:
 jobs:
   generate-openapi:
     name: Generate OpenAPI spec (via Maven plugin)
-    runs-on: maven:3-sapmachine-24
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        
+      - name: Set up JDK 24
+        uses: actions/setup-java@v3
+        with:
+          java-version: '24'
+          distribution: 'temurin'
 
       - name: Generate OpenAPI spec
         run: mvn clean compile springdoc-openapi:generate
