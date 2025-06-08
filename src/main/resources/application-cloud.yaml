@@ -28,4 +28,6 @@ jwt:
   expiration: 300000
 
 unleash:
+  url: ${UNLEASH_URL}
+  instanceId: ${UNLEASH_INSTANCE_ID}
   apiKey: ${UNLEASH_API_KEY}
