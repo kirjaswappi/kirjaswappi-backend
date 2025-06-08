@@ -150,6 +150,13 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<!-- Unleash -->
+		<dependency>
+			<groupId>io.getunleash</groupId>
+			<artifactId>unleash-client-java</artifactId>
+			<version>LATEST</version>
+		</dependency>
 	</dependencies>
 
 	<dependencyManagement>

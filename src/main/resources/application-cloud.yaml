@@ -26,3 +26,6 @@ s3:
 jwt:
   secret: ${JWT_SECRET}
   expiration: 300000
+
+unleash:
+  apiKey: ${UNLEASH_API_KEY}
