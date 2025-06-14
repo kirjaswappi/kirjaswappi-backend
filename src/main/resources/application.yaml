@@ -16,13 +16,15 @@ spring:
       max-request-size: 100MB
 
   mail:
-    host: smtp.zoho.com
-    port: 587
+    host: ${EMAIL_HOST}
+    port: ${EMAIL_PORT}
     username: ${EMAIL_USERNAME}
     password: ${EMAIL_PASSWORD}
     properties:
       mail:
         debug: true
+        default:
+          encoding: UTF-8
         smtp:
           from: ${EMAIL_USERNAME}
           auth: true
@@ -30,12 +32,11 @@ spring:
             enable: true
             required: true
           ssl:
-            trust: smtp.zoho.com
+            trust: ${EMAIL_HOST}
           connectiontimeout: 5000
           timeout: 5000
           writetimeout: 5000
-        default:
-          encoding: UTF-8
+
 
 resilience4j.retry:
   instances:
