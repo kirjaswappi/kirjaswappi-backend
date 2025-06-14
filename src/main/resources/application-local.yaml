@@ -7,6 +7,18 @@ spring:
       autoIndexCreation: true
       uri: mongodb://localhost:27017/kirjaswappi
       database: kirjaswappi
+  mail:
+    host: smtp.example.com
+    port: 587
+    username: test@example.com
+    password: test
+    from-email: test@example.com
+    properties:
+      mail:
+        smtp:
+          from: test@example.com
+          ssl:
+            trust: smtp.example.com
 
 server:
   port: 8080

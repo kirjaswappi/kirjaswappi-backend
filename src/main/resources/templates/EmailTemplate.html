@@ -4,16 +4,73 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OTP Verification</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+        body {
+            font-family: 'Poppins', Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .email-header {
+            background-color: #007bff;
+            color: #ffffff;
+            text-align: center;
+            padding: 20px;
+        }
+        .email-header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .email-body {
+            padding: 30px 20px;
+            color: #333333;
+            line-height: 1.6;
+            text-align: center;
+        }
+        .email-body h3 {
+            font-size: 28px;
+            font-weight: bold;
+            color: #007bff;
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #f0f8ff;
+            border: 1px solid #007bff;
+            border-radius: 8px;
+            display: inline-block;
+        }
+        .email-footer {
+            text-align: center;
+            padding: 15px;
+            font-size: 12px;
+            color: #777777;
+            background-color: #f9f9f9;
+        }
+    </style>
 </head>
-<body style="font-family: Arial, sans-serif; background-color: #f5f5f5; padding: 20px;">
-<div style="background-color: #ffffff; border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-    <p>Hello,</p>
-    <p>Your One-Time Password (OTP) for account verification is:</p>
-    <h3 style="font-size: 24px; font-weight: bold; color: #007bff;">{{otp}}</h3>
-    <p>This OTP is valid for 15 minutes.</p>
-    <p>If you didn't request this verification, please ignore this email.</p><br/>
-    <p>Best regards,</p>
-    <p>Your KirjaSwappi Team</p>
-</div>
+<body>
+    <div class="email-container">
+        <div class="email-header">
+            <h1>KirjaSwappi</h1>
+        </div>
+        <div class="email-body">
+            <p>Your verification code is:</p>
+            <h3>{{otp}}</h3>
+            <p>Valid for 15 minutes.</p>
+        </div>
+        <div class="email-footer">
+            <p>&copy; 2025 KirjaSwappi. All rights reserved.</p>
+        </div>
+    </div>
 </body>
 </html>
