@@ -39,8 +39,8 @@ public class EmailService {
 
   @PostConstruct
   public void validateConfiguration() {
-    String username = env.getProperty("spring.mail.username");
-    if (username == null || username.trim().isEmpty()) {
+    String senderEmail = env.getProperty("spring.mail.from-email");
+    if (senderEmail == null || senderEmail.trim().isEmpty()) {
       logger.warn("Email sender address is not configured. Emails will not be sent properly.");
     }
   }
@@ -101,7 +101,7 @@ public class EmailService {
     MimeMessage message = mailSender.createMimeMessage();
     try {
       MimeMessageHelper helper = new MimeMessageHelper(message, true, StandardCharsets.UTF_8.name());
-      String from = Objects.requireNonNull(env.getProperty("spring.mail.username"), "Sender email is not configured");
+      String from = Objects.requireNonNull(env.getProperty("spring.mail.from-email"), "Sender email is not configured");
       helper.setFrom(from);
       helper.setTo(to);
       helper.setSubject(subject);

@@ -50,7 +50,7 @@ class EmailServiceTest {
   @Test
   @DisplayName("Should validate configuration and log warning when email sender not configured")
   void validateConfigurationLogWarningWhenNoSender() {
-    when(env.getProperty("spring.mail.username")).thenReturn(null);
+    when(env.getProperty("spring.mail.from-email")).thenReturn(null);
     emailService.validateConfiguration();
     // This test verifies that the method executes without exception
     // Ideally we would test for log output but that requires additional setup
@@ -59,7 +59,7 @@ class EmailServiceTest {
   @Test
   @DisplayName("Should validate configuration without warning when email sender is configured")
   void validateConfigurationSuccessWhenSenderConfigured() {
-    when(env.getProperty("spring.mail.username")).thenReturn("test@example.com");
+    when(env.getProperty("spring.mail.from-email")).thenReturn("test@example.com");
     emailService.validateConfiguration();
     // No exception means success
   }
@@ -115,7 +115,7 @@ class EmailServiceTest {
   void sendEmailSuccess() throws Exception {
     MimeMessage message = mock(MimeMessage.class);
     when(mailSender.createMimeMessage()).thenReturn(message);
-    when(env.getProperty("spring.mail.username")).thenReturn("from@example.com");
+    when(env.getProperty("spring.mail.from-email")).thenReturn("from@example.com");
     doNothing().when(mailSender).send(any(MimeMessage.class));
 
     // Use reflection to access the private method
@@ -144,7 +144,7 @@ class EmailServiceTest {
   void sendEmailHandlesNullFrom() throws Exception {
     MimeMessage message = mock(MimeMessage.class);
     when(mailSender.createMimeMessage()).thenReturn(message);
-    when(env.getProperty("spring.mail.username")).thenReturn(null);
+    when(env.getProperty("spring.mail.from-email")).thenReturn(null);
 
     // Use reflection to access the private method
     Method sendEmailMethod = EmailService.class.getDeclaredMethod("sendEmail", String.class, String.class,
@@ -163,10 +163,9 @@ class EmailServiceTest {
   void sendEmailHandlesMessagingException() throws Exception {
     MimeMessage message = mock(MimeMessage.class);
     when(mailSender.createMimeMessage()).thenReturn(message);
-    when(env.getProperty("spring.mail.username")).thenReturn("from@example.com");
+    when(env.getProperty("spring.mail.from-email")).thenReturn("from@example.com");
 
-    // Use MailSendException which is an unchecked RuntimeException instead of
-    // MessagingException
+    // Simulate a MessagingException when sending the email
     doThrow(new MailSendException("Failed to send email")).when(mailSender).send(any(MimeMessage.class));
 
     // Use reflection to access the private method
@@ -193,7 +192,7 @@ class EmailServiceTest {
 
       MimeMessage message = mock(MimeMessage.class);
       when(mailSender.createMimeMessage()).thenReturn(message);
-      when(env.getProperty("spring.mail.username")).thenReturn("from@example.com");
+      when(env.getProperty("spring.mail.from-email")).thenReturn("from@example.com");
       doNothing().when(mailSender).send(any(MimeMessage.class));
 
       assertDoesNotThrow(() -> emailService.sendOTPByEmail("to@example.com", "123456"));

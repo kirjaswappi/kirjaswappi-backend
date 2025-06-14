@@ -20,9 +20,10 @@ spring:
     port: ${EMAIL_PORT}
     username: ${EMAIL_USERNAME}
     password: ${EMAIL_PASSWORD}
+    from-email: ${EMAIL_FROM}
     properties:
       mail:
-        debug: true
+        debug: false
         default:
           encoding: UTF-8
         smtp:
