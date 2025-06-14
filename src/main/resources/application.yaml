@@ -1,6 +1,4 @@
 spring:
-  mvc:
-    throw-exception-if-no-handler-found: true
   web:
     resources:
       add-mappings: false
@@ -18,33 +16,46 @@ spring:
       max-request-size: 100MB
 
   mail:
-    host: smtp.gmail.com
-    port: 587
+    host: ${EMAIL_HOST}
+    port: ${EMAIL_PORT}
     username: ${EMAIL_USERNAME}
     password: ${EMAIL_PASSWORD}
+    from-email: ${EMAIL_FROM}
     properties:
       mail:
         debug: false
+        default:
+          encoding: UTF-8
         smtp:
+          from: ${EMAIL_USERNAME}
           auth: true
           starttls:
             enable: true
+            required: true
+          ssl:
+            trust: ${EMAIL_HOST}
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
 
 resilience4j.retry:
   instances:
     globalRetry:
-      maxRetryAttempts: 3
+      maxAttempts: 3
       waitDuration: 1000
       retryExceptions:
         - java.net.SocketTimeoutException
         - java.net.ConnectException
         - org.springframework.dao.OptimisticLockingFailureException
         - org.springframework.web.client.HttpServerErrorException
+        - org.springframework.mail.MailSendException
 
 logging:
   level:
     org:
       springframework:
+        mail: DEBUG
         boot:
           actuate: DEBUG
         security: DEBUG
