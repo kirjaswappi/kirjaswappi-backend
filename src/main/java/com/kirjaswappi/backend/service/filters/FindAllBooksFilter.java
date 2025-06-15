@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 @Getter
@@ -28,7 +29,7 @@ public class FindAllBooksFilter {
       "Fantasy", "Science Fiction", "Mystery", "Horror", "Romance", "Thriller", "Historical Fiction", "Non-Fiction" })
   List<String> genres;
 
-  public Criteria buildSearchAndFilterCriteria() {
+  public Criteria buildSearchAndFilterCriteria(String userId) {
     List<Criteria> combinedCriteria = new ArrayList<>();
 
     // Add search criteria:
@@ -41,9 +42,16 @@ public class FindAllBooksFilter {
 
     // Add filter criteria:
     combinedCriteria.add(Criteria.where("isDeleted").is(false));
+
+    // Filter by owner ID if provided:
+    if (userId != null && !userId.isEmpty()) {
+      combinedCriteria.add(Criteria.where("owner.$id").is(new ObjectId(userId)));
+    }
+
+    // Add language, condition, and genre filters:
     if (languages != null && !languages.isEmpty()) {
       if (languages.size() == 1) {
-        combinedCriteria.add(Criteria.where("language").is(languages.get(0)));
+        combinedCriteria.add(Criteria.where("language").is(languages.getFirst()));
       } else {
         combinedCriteria.add(new Criteria().orOperator(
             languages.stream().map(lang -> Criteria.where("language").is(lang)).toArray(Criteria[]::new)));
@@ -52,7 +60,7 @@ public class FindAllBooksFilter {
 
     if (conditions != null && !conditions.isEmpty()) {
       if (conditions.size() == 1) {
-        combinedCriteria.add(Criteria.where("condition").is(conditions.get(0)));
+        combinedCriteria.add(Criteria.where("condition").is(conditions.getFirst()));
       } else {
         combinedCriteria.add(new Criteria().orOperator(
             conditions.stream().map(cond -> Criteria.where("condition").is(cond)).toArray(Criteria[]::new)));
@@ -61,7 +69,7 @@ public class FindAllBooksFilter {
 
     if (genres != null && !genres.isEmpty()) {
       if (genres.size() == 1) {
-        combinedCriteria.add(Criteria.where("genres.name").is(genres.get(0)));
+        combinedCriteria.add(Criteria.where("genres.name").is(genres.getFirst()));
       } else {
         combinedCriteria.add(new Criteria().orOperator(
             genres.stream().map(genre -> Criteria.where("genres.name").is(genre)).toArray(Criteria[]::new)));

@@ -9,15 +9,21 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -27,12 +33,17 @@ import com.kirjaswappi.backend.common.service.OTPService;
 import com.kirjaswappi.backend.common.service.exceptions.InvalidCredentials;
 import com.kirjaswappi.backend.http.controllers.UserController;
 import com.kirjaswappi.backend.http.dtos.requests.*;
+import com.kirjaswappi.backend.service.BookService;
 import com.kirjaswappi.backend.service.UserService;
+import com.kirjaswappi.backend.service.entities.Book;
 import com.kirjaswappi.backend.service.entities.Genre;
 import com.kirjaswappi.backend.service.entities.User;
+import com.kirjaswappi.backend.service.enums.Condition;
+import com.kirjaswappi.backend.service.enums.Language;
 import com.kirjaswappi.backend.service.exceptions.BadRequestException;
 import com.kirjaswappi.backend.service.exceptions.BookNotFoundException;
 import com.kirjaswappi.backend.service.exceptions.UserNotFoundException;
+import com.kirjaswappi.backend.service.filters.FindAllBooksFilter;
 
 @WebMvcTest(UserController.class)
 @Import(CustomMockMvcConfiguration.class)
@@ -50,6 +61,9 @@ public class UserControllerTest {
 
   @MockBean
   private OTPService otpService;
+
+  @MockBean
+  private BookService bookService;
 
   private User user;
 
@@ -197,6 +211,72 @@ public class UserControllerTest {
         .header("Authorization ", "Bearer a.b.c"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.message").value("Password changed for user: test@example.com"));
+  }
+
+  @Test
+  @DisplayName("Should find books by user ID with filter")
+  void shouldFindUserBooks() throws Exception {
+    // Prepare test data
+    String userId = "1";
+    Book book = new Book();
+    book.setId("book123");
+    book.setTitle("Test");
+    book.setAuthor("Test Author");
+    book.setGenres(new ArrayList<>());
+    book.setLanguage(Language.BENGALI);
+    book.setCondition(Condition.FAIR);
+    book.setOwner(user);
+
+    Page<Book> bookPage = new PageImpl<>(List.of(book), PageRequest.of(0, 10), 1);
+
+    // Setup mocks
+    when(bookService.getUserBooksByFilter(
+        Mockito.eq(userId),
+        any(FindAllBooksFilter.class),
+        any(Pageable.class)))
+            .thenReturn(bookPage);
+
+    // Execute and verify
+    mockMvc.perform(get(API_BASE + "/" + userId + "/books")
+        .param("page", "0")
+        .param("size", "10")
+        .header("Authorization", "Bearer a.b.c"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$._embedded.books[0].id").value("book123"))
+        .andExpect(jsonPath("$._embedded.books[0].title").value("Test"))
+        .andExpect(jsonPath("$._embedded.books[0].author").value("Test Author"))
+        .andExpect(jsonPath("$.page.totalElements").value(1));
+  }
+
+  @Test
+  @DisplayName("Should return 404 when user ID not found in findUserBooks")
+  void shouldReturnNotFoundWhenUserIdNotFoundInFindUserBooks() throws Exception {
+    when(bookService.getUserBooksByFilter(
+        Mockito.eq("non-existent"),
+        any(FindAllBooksFilter.class),
+        any(Pageable.class)))
+            .thenThrow(new UserNotFoundException("non-existent"));
+
+    mockMvc.perform(get(API_BASE + "/non-existent/books")
+        .header("Authorization", "Bearer a.b.c"))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  @DisplayName("Should return empty page when user has no books")
+  void shouldReturnEmptyPageWhenUserHasNoBooks() throws Exception {
+    Page<Book> emptyPage = new PageImpl<>(List.of(), PageRequest.of(0, 10), 0);
+
+    when(bookService.getUserBooksByFilter(
+        Mockito.eq("1"),
+        any(FindAllBooksFilter.class),
+        any(Pageable.class)))
+            .thenReturn(emptyPage);
+
+    mockMvc.perform(get(API_BASE + "/1/books")
+        .header("Authorization", "Bearer a.b.c"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.page.totalElements").value(0));
   }
 
   private static User getUpdatedUser() {

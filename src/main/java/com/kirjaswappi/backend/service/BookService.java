@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import jakarta.validation.Valid;
+
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,6 +18,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -97,11 +100,8 @@ public class BookService {
   }
 
   public Page<Book> getAllBooksByFilter(FindAllBooksFilter filter, Pageable pageable) {
-    var criteria = filter.buildSearchAndFilterCriteria();
-    pageable = getPageableWithValidSortingCriteria(pageable);
-    var bookDaos = bookRepository.findAllBooksByFilter(criteria, pageable);
-    var books = bookDaos.stream().map(this::bookWithCoverPhotoUrl).toList();
-    return new PageImpl<>(books, pageable, bookDaos.getTotalElements());
+    var criteria = filter.buildSearchAndFilterCriteria(null);
+    return getBooks(pageable, criteria);
   }
 
   // keeping the book cover photo for future references
@@ -305,5 +305,18 @@ public class BookService {
     return owner.getBooks().stream()
         .filter(book -> !book.getId().equals(bookId)) // Exclude the current book
         .map(this::bookWithImageUrlAndOwner).toList();
+  }
+
+  public Page<Book> getUserBooksByFilter(String id, @Valid FindAllBooksFilter filter, Pageable pageable) {
+    var criteria = filter.buildSearchAndFilterCriteria(id);
+    return getBooks(pageable, criteria);
+  }
+
+  @NotNull
+  private PageImpl<Book> getBooks(Pageable pageable, Criteria criteria) {
+    pageable = getPageableWithValidSortingCriteria(pageable);
+    var bookDaos = bookRepository.findAllBooksByFilter(criteria, pageable);
+    var books = bookDaos.stream().map(this::bookWithCoverPhotoUrl).toList();
+    return new PageImpl<>(books, pageable, bookDaos.getTotalElements());
   }
 }

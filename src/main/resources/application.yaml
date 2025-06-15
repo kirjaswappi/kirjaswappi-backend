@@ -53,6 +53,7 @@ resilience4j.retry:
 
 logging:
   level:
+    com.kirjaswappi.backend.jpa.repositories.CustomBookRepositoryImpl: DEBUG
     org:
       springframework:
         mail: DEBUG

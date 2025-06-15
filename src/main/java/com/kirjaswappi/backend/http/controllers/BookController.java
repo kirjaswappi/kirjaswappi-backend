@@ -106,7 +106,7 @@ public class BookController {
   @Operation(summary = "Search for books with (optional) filter properties.", responses = {
       @ApiResponse(responseCode = "200", description = "List of Books.") })
   public ResponseEntity<PagedModel<BookListResponse>> findAllBooks(@Valid @ParameterObject FindAllBooksFilter filter,
-      @PageableDefault(size = 10) Pageable pageable) {
+      @PageableDefault() Pageable pageable) {
     Page<Book> books = bookService.getAllBooksByFilter(filter, pageable);
     Page<BookListResponse> response = books.map(BookListResponse::new);
     return ResponseEntity.status(HttpStatus.OK).body(LinkBuilder.forPage(response, API_BASE + BOOKS));
