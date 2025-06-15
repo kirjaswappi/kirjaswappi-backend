@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.query.Criteria;
 
 import com.kirjaswappi.backend.jpa.daos.BookDao;
 import com.kirjaswappi.backend.jpa.daos.SwapConditionDao;
@@ -79,7 +80,7 @@ class BookServiceTest {
   void getAllBooksByFilterReturnsPage() {
     FindAllBooksFilter filter = mock(FindAllBooksFilter.class);
     Pageable pageable = PageRequest.of(0, 10);
-    when(filter.buildSearchAndFilterCriteria()).thenReturn(null);
+    when(filter.buildSearchAndFilterCriteria(null)).thenReturn(null);
     when(bookRepository.findAllBooksByFilter(any(), any())).thenReturn(new PageImpl<>(List.of()));
     Page<Book> result = bookService.getAllBooksByFilter(filter, pageable);
     assertNotNull(result);
@@ -185,8 +186,29 @@ class BookServiceTest {
   }
 
   @Test
+  @DisplayName("Throws when deleting a non-existent book")
   void deleteBookThrowsWhenNotFound() {
     when(bookRepository.findByIdAndIsDeletedFalse("id")).thenReturn(Optional.empty());
     assertThrows(BookNotFoundException.class, () -> bookService.deleteBook("id"));
+  }
+
+  @Test
+  @DisplayName("Returns page of books by user ID and filter")
+  void getUserBooksByFilterReturnsPage() {
+    String userId = "user-123";
+    FindAllBooksFilter filter = mock(FindAllBooksFilter.class);
+    Pageable pageable = PageRequest.of(0, 10);
+    Criteria mockCriteria = mock(Criteria.class);
+
+    when(filter.buildSearchAndFilterCriteria(userId)).thenReturn(mockCriteria);
+    when(bookRepository.findAllBooksByFilter(eq(mockCriteria), any(Pageable.class)))
+        .thenReturn(new PageImpl<>(List.of(), pageable, 0));
+
+    Page<Book> result = bookService.getUserBooksByFilter(userId, filter, pageable);
+
+    assertNotNull(result);
+    assertEquals(0, result.getTotalElements());
+    verify(filter).buildSearchAndFilterCriteria(userId);
+    verify(bookRepository).findAllBooksByFilter(eq(mockCriteria), any(Pageable.class));
   }
 }
