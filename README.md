@@ -6,7 +6,7 @@ This repository contains the `kirjaswappi backend` service for the KirjaSwappi P
 
 ## Local Development Setup
 
-To start developing, you first need to set up your local machine as described [here]().
+To start developing, you first need to set up your local machine with JDK 24.
 
 To build the application and run all tests, execute
 
@@ -28,4 +28,4 @@ mvn spotless:apply
 
 ## API documentation
 
-API documentation available on: [Swagger-UI](https://api.kirjaswappi.fi/swagger-ui/index.html) and [bump-sh](https://bump.sh/kirjaswappi/doc/backend-api).
+API documentation is available on: [Swagger](https://api.kirjaswappi.fi/swagger-ui/index.html) and [Bump](https://bump.sh/kirjaswappi/doc/backend-api).
