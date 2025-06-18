@@ -28,4 +28,4 @@ mvn spotless:apply
 
 ## API documentation
 
-API documentation available on [swagger ui](https://api.kirjaswappi.fi/swagger-ui/index.html).
+API documentation available on: [Swagger-UI](https://api.kirjaswappi.fi/swagger-ui/index.html) and [bump-sh](https://bump.sh/kirjaswappi/doc/backend-api).
